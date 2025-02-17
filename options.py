@@ -29,7 +29,11 @@ class ProviderConfigWidget(QWidget):
         # Endpoint URL
         self.endpoint_edit = QLineEdit()
         layout.addRow("Endpoint URL:", self.endpoint_edit)
-        
+
+        # Model
+        self.model_edit = QLineEdit()
+        layout.addRow("Model:", self.model_edit)
+
         # API Key
         self.api_key_edit = QLineEdit()
         self.api_key_edit.setEchoMode(QLineEdit.Password)
@@ -68,15 +72,17 @@ class ProviderConfigWidget(QWidget):
             "name": self.name_edit.text().strip(),
             "provider": self.provider_combo.currentText(),
             "endpoint": self.endpoint_edit.text().strip(),
+            "model": self.model_edit.text().strip(),
             "api_key": self.api_key_edit.text().strip(),
             "timeout": self.timeout_spin.value()
         }
-    
+
     def set_config(self, config):
         """Set the configuration from a dictionary."""
         self.name_edit.setText(config.get("name", ""))
         self.provider_combo.setCurrentText(config.get("provider", "Local"))
         self.endpoint_edit.setText(config.get("endpoint", ""))
+        self.model_edit.setText(config.get("model", ""))
         self.api_key_edit.setText(config.get("api_key", ""))
         self.timeout_spin.setValue(config.get("timeout", 60))
 
