@@ -110,6 +110,8 @@ class RewriteDialog(QDialog):
             QMessageBox.warning(self, "Rewrite", "Selected prompt has no text.")
             return
         
+        self.new_edit.clear()  # Clear previous rewritten text.
+
         # Construct final prompt.
         final_prompt = f"{prompt_text}\n\nOriginal Passage:\n{self.orig_edit.toPlainText()}"
         
@@ -136,6 +138,7 @@ class RewriteDialog(QDialog):
         self.generate_rewrite()
     
     def apply_rewrite(self):
+        self.rewritten_text = self.new_edit.toPlainText()
         if not self.rewritten_text:
             QMessageBox.warning(self, "Rewrite", "No rewritten text to apply.")
             return

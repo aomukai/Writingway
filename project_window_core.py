@@ -681,12 +681,20 @@ class ProjectWindow(QMainWindow):
         self.worker.data_received.connect(self.update_text)
         self.worker.finished.connect(self.on_finished)
         self.worker.start()
+        self.stop_button.setEnabled(True)
 
     def update_text(self, text):
         self.preview_text.insertPlainText(text)
 
     def on_finished(self):
         self.send_button.setEnabled(True)
+
+    def stop_llm(self):
+        if hasattr(self, 'worker') and self.worker.isRunning():
+            self.worker.terminate()
+            self.stop_button.setEnabled(False)
+        self.send_button.setEnabled(True)
+
 
     def apply_preview(self):
         preview = self.preview_text.toPlainText().strip()
@@ -785,7 +793,7 @@ class ProjectWindow(QMainWindow):
         if self.tts_playing:
             tts_manager.stop()
             self.tts_playing = False
-            self.tts_button.setIcon(QIcon("assets/icons/play-circle.svg"))
+            self.tts_action.setIcon(QIcon("assets/icons/play-circle.svg"))
         else:
             cursor = self.editor.textCursor()
             if cursor.hasSelection():
@@ -798,18 +806,16 @@ class ProjectWindow(QMainWindow):
                 QMessageBox.warning(self, "TTS Warning", "There is no text to read.")
                 return
             self.tts_playing = True
-            self.tts_button.setIcon(QIcon("assets/icons/stop-circle.svg"))
+            self.tts_action.setIcon(QIcon("assets/icons/stop-circle.svg"))
             def run_speech():
                 try:
                     tts_manager.speak(
                         text,
                         start_position=start_position,
-                        on_complete=lambda: QTimer.singleShot(0, lambda: self.tts_button.setIcon(QIcon("assets/icons/play-circle.svg")))
+                        on_complete=lambda: QTimer.singleShot(0, lambda: self.tts_action.setIcon(QIcon("assets/icons/play-circle.svg")))
                     )
                 except Exception as e:
                     print("Error during TTS:", e)
-                finally:
-                    self.tts_playing = False
             threading.Thread(target=run_speech).start()
 
     def perform_tts(self):
