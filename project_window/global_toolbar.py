@@ -21,6 +21,8 @@ class GlobalToolbar(QWidget):
         self.prompt_options_action = self.add_action("assets/icons/settings.svg", "Prompt Options", self.controller.open_prompts_window)
         self.workshop_action = self.add_action("assets/icons/message-square.svg", "Workshop Chat", self.controller.open_workshop)
         self.focus_mode_action = self.add_action("assets/icons/maximize-2.svg", "Focus Mode", self.controller.open_focus_mode)
+        # Update visibility based on LLM availability
+        self.update_visibility()
 
     def add_action(self, icon_path, tooltip, callback):
         action = QAction(self.controller.get_tinted_icon(icon_path, self.tint_color), "", self)
@@ -36,3 +38,9 @@ class GlobalToolbar(QWidget):
         self.prompt_options_action.setIcon(self.controller.get_tinted_icon("assets/icons/settings.svg", tint_color))
         self.workshop_action.setIcon(self.controller.get_tinted_icon("assets/icons/message-square.svg", tint_color))
         self.focus_mode_action.setIcon(self.controller.get_tinted_icon("assets/icons/maximize-2.svg", tint_color))
+
+    def update_visibility(self):
+        """Update visibility of actions that depend on LLM availability."""
+        # If LLM is available, show prompt_options and workshop; otherwise hide them.
+        self.prompt_options_action.setVisible(self.controller.llm_available)
+        self.workshop_action.setVisible(self.controller.llm_available)

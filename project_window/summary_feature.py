@@ -10,7 +10,7 @@ from settings.settings_manager import WWSettingsManager
 class SummaryCreator:
     """A class to handle the creation and management of summaries for a project."""
 
-    def __init__(self, project_window, max_tokens = 16000, encoding_name="cl100k_base"):
+    def __init__(self, project_window, max_tokens=16000, encoding_name="cl100k_base"):
         """
         Initialize the SummaryCreator with a reference to the ProjectWindow.
 
@@ -24,7 +24,13 @@ class SummaryCreator:
     def create_summary(self):
         """
         Create a summary for the selected Act or Chapter in the project tree.
+        If no LLM API key is available, the summary feature is disabled.
         """
+        # Check if LLM API key is configured
+        if not self.project_window.llm_available:
+            self._show_warning("LLM API key not configured. Summary feature is disabled.")
+            return
+
         current_item = self._get_current_tree_item()
         if not self._validate_selection(current_item):
             return
@@ -165,7 +171,7 @@ class SummaryCreator:
             summary_prompts (list): List of summary prompt dictionaries.
 
         Returns:
-            str: The selected prompt text, or None if selection is canceled or invalid.
+            dict: The selected prompt dictionary, or None if selection is canceled or invalid.
         """
         prompt_names = [p.get("name", "Unnamed") for p in summary_prompts]
         selected, ok = QInputDialog.getItem(
@@ -208,7 +214,7 @@ class SummaryCreator:
         Build the final prompt by combining the selected prompt and gathered content.
 
         Args:
-            prompt (str): The selected summary prompt text.
+            prompt (dict): The selected summary prompt dictionary.
             content (str): The gathered child content.
 
         Returns:
@@ -297,7 +303,6 @@ class SummaryCreator:
         Returns:
             str: The generated file path.
         """
-        
         hierarchy = []
         temp = item
         while temp:

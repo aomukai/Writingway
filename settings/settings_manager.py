@@ -47,7 +47,7 @@ class SettingsManager:
                 "provider": "OpenRouter",
                 "endpoint": "https://openrouter.ai/api/v1/",
                 "model": "",
-                "api_key": "sk-or-v1-xxx",
+                "api_key": "",
                 "timeout": 60
             },
             "LMStudio": {

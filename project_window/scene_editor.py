@@ -54,14 +54,15 @@ class SceneEditor(QWidget):
         self.wikidata_dialog_action = self.add_action("wikidata_dialog", "assets/icons/wikidata.svg", "Open Wikipedia", self.controller.open_wikidata_search)
         self.toolbar.addSeparator()
 
-        # POV, Character, Tense Pulldowns
-        pulldown_widget = QWidget()
-        pulldown_layout = QHBoxLayout(pulldown_widget)
-        pulldown_layout.setContentsMargins(0, 0, 0, 0)
-        self.pov_combo = self.add_combo(pulldown_layout, "POV", ["First Person", "Third Person Limited", "Omniscient", "Custom..."], self.controller.handle_pov_change)
-        self.pov_character_combo = self.add_combo(pulldown_layout, "POV Character", ["Alice", "Bob", "Charlie", "Custom..."], self.controller.handle_pov_character_change)
-        self.tense_combo = self.add_combo(pulldown_layout, "Tense", ["Past Tense", "Present Tense", "Custom..."], self.controller.handle_tense_change)
-        self.toolbar.addWidget(pulldown_widget)
+        # POV, Character, Tense Pulldowns - add only if LLM is available
+        if self.controller.llm_available:
+            self.pulldown_widget = QWidget()
+            pulldown_layout = QHBoxLayout(self.pulldown_widget)
+            pulldown_layout.setContentsMargins(0, 0, 0, 0)
+            self.pov_combo = self.add_combo(pulldown_layout, "POV", ["First Person", "Third Person Limited", "Omniscient", "Custom..."], self.controller.handle_pov_change)
+            self.pov_character_combo = self.add_combo(pulldown_layout, "POV Character", ["Alice", "Bob", "Charlie", "Custom..."], self.controller.handle_pov_character_change)
+            self.tense_combo = self.add_combo(pulldown_layout, "Tense", ["Past Tense", "Present Tense", "Custom..."], self.controller.handle_tense_change)
+            self.toolbar.addWidget(self.pulldown_widget)
 
     def add_action(self, name, icon_path, tooltip, callback, checkable=False):
         action = QAction(self.controller.get_tinted_icon(icon_path, self.tint_color), "", self)
@@ -73,7 +74,8 @@ class SceneEditor(QWidget):
         return action
 
     def add_combo(self, layout, label_text, items, callback):
-        layout.addWidget(QLabel(f"{label_text}:"))
+        label = QLabel(f"{label_text}:")
+        layout.addWidget(label)
         combo = QComboBox()
         combo.addItems(items)
         combo.currentIndexChanged.connect(callback)
@@ -92,3 +94,16 @@ class SceneEditor(QWidget):
         self.tint_color = tint_color
         for action in ["bold", "italic", "underline", "tts", "align_left", "align_center", "align_right", "manual_save", "oh_shit", "analysis_editor"]:
             getattr(self, f"{action}_action").setIcon(self.controller.get_tinted_icon(f"assets/icons/{action.replace('_', '-')}.svg", tint_color))
+
+    def update_visibility(self):
+        if hasattr(self, 'pulldown_widget'):
+            if self.controller.llm_available:
+                self.pulldown_widget.show()
+            else:
+                self.pulldown_widget.hide()
+        # Wikidata button should only be visible if internet is available
+        if hasattr(self, 'wikidata_dialog_action'):
+            self.wikidata_dialog_action.setVisible(self.controller.internet_available)
+        # TTS button should be visible only if LLM is available
+        if hasattr(self, 'tts_action'):
+            self.tts_action.setVisible(self.controller.llm_available)
