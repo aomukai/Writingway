@@ -1,6 +1,8 @@
 import os
 import json
 import shutil
+import json
+import random
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QStackedWidget, QHBoxLayout, QVBoxLayout,
     QToolButton, QPushButton, QLabel, QMessageBox, QMenu, QFileDialog, QInputDialog
@@ -327,6 +329,36 @@ class WorkbenchWindow(QMainWindow):
         new_project_button.setToolTip("Create a brand-new project")
         new_project_button.clicked.connect(self.new_project)
         layout.addWidget(new_project_button, alignment=Qt.AlignCenter)
+                
+        # New: Random Quote display under the New Project button
+        self.quoteLabel = QLabel()
+        self.quoteLabel.setObjectName("quoteLabel")
+        self.quoteLabel.setAlignment(Qt.AlignCenter)
+        self.quoteLabel.setWordWrap(True)
+        from PyQt5.QtWidgets import QSizePolicy
+        self.quoteLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # Set style without debugging border and with increased font size
+        self.quoteLabel.setStyleSheet("font-style: italic; color: #666; margin: 10px;")
+        # Load and format the random quote
+        random_quote = self.load_random_quote()
+        print("Loaded quote:", random_quote)
+        quote_text = random_quote.get('text', 'No quote available')
+        author_text = random_quote.get('author', 'Unknown')
+        # Use <div> and <span> for better formatting and center alignment with increased font sizes
+        formatted_text = (
+            f"<html><body>"
+            f"<div style='text-align:center;'>"
+            f"<span style='font-size:18px;'>{quote_text}</span><br/>"
+            f"<span style='font-size:14px; color:#444;'> {author_text}</span>"
+            f"</div>"
+            f"</body></html>"
+        )
+        self.quoteLabel.setText(formatted_text)
+        self.quoteLabel.setTextFormat(Qt.RichText)
+        # Set a larger minimum size to ensure the quote and author are visible
+        self.quoteLabel.setMinimumSize(650, 150)
+        self.quoteLabel.adjustSize()
+        layout.addWidget(self.quoteLabel, alignment=Qt.AlignCenter)
 
         self.coverStack.currentChanged.connect(self.updateCoverStackSize)
         self.load_covers()
@@ -341,6 +373,17 @@ class WorkbenchWindow(QMainWindow):
         version_label.setAlignment(Qt.AlignRight)
         version_layout.addWidget(version_label)
         layout.addLayout(version_layout)
+        
+    def load_random_quote(self):
+        """Load a random quote from quotes.json located in the same directory as the workbench."""
+        quotes_file = os.path.join(os.getcwd(), "quotes.json")
+        try:
+            with open(quotes_file, "r", encoding="utf-8") as f:
+                quotes = json.load(f)
+            return random.choice(quotes)
+        except Exception as e:
+            print(f"Error loading quotes: {e}")
+            return {"text": "No quote available", "author": ""}
 
     def apply_fixed_stylesheet(self):
         fixed_styles = """

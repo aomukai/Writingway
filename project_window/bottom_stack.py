@@ -110,7 +110,7 @@ class BottomStack(QWidget):
         left_layout.addLayout(buttons_layout)
 
         self.context_panel = ContextPanel(self.model.structure, self.model.project_name)
-        self.context_panel.setVisible(False)
+        self.context_panel.setVisible(False)  # Start with context panel hidden
         left_container.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
         action_layout.addWidget(left_container, stretch=2)
         action_layout.addWidget(self.context_panel, stretch=1)
@@ -128,3 +128,13 @@ class BottomStack(QWidget):
         self.stop_button.setIcon(self.controller.get_tinted_icon("assets/icons/x-octagon.svg", tint_color))
         self.context_toggle_button.setIcon(self.controller.get_tinted_icon(
             "assets/icons/book-open.svg" if self.context_panel.isVisible() else "assets/icons/book.svg", tint_color))
+    
+    def update_visibility(self, is_visible):
+        """Control visibility of the bottom stack without affecting layout"""
+        self.setVisible(is_visible)
+        # Make sure the context panel starts hidden even when the bottom stack becomes visible
+        if hasattr(self, 'context_panel') and is_visible:
+            # Only apply the controller's LLM availability to the toggle button state, not directly to visibility
+            self.context_toggle_button.setEnabled(self.controller.llm_available)
+            # The context panel should remain hidden unless explicitly toggled
+            # Do not modify context_panel visibility here
