@@ -2,6 +2,7 @@ import os
 import time
 import json
 import tiktoken
+import requests
 
 from PyQt5.QtWidgets import QMainWindow, QSplitter, QLabel, QShortcut, QMessageBox, QInputDialog, QApplication, QDialog
 from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSlot
@@ -13,6 +14,7 @@ from .scene_editor import SceneEditor
 from .bottom_stack import BottomStack
 from .focus_mode import FocusMode
 from .rewrite_feature import RewriteDialog
+from .right_button import RightButtonMixin  # Upewnij się, że import jest poprawny
 from util.tts_manager import WW_TTSManager
 from .summary_feature import SummaryCreator
 from compendium.compendium_panel import CompendiumPanel
@@ -30,7 +32,7 @@ from .token_limit_dialog import TokenLimitDialog
 import muse.prompt_handler as prompt_handler
 
 
-class ProjectWindow(QMainWindow):
+class ProjectWindow(QMainWindow, RightButtonMixin):
     def __init__(self, project_name):
         super().__init__()
         self.model = ProjectModel(project_name)
@@ -40,14 +42,21 @@ class ProjectWindow(QMainWindow):
         self.current_prose_prompt = None
         self.current_prose_config = None
         self.previous_item = None
+        self.llm_available = False
+        self.internet_available = False
+
+        # First, check LLM connectivity so that we know if API key is available.
+        self.check_llm_connectivity()
+
+        # Now create UI with the correct flag
         self.init_ui()
         self.setup_connections()
         self.read_settings()
         self.load_initial_state()
 
-        # Restore the toolbar if the user invoked toggleViewAction and saved the settings
-        # If we prevent the user from hiding the toolbar, this will be redundant (but harmless)
-        self.global_toolbar.toolbar.show()
+        # Check internet connectivity and update UI accordingly.
+        self.check_internet_connectivity()
+        self.adjust_ui_for_connectivity()
 
     def init_ui(self):
         self.setWindowTitle(f"Project: {self.model.project_name}")
@@ -85,17 +94,70 @@ class ProjectWindow(QMainWindow):
         main_splitter.setStretchFactor(1, 3)  # Right Side
         self.main_splitter = main_splitter
         self.setCentralWidget(main_splitter)
+        
+    def check_llm_connectivity(self):
+        """Check if the active LLM provider has a valid API key configured."""
+        active_provider = WWSettingsManager.get_active_llm_name()
+        config = WWSettingsManager.get_llm_config(active_provider)
+        self.llm_available = bool(config and config.get("api_key"))
 
+    def check_internet_connectivity(self):
+        """Check basic internet connectivity."""
+        try:
+            requests.get("https://www.google.com", timeout=5)
+            self.internet_available = True
+        except (requests.ConnectionError, requests.Timeout):
+            self.internet_available = False
+
+    def adjust_ui_for_connectivity(self):
+        """Adjust UI without disabling core editor functionality."""
+        # Update visibility in UI components
+        if hasattr(self, 'scene_editor'):
+            self.scene_editor.update_visibility()
+
+        if hasattr(self, 'global_toolbar'):
+            self.global_toolbar.update_visibility()
+
+        if hasattr(self, 'bottom_stack'):
+            # Hide BottomStack if LLM is not available
+            self.bottom_stack.setVisible(self.llm_available)
+
+            # Update internal components if they exist
+            if hasattr(self.bottom_stack, 'update_visibility'):
+                self.bottom_stack.update_visibility(self.llm_available)
+
+            if hasattr(self.bottom_stack, 'send_button'):
+                self.bottom_stack.send_button.setEnabled(self.llm_available)
+
+            if hasattr(self.bottom_stack, 'prompt_input'):
+                self.bottom_stack.prompt_input.setReadOnly(not self.llm_available)
+
+        # Adjust splitter sizes
+        if hasattr(self, 'main_splitter'):
+            if self.llm_available:
+                self.main_splitter.setSizes([140, 600])
+            else:
+                self.main_splitter.setSizes([140, 1000])  # More space for editor
+
+        # Keep all text editing elements visible
+        if hasattr(self, 'scene_editor'):
+            self.scene_editor.toolbar.setVisible(True)
+            self.scene_editor.editor.setEnabled(True)
+        
+    def setup_connections(self):
+        self.focus_mode_shortcut = QShortcut(QKeySequence("F11"), self)
+        self.focus_mode_shortcut.activated.connect(self.open_focus_mode)
+        # Disable LLM-dependent functions if not available
+        if not self.llm_available:
+            self.bottom_stack.send_button.setEnabled(False)
+            self.bottom_stack.prompt_input.setReadOnly(True)
+                                        
     def setup_status_bar(self):
         self.setStatusBar(self.statusBar())
         self.word_count_label = QLabel("Words: 0")
         self.last_save_label = QLabel("Last Saved: Never")
         self.statusBar().addPermanentWidget(self.word_count_label)
         self.statusBar().addPermanentWidget(self.last_save_label)
-
-    def setup_connections(self):
-        self.focus_mode_shortcut = QShortcut(QKeySequence("F11"), self)
-        self.focus_mode_shortcut.activated.connect(self.open_focus_mode)
 
     def get_tinted_icon(self, file_path, tint_color=None):
         """Generate a tinted icon from a file path."""
@@ -114,11 +176,25 @@ class ProjectWindow(QMainWindow):
         painter.end()
         return QIcon(tinted_pix)
 
+    def start_autosave_timer(self):
+        self.autosave_timer = QTimer(self)
+        self.autosave_timer.setInterval(300000)  # 5 minutes
+        self.autosave_timer.timeout.connect(self.autosave_scene)
+        self.autosave_timer.start()
+        
     def load_initial_state(self):
-        self.scene_editor.pov_combo.setCurrentText(self.model.settings["global_pov"])
-        self.scene_editor.pov_character_combo.setCurrentText(self.model.settings["global_pov_character"])
-        self.scene_editor.tense_combo.setCurrentText(self.model.settings["global_tense"])
-        self.update_pov_character_dropdown()
+        # Update values in drop-down menus only if LLM is available and widgets exist
+        if self.llm_available and hasattr(self.scene_editor, 'pov_combo'):
+            self.scene_editor.pov_combo.setCurrentText(self.model.settings["global_pov"])
+            self.scene_editor.pov_character_combo.setCurrentText(self.model.settings["global_pov_character"])
+            self.scene_editor.tense_combo.setCurrentText(self.model.settings["global_tense"])
+            self.scene_editor.pulldown_widget.show()
+        elif hasattr(self.scene_editor, 'pulldown_widget'):
+            self.scene_editor.pulldown_widget.hide()
+
+        if self.llm_available:
+            self.update_pov_character_dropdown()
+
         self.populate_prompt_dropdown()
         self.bottom_stack.prompt_input.setPlainText(self.load_prompt_input())
         if self.model.autosave_enabled:
@@ -130,11 +206,8 @@ class ProjectWindow(QMainWindow):
                 if chapter_item.childCount() > 0:
                     self.project_tree.tree.setCurrentItem(chapter_item.child(0))
 
-    def start_autosave_timer(self):
-        self.autosave_timer = QTimer(self)
-        self.autosave_timer.setInterval(300000)  # 5 minutes
-        self.autosave_timer.timeout.connect(self.autosave_scene)
-        self.autosave_timer.start()
+        # Make sure the visibility is updated at the end
+        self.scene_editor.update_visibility()
 
     def read_settings(self):
         settings = QSettings("MyCompany", "WritingwayProject")
@@ -343,11 +416,14 @@ class ProjectWindow(QMainWindow):
         self.model.settings["global_tense"] = value
         self.update_setting_tooltips()
         self.model.save_settings()
-
+        
     def update_setting_tooltips(self):
-        self.scene_editor.pov_combo.setToolTip(f"POV: {self.model.settings['global_pov']}")
-        self.scene_editor.pov_character_combo.setToolTip(f"POV Character: {self.model.settings['global_pov_character']}")
-        self.scene_editor.tense_combo.setToolTip(f"Tense: {self.model.settings['global_tense']}")
+        if hasattr(self.scene_editor, 'pov_combo'):
+            self.scene_editor.pov_combo.setToolTip(f"POV: {self.model.settings['global_pov']}")
+        if hasattr(self.scene_editor, 'pov_character_combo'):
+            self.scene_editor.pov_character_combo.setToolTip(f"POV Character: {self.model.settings['global_pov_character']}")
+        if hasattr(self.scene_editor, 'tense_combo'):
+            self.scene_editor.tense_combo.setToolTip(f"Tense: {self.model.settings['global_tense']}")
 
     def populate_prompt_dropdown(self):
         prose_prompts = []
@@ -661,25 +737,6 @@ class ProjectWindow(QMainWindow):
         self.workshop_window = WorkshopWindow(self)
         self.workshop_window.show()
 
-    def show_editor_context_menu(self, pos):
-        menu = self.scene_editor.editor.createStandardContextMenu()
-        cursor = self.scene_editor.editor.textCursor()
-        if cursor.hasSelection():
-            rewrite_action = menu.addAction("Rewrite")
-            rewrite_action.triggered.connect(self.rewrite_selected_text)
-        menu.exec_(self.scene_editor.editor.mapToGlobal(pos))
-
-    def rewrite_selected_text(self):
-        cursor = self.scene_editor.editor.textCursor()
-        if not cursor.hasSelection():
-            QMessageBox.warning(self, "Rewrite", "No text selected to rewrite.")
-            return
-        selected_text = cursor.selectedText()
-        dialog = RewriteDialog(self.model.project_name, selected_text, self)
-        if dialog.exec_() == QDialog.Accepted:
-            cursor.insertText(dialog.rewritten_text)
-            self.scene_editor.editor.setTextCursor(cursor)
-
     def toggle_context_panel(self):
         context_panel = self.bottom_stack.context_panel
         if context_panel.isVisible():
@@ -690,8 +747,11 @@ class ProjectWindow(QMainWindow):
             context_panel.build_compendium_tree()
             context_panel.setVisible(True)
             self.bottom_stack.context_toggle_button.setIcon(self.get_tinted_icon("assets/icons/book-open.svg"))
-
+            
     def update_pov_character_dropdown(self):
+        if not self.llm_available or not hasattr(self.scene_editor, 'pov_character_combo'):
+            return
+
         compendium_path = WWSettingsManager.get_project_path(self.model.project_name, "compendium.json")
         characters = []
         if os.path.exists(compendium_path):
@@ -755,7 +815,16 @@ class ProjectWindow(QMainWindow):
                 f.write(self.bottom_stack.prompt_input.toPlainText())
         except Exception as e:
             print(f"Error saving prompt input: {e}")
-
+            
+    def open_compendium(self):
+        # If you have a compendium panel, toggle its visibility.
+        if hasattr(self, 'compendium_panel'):
+            visible = self.compendium_panel.isVisible()
+            self.compendium_panel.setVisible(not visible)
+        else:
+            # Otherwise, you can show a message or simply pass.
+            print("Compendium panel not available.")
+            
 if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication
     import sys

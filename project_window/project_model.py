@@ -48,3 +48,7 @@ class ProjectModel:
     def save_scene(self, hierarchy, content):
         """Save scene content with the given hierarchy."""
         return save_scene(self.project_name, hierarchy, content)
+        
+    def check_provider_availability(self, provider_name):
+        config = WWSettingsManager.get_llm_config(provider_name)
+        return bool(config and config.get("api_key"))
