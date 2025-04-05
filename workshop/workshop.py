@@ -260,7 +260,16 @@ class WorkshopWindow(QDialog):
 
             response = WWApiAggregator.send_prompt_to_llm("", overrides=overrides, conversation_history=conversation_payload)
 
-            self.chat_log.append("LLM: " + response)
+            # Format the response to render Markdown-style bold and italic text as HTML.
+            formatted_response = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", response)  # Bold
+            formatted_response = re.sub(r"\*(.*?)\*", r"<i>\1</i>", formatted_response)  # Italic
+
+            # Replace newlines with <br> to preserve paragraph breaks in HTML.
+            formatted_response = formatted_response.replace("\n", "<br>")
+
+            # Append the formatted response to the chat log using insertHtml to preserve structure.
+            self.chat_log.insertHtml(f"<p><b>LLM:</b> {formatted_response}</p>")
+            self.chat_log.insertHtml("<br>")  # Add a blank line for spacing.
             QApplication.processEvents()
 
             self.conversation_history = conversation_payload
@@ -281,7 +290,17 @@ class WorkshopWindow(QDialog):
         for msg in self.conversation_history:
             role = msg.get("role", "Unknown")
             content = msg.get("content", "")
-            self.chat_log.append(f"{role.capitalize()}: {content}")
+
+            # Format Markdown-style bold and italic text as HTML.
+            formatted_content = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", content)  # Bold
+            formatted_content = re.sub(r"\*(.*?)\*", r"<i>\1</i>", formatted_content)  # Italic
+
+            # Replace newlines with <br> to preserve paragraph breaks in HTML.
+            formatted_content = formatted_content.replace("\n", "<br>")
+
+            # Append the formatted content to the chat log.
+            self.chat_log.insertHtml(f"<p><b>{role.capitalize()}:</b> {formatted_content}</p>")
+            self.chat_log.insertHtml("<br>")  # Add a blank line for spacing.
 
     def show_conversation_context_menu(self, pos: QPoint):
         item = self.conversation_list.itemAt(pos)

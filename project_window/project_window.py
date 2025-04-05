@@ -2,6 +2,7 @@ import os
 import time
 import json
 import tiktoken
+import re
 
 from PyQt5.QtWidgets import QMainWindow, QSplitter, QLabel, QShortcut, QMessageBox, QInputDialog, QApplication, QDialog
 from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSlot
@@ -478,7 +479,7 @@ class ProjectWindow(QMainWindow):
             None
         )
         self.bottom_stack.preview_text.clear()
-        self.bottom_stack.preview_text.setReadOnly(True) # User clicks can really mess up the text inserts
+        self.bottom_stack.psetRe # User clicks can really mess up the text insertsadOnly.setRe # User clicks can really mess up the text insertsadOnly(True) # User clicks can really mess up the text inserts
         self.worker = LLMWorker(final_prompt, self.current_prose_config)
         self.worker.data_received.connect(self.update_text)
         self.worker.finished.connect(self.on_finished)
@@ -506,6 +507,13 @@ class ProjectWindow(QMainWindow):
         self.retry_with_summary(truncated)
 
     def update_text(self, text):
+        # Format Markdown-style bold and italic text as HTML.
+        formatted_text = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", text)  # Bold
+        formatted_text = re.sub(r"\*(.*?)\*", r"<i>\1</i>", formatted_text)  # Italic
+        
+        # Replace newlines with <br> to preserve paragraph breaks in HTML.
+        formatted_text = formatted_text.replace("\n", "<br>")
+        
         cursor = self.bottom_stack.preview_text.textCursor()
         cursor.movePosition(QTextCursor.End)  # Move cursor to the end
         self.bottom_stack.preview_text.setTextCursor(cursor)
@@ -514,12 +522,22 @@ class ProjectWindow(QMainWindow):
     def on_finished(self):
         self.bottom_stack.send_button.setEnabled(True)
         self.bottom_stack.preview_text.setReadOnly(False)
+
         if not self.bottom_stack.preview_text.toPlainText().strip():
             QMessageBox.warning(self, "LLM Response", "The LLM did not return any text. Possible token limit reached or an error occurred.")
+            return
+
+        # Format Markdown-style bold and italic text as HTML.
+        raw_text = self.bottom_stack.preview_text.toPlainText()
+        formatted_text = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", raw_text)  # Bold
+        formatted_text = re.sub(r"\*(.*?)\*", r"<i>\1</i>", formatted_text)  # Italic
         
-        # Connect preview_text modified signal if not already connected
-        if not self.bottom_stack.preview_text.receivers(self.bottom_stack.preview_text.textChanged):
-            self.bottom_stack.preview_text.textChanged.connect(self.on_preview_text_changed)
+        # Replace newlines with <br> to preserve paragraph breaks in HTML.
+        formatted_text = formatted_text.replace("\n", "<br>")
+
+
+        # Set the formatted text in the preview text area.
+        self.bottom_stack.preview_text.setHtml(f"<p>{formatted_text}</p>")
 
     def stop_llm(self):
         if hasattr(self, 'worker') and self.worker.isRunning():
@@ -528,21 +546,39 @@ class ProjectWindow(QMainWindow):
         self.bottom_stack.preview_text.setReadOnly(False)
 
     def apply_preview(self):
+        """Appends the LLM's output to the scene editor."""
         preview = self.bottom_stack.preview_text.toPlainText().strip()
         if not preview:
             QMessageBox.warning(self, "Apply Preview", "No preview text to apply.")
             return
+
+        # Include the prompt block if the checkbox is checked
         prompt_block = ""
         if self.bottom_stack.include_prompt_checkbox.isChecked():
             prompt = self.bottom_stack.prompt_input.toPlainText().strip()
             if prompt:
                 prompt_block = f"\n{'_' * 10}\n{prompt}\n{'_' * 10}\n"
+
+        # Format Markdown-style bold and italic text as HTML
+        formatted_preview = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", preview)  # Bold
+        formatted_preview = re.sub(r"\*(.*?)\*", r"<i>\1</i>", formatted_preview)  # Italic
+
+        # Replace newlines with <br> to preserve paragraph breaks in HTML
+        formatted_preview = formatted_preview.replace("\n", "<br>")
+        
+        # Combine the prompt block and formatted preview
+        combined_content = f"{prompt_block}<p>{formatted_preview}</p>"
+
+        # Append the formatted text and prompt block to the scene editor
         cursor = self.scene_editor.editor.textCursor()
-        cursor.movePosition(QTextCursor.End)
-        cursor.insertText(prompt_block + preview)
-        self.scene_editor.editor.moveCursor(QTextCursor.End)
+        cursor.movePosition(QTextCursor.End)  # Move cursor to the end of the current text
+        self.scene_editor.editor.setTextCursor(cursor)
+        self.scene_editor.editor.insertHtml(combined_content)  # Append the prompt block and preview text
+        self.scene_editor.editor.insertHtml("<br>")  # Add a blank line for spacing
+        self.scene_editor.editor.moveCursor(QTextCursor.End)  # Ensure the cursor is at the end
+
+        # Clear the preview text area after applying
         self.bottom_stack.preview_text.clear()
-        self.bottom_stack.prompt_input.clear()
         self.model.unsaved_changes = True
         self.unsaved_preview = False
 
