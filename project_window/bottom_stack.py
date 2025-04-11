@@ -219,7 +219,7 @@ class BottomStack(QWidget):
                     self.summary_model_combo.addItem(prompt["model"])
                 break
 
-
+  
     def _load_summary_prompts(self):
         """
         Load summary prompts from the project's prompts JSON file.
