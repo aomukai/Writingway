@@ -4,7 +4,9 @@ import json
 import tiktoken
 import re
 
-from PyQt5.QtWidgets import QMainWindow, QSplitter, QLabel, QShortcut, QMessageBox, QInputDialog, QApplication, QDialog
+from PyQt5.QtWidgets import (QMainWindow, QSplitter, QLabel, QShortcut, 
+                             QMessageBox, QInputDialog, QApplication, QDialog,
+                             QTreeWidgetItem)
 from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSlot
 from PyQt5.QtGui import QIcon, QColor, QTextCharFormat, QFont, QTextCursor, QPixmap, QPainter, QKeySequence
 from .project_model import ProjectModel
@@ -38,7 +40,6 @@ class ProjectWindow(QMainWindow):
         self.tts_playing = False
         self.current_prose_prompt = None
         self.current_prose_config = None
-        self.previous_item = None
         self.unsaved_preview = False
         self.init_ui()
         self.setup_connections()
@@ -167,38 +168,32 @@ class ProjectWindow(QMainWindow):
         if not self.check_unsaved_changes():
             event.ignore()
             return
+        # Stop the autosave timer if it exists and is running
+        if hasattr(self, 'autosave_timer') and self.autosave_timer.isActive():
+            self.autosave_timer.stop()
         self.write_settings()
         event.accept()
 
-    def check_unsaved_changes(self):
-        warning_message = None
-        if self.unsaved_preview:
-            warning_message = "You have content in the preview text that hasn't been applied."
+    # This used to ask if you want to save. Now it just autosaves.
+    def check_unsaved_changes(self, item=None):
         if self.model.unsaved_changes:
-            warning_message = "You have unsaved content on this screen."
-        if warning_message:
-            reply = QMessageBox.question(self, "Unsaved Changes", f"{warning_message} Do you really want to leave?",
-                                         QMessageBox.Yes | QMessageBox.No)
-            return reply == QMessageBox.Yes
+            self.autosave_scene(item)
+        if self.unsaved_preview:
+            self.autsave_preview()
         return True
 
-    @pyqtSlot()
-    def tree_item_selection_changed(self):
-        current = self.project_tree.tree.currentItem()
-        if self.previous_item and not self.check_unsaved_changes():
-            self.project_tree.tree.blockSignals(True)
-            self.project_tree.tree.setCurrentItem(self.previous_item)
-            self.project_tree.tree.blockSignals(False)
-            return
-        self.load_current_item_content()
-        self.previous_item = current
-        self.model.unsaved_changes = False
-        self.unsaved_preview = False
-
+    @pyqtSlot(QTreeWidgetItem, QTreeWidgetItem)
     def tree_item_changed(self, current, previous):
         if not current:
             self.scene_editor.editor.clear()
             self.bottom_stack.stack.setCurrentIndex(0)
+            return
+        if previous:
+            self.check_unsaved_changes(previous)
+        self.load_current_item_content()
+        self.model.unsaved_changes = False
+        self.unsaved_preview = False
+
 
     def load_current_item_content(self):
         current = self.project_tree.tree.currentItem()
@@ -255,15 +250,16 @@ class ProjectWindow(QMainWindow):
             self.update_save_status("Scene manually saved")
             self.model.unsaved_changes = False
 
-    def autosave_scene(self):
-        current_item = self.project_tree.tree.currentItem()
+    def autosave_scene(self, current_item=None):
+        if not current_item:
+            current_item = self.project_tree.tree.currentItem()
         if not current_item or self.project_tree.get_item_level(current_item) < 2:
             return
         content = self.scene_editor.editor.toHtml()
         if not content.strip():
             return
         hierarchy = self.get_item_hierarchy(current_item)
-        filepath = self.model.save_scene(hierarchy, content)
+        filepath = self.model.save_scene(hierarchy, content, expected_project_name=self.model.project_name)
         if filepath:
             self.update_save_status("Scene autosaved")
             self.model.unsaved_changes = False
@@ -273,6 +269,11 @@ class ProjectWindow(QMainWindow):
         now = time.strftime("%Y-%m-%d %H:%M:%S")
         self.last_save_label.setText(f"Last Saved: {now}")
         self.statusBar().showMessage(message, 3000)
+
+    # This function is a placeholder for the autosave preview feature.
+    # Currently the preview remains even if you navigate away from the scene.
+    def autosave_preview(self):
+        pass
 
     def on_oh_shit(self):
         current_item = self.project_tree.tree.currentItem()
@@ -628,10 +629,36 @@ class ProjectWindow(QMainWindow):
         self.scene_editor.editor.setAlignment(Qt.AlignRight)
 
     def set_font_size(self, size):
-        font = self.scene_editor.editor.currentFont()
-        font.setPointSize(size)
-        self.scene_editor.editor.setCurrentFont(font)
+        cursor = self.scene_editor.editor.textCursor()
+        if not cursor.hasSelection():
+            # Apply to the current position for typing new text
+            fmt = self.scene_editor.editor.currentCharFormat()
+            fmt.setFontPointSize(float(size))  # Ensure size is a float
+            self.scene_editor.editor.setCurrentCharFormat(fmt)
+        else:
+            # Apply to selected text, preserving formatting
+            fmt = QTextCharFormat()  # Get the current format of the selection
+            fmt.setFontPointSize(float(size))  # Update only the size
+            cursor.mergeCharFormat(fmt)  # Apply to the selection directly
+        # No need for setTextCursor here, as mergeCharFormat updates the text directly
 
+    def update_font_family(self, font):
+        cursor = self.scene_editor.editor.textCursor()
+        if not cursor.hasSelection():
+            # Apply to current position for typing new text
+            fmt = self.scene_editor.editor.currentCharFormat()
+            fmt.setFontFamilies([font.family()])
+            # Preserve existing size if set, otherwise use default from combo
+            current_size = self.scene_editor.font_size_combo.currentText()
+            fmt.setFontPointSize(float(current_size) if current_size else font.pointSizeF())
+            self.scene_editor.editor.setCurrentCharFormat(fmt)
+        else:
+            # Apply to selected text, preserving formatting
+            fmt = QTextCharFormat()  # Get the current format of the selection
+            fmt.setFontFamilies([font.family()])  # Update only the family
+            cursor.mergeCharFormat(fmt)  # Apply to the selection directly
+        # No need for setTextCursor here, as mergeCharFormat updates the text directly
+       
     def toggle_tts(self):
         if self.tts_playing:
             WW_TTSManager.stop()

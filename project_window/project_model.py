@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import uuid
 from PyQt5.QtCore import pyqtSignal, QObject
 from . import project_settings_manager as psm
 from settings.settings_manager import WWSettingsManager
@@ -8,7 +9,8 @@ from .tree_manager import load_structure, save_structure, update_structure_from_
 
 class ProjectModel(QObject):
     """Manages project data and persistence."""
-    structureChanged = pyqtSignal(list)
+    structureChanged = pyqtSignal(list, str) # hierarchy, uuid
+    errorOccurred = pyqtSignal(str)  # Signal for error messages
 
     def __init__(self, project_name):
         super().__init__()
@@ -73,17 +75,25 @@ class ProjectModel(QObject):
         if os.path.exists(file_path) and not os.path.exists(backup_path):
             os.rename(file_path, backup_path)
 
+
+        acts = self.structure.get("acts", [])        
         # Perform migration
-        for act in self.structure.get("acts", []):
+        for act in acts:
             traverse_and_migrate(act, [act["name"]])
 
         # Save updated structure
         if os.path.exists(backup_path):
             self.save_structure()
-            os.remove(backup_path)  # Remove backup if successful
+#            os.remove(backup_path)  # Remove backup if successful
 
     def load_scene_content(self, hierarchy):
         """Load content, prioritizing HTML, falling back to structure (for legacy)."""
+        node = self._get_node_by_hierarchy(hierarchy)
+        if node:
+            uuid = node.get("uuid")
+            if not uuid:  # Ensure backward compatibility
+                uuid = str(uuid.uuid4())
+                node["uuid"] = uuid
         content = load_latest_autosave(self.project_name, hierarchy)
         if content is None:
             node = self._get_node_by_hierarchy(hierarchy)
@@ -93,18 +103,24 @@ class ProjectModel(QObject):
                 if filepath and "content" in node:
                     del node["content"]
                     self.save_structure()
-                    self.structureChanged.emit(hierarchy)
+                    self.structureChanged.emit(hierarchy, uuid)
         return content
 
-    def save_scene(self, hierarchy, content):
+    def save_scene(self, hierarchy, content, expected_project_name=None):
         """Save scene to HTML and remove content from structure."""
-        filepath = save_scene(self.project_name, hierarchy, content)
+        filepath = save_scene(self.project_name, hierarchy, content, expected_project_name=expected_project_name)
         if filepath:
             node = self._get_node_by_hierarchy(hierarchy)
+            if node:
+                uuid = node.get("uuid")
+                if not uuid:  # Ensure backward compatibility
+                    uuid = str(uuid.uuid4())
+                    node["uuid"] = uuid
             if node and "content" in node:
                 del node["content"]
+
             self.save_structure()
-            self.structureChanged.emit(hierarchy)
+            self.structureChanged.emit(hierarchy, uuid)
         return filepath
     
     def save_summary(self, hierarchy, summary_text):
@@ -129,6 +145,10 @@ class ProjectModel(QObject):
         filename = f"{sanitized_project_name}-Summary-{sanitized_hierarchy}.html"
         filepath = WWSettingsManager.get_project_relpath(self.project_name, filename)
 
+        uuid = node.get("uuid")
+        if not uuid:  # Ensure backward compatibility
+            uuid = str(uuid.uuid4())
+            node["uuid"] = uuid
         try:
             with open(filepath, "w", encoding="utf-8") as f:
                 f.write(summary_text)
@@ -170,56 +190,101 @@ class ProjectModel(QObject):
             return summary_ref  # Legacy case: return text if not a filepath
         return None
     
+    def _check_duplicate_name(self, nodes, name, exclude_uuid=None):
+        """Check if a name already exists in a list of nodes, excluding a specific UUID if provided."""
+        for node in nodes:
+            if node["name"] == name and (exclude_uuid is None or node["uuid"] != exclude_uuid):
+                return True
+        return False
+    
     def add_act(self, act_name):
-        new_act = {"name": act_name, "summary": f"This is the summary for {act_name}.", "chapters": []}
+        if self._check_duplicate_name(self.structure.get("acts", []), act_name):
+            self.errorOccurred.emit(f"An Act named '{act_name}' already exists. Please choose a unique name.")
+            return
+        
+        new_act = {
+            "uuid": str(uuid.uuid4()),
+            "name": act_name,
+            "summary": f"This is the summary for {act_name}.",
+            "chapters": []
+        }
         self.structure.setdefault("acts", []).append(new_act)
         self.save_structure()
-        self.structureChanged.emit([act_name])
+        self.structureChanged.emit([act_name], new_act["uuid"])
 
     def add_chapter(self, act_name, chapter_name):
-        new_chapter = {"name": chapter_name, "summary": f"This is the summary for {chapter_name}.", "scenes": []}
         for act in self.structure.get("acts", []):
             if act.get("name") == act_name:
+                if self._check_duplicate_name(act.get("chapters", []), chapter_name):
+                    self.errorOccurred.emit(f"A Chapter named '{chapter_name}' already exists in Act '{act_name}'. Please choose a unique name.")
+                    return
+                new_chapter = {
+                    "uuid": str(uuid.uuid4()),
+                    "name": chapter_name,
+                    "summary": f"This is the summary for {chapter_name}.",
+                    "scenes": []
+                }
                 act.setdefault("chapters", []).append(new_chapter)
                 self.save_structure()
-                self.structureChanged.emit([act_name, chapter_name])
+                self.structureChanged.emit([act_name, chapter_name], new_chapter["uuid"])
                 break
 
     def add_scene(self, act_name, chapter_name, scene_name):
-        new_scene = {"name": scene_name}
         for act in self.structure.get("acts", []):
             if act.get("name") == act_name:
                 for chapter in act.get("chapters", []):
                     if chapter.get("name") == chapter_name:
+                        if self._check_duplicate_name(chapter.get("scenes", []), scene_name):
+                            self.errorOccurred.emit(f"A Scene named '{scene_name}' already exists in Chapter '{chapter_name}' of Act '{act_name}'. Please choose a unique name.")
+                            return
+                        new_scene = {
+                            "uuid": str(uuid.uuid4()),
+                            "name": scene_name
+                        }
                         chapter.setdefault("scenes", []).append(new_scene)
                         self.save_structure()
-                        self.structureChanged.emit([act_name, chapter_name, scene_name])
+                        self.structureChanged.emit([act_name, chapter_name, scene_name], new_scene["uuid"])
                         break
                 break
 
     def rename_node(self, hierarchy, new_name):
         node = self._get_node_by_hierarchy(hierarchy)
-        if node:
-            node["name"] = new_name
-            self.save_structure()
-            self.structureChanged.emit(hierarchy)
+        if not node:
+            return
+        uuid = node["uuid"]
+        parent_nodes = self._get_parent_nodes(hierarchy)
+        if self._check_duplicate_name(parent_nodes, new_name, exclude_uuid=uuid):
+            level_name = "Act" if len(hierarchy) == 1 else "Chapter" if len(hierarchy) == 2 else "Scene"
+            parent_context = " in " + " -> ".join(hierarchy[:-1]) if len(hierarchy) > 1 else ""
+            self.errorOccurred.emit(f"A {level_name} named '{new_name}' already exists{parent_context}. Please choose a unique name.")
+            return
+        old_hierarchy = hierarchy.copy()
+        node["name"] = new_name
+        self.save_structure()
+        new_hierarchy = old_hierarchy[:-1] + [new_name]  # Use new hierarchy
+        self.structureChanged.emit(new_hierarchy, node["uuid"])
 
+    def _get_parent_nodes(self, hierarchy):
+        """Get the list of sibling nodes at the same level as the node in the hierarchy."""
+        if not hierarchy:
+            return []
+        current = self.structure.get("acts", [])
+        for level, name in enumerate(hierarchy[:-1]):
+            for item in current:
+                if item.get("name") == name:
+                    current = item.get("chapters" if level == 0 else "scenes", [])
+                    break
+        return current
+    
     def delete_node(self, hierarchy):
+        node = self._get_node_by_hierarchy(hierarchy)
+        if node:
+            uuid = node["uuid"]
         parent, index = self._get_parent_and_index(hierarchy)
         if parent and index is not None:
             parent.pop(index)
             self.save_structure()
-            self.structureChanged.emit(hierarchy)
-
-    def save_scene(self, hierarchy, content):
-        filepath = save_scene(self.project_name, hierarchy, content)
-        if filepath:
-            node = self._get_node_by_hierarchy(hierarchy)
-            if node and "content" in node:
-                del node["content"]  # Remove content from structure
-            self.save_structure()
-            self.structureChanged.emit(hierarchy)
-        return filepath
+            self.structureChanged.emit(hierarchy, uuid)
 
     def _get_node_by_hierarchy(self, hierarchy):
         current = self.structure.get("acts", [])

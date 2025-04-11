@@ -76,7 +76,7 @@ def cleanup_old_autosaves(project_folder: str, scene_identifier: str, max_files:
         except Exception as e:
             print("Error removing old autosave file:", e)
 
-def save_scene(project_name: str, hierarchy: list, content: str) -> str:
+def save_scene(project_name: str, hierarchy: list, content: str, expected_project_name: str = None) -> str:
     """
     Save the scene content if it has changed since the last autosave.
     Uses the new HTML format for saving, preserving rich formatting.
@@ -85,6 +85,7 @@ def save_scene(project_name: str, hierarchy: list, content: str) -> str:
         project_name (str): The name of the project.
         hierarchy (list): List of strings representing the scene hierarchy (e.g., [Act, Chapter, Scene]).
         content (str): The scene content to save (HTML formatted).
+        expected_project_name (str, optional): The project name expected by the caller for validation.
     
     Returns:
         The filepath of the new autosave file if saved, or None if no changes were detected.
@@ -100,6 +101,12 @@ def save_scene(project_name: str, hierarchy: list, content: str) -> str:
     timestamp = time.strftime("%Y%m%d%H%M%S")
     filename = f"{scene_identifier}_{timestamp}{NEW_FILE_EXTENSION}"
     filepath = os.path.join(project_folder, filename)
+
+    # Validate project directory if expected_project_name is provided
+    if expected_project_name and expected_project_name != project_name:
+        error_msg = f"Autosave error: Attempted to save content for project '{expected_project_name}' into project '{project_name}' directory at {filepath}"
+        print(error_msg)
+        return None  # Prevent saving to the wrong project
 
     try:
         with open(filepath, "w", encoding="utf-8") as f:

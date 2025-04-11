@@ -15,9 +15,9 @@ from project_window import project_settings_manager
 
 # Define the file used for storing project data.
 PROJECTS_FILE = "projects.json"
-
+# Define a key for the last displayed project
+LAST_DISPLAYED_KEY = "last_displayed_project"
 # Load version display
-
 VERSION_FILE = "version.json"
 
 def load_version():
@@ -42,24 +42,33 @@ def load_projects():
         oldpath = os.path.join(os.getcwd(), PROJECTS_FILE) # backward compatibility
         if (os.path.exists(oldpath)):
             os.rename(oldpath, filepath)
+    default_data = {
+        "projects": [
+            {"name": "My First Project", "cover": None},
+            {"name": "Sci-Fi Epic", "cover": None},
+            {"name": "Mystery Novel", "cover": None},
+        ],
+        LAST_DISPLAYED_KEY: None
+    }
     if os.path.exists(filepath):
         try:
             with open(filepath, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                # Ensure compatibility with older files
+                if isinstance(data, list):
+                    return {LAST_DISPLAYED_KEY: None, "projects": data}
+                return data
         except Exception as e:
             QMessageBox.warning(None, "Load Projects",
                                 f"Error loading projects: {e}")
     # Default dummy project data.
-    return [
-        {"name": "My First Project", "cover": None},
-        {"name": "Sci-Fi Epic", "cover": None},
-        {"name": "Mystery Novel", "cover": None},
-    ]
+    return default_data
 
 
 def save_projects(projects):
     """Save the project data to a JSON file."""
     filepath = os.path.join(os.getcwd(), "Projects", PROJECTS_FILE)
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
     try:
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(projects, f, indent=4)
@@ -67,10 +76,9 @@ def save_projects(projects):
         QMessageBox.warning(None, "Save Projects",
                             f"Error saving projects: {e}")
 
-
-# Load projects at module level.
-PROJECTS = load_projects()
-
+# Load projects at module level with the new structure
+PROJECTS_DATA = load_projects()
+PROJECTS = PROJECTS_DATA["projects"]
 
 class ProjectPostIt(QToolButton):
     """
@@ -119,7 +127,7 @@ class ProjectPostIt(QToolButton):
             if confirm == QMessageBox.Yes:
                 try:
                     PROJECTS.remove(self.project)
-                    save_projects(PROJECTS)
+                    save_projects(PROJECTS_DATA)
                     QMessageBox.information(
                         self, "Delete Project", f"Project '{self.project['name']}' deleted.")
                     workbench = self.window()
@@ -203,14 +211,14 @@ class ProjectPostIt(QToolButton):
         elif action == cover_action:
             try:
                 self.add_book_cover()
-                save_projects(PROJECTS)
+                save_projects(PROJECTS_DATA)
             except Exception as e:
                 QMessageBox.warning(self, "Error Adding Cover",
                                     f"Error adding book cover: {e}")
         elif action == rename_action:
             try:
                 self.rename_project()
-                save_projects(PROJECTS)
+                save_projects(PROJECTS_DATA)
             except Exception as e:
                 QMessageBox.warning(self, "Error renaming project",
                                     f"Error renaming project: {e}")
@@ -256,7 +264,7 @@ class ProjectPostIt(QToolButton):
             self.rename_project_dir(oldname, newname)
             self.project["name"] = newname
             self.rename_cover(newname)
-            save_projects(PROJECTS)
+            save_projects(PROJECTS_DATA)
 
             # Update project settings - not so critical if we fail
             settings = project_settings_manager.load_project_settings(oldname)
@@ -347,6 +355,7 @@ class WorkbenchWindow(QMainWindow):
         self.resize(640, 720)
         self.init_ui()
         self.apply_fixed_stylesheet()
+        self.last_opened_project = None
 
     def init_ui(self):
         central_widget = QWidget()
@@ -428,6 +437,9 @@ class WorkbenchWindow(QMainWindow):
         version_label.setAlignment(Qt.AlignRight)
         version_layout.addWidget(version_label)
         self.main_layout.addLayout(version_layout)
+
+        # Connect the signal to update the last displayed project
+        self.coverStack.currentChanged.connect(self.update_current_project)
         
     def create_quote_label(self):
         """Creates a quote label and adds it to the content layout (or main layout as fallback)."""
@@ -578,6 +590,14 @@ class WorkbenchWindow(QMainWindow):
                 cover_widget = ProjectCoverWidget(project)
                 cover_widget.openProject.connect(self.open_project)
                 self.coverStack.addWidget(cover_widget)
+            
+            # Set the last displayed project
+            last_displayed = PROJECTS_DATA.get(LAST_DISPLAYED_KEY)
+            if last_displayed:
+                for i, project in enumerate(PROJECTS):
+                    if project["name"] == last_displayed:
+                        self.coverStack.setCurrentIndex(i)
+                        break
         else:
             new_project_btn = QToolButton()
             new_project_btn.setText("＋ New Project")
@@ -603,6 +623,10 @@ class WorkbenchWindow(QMainWindow):
         self.coverStack.setCurrentIndex(new_index)
 
     def open_project(self, project_name):
+        """Open a project and mark it as last opened."""
+        self.last_opened_project = project_name
+        PROJECTS_DATA[LAST_DISPLAYED_KEY] = project_name
+        save_projects(PROJECTS_DATA)
         self.project_window = ProjectWindow(project_name)
         self.project_window.show()
 
@@ -616,7 +640,8 @@ class WorkbenchWindow(QMainWindow):
                 return
             new_project = {"name": name.strip(), "cover": None}
             PROJECTS.append(new_project)
-            save_projects(PROJECTS)
+            PROJECTS_DATA[LAST_DISPLAYED_KEY] = name.strip()  # Set new project as last displayed
+            save_projects(PROJECTS_DATA)
             self.load_covers()
             self.coverStack.setCurrentIndex(len(PROJECTS) - 1)
             QMessageBox.information(
@@ -625,6 +650,19 @@ class WorkbenchWindow(QMainWindow):
             QMessageBox.information(
                 self, "New Project", "Project creation cancelled.")
 
+    def closeEvent(self, event):
+        """Save the last displayed project when closing."""
+        current_index = self.coverStack.currentIndex()
+        if current_index >= 0 and PROJECTS:
+            PROJECTS_DATA[LAST_DISPLAYED_KEY] = PROJECTS[current_index]["name"]
+        save_projects(PROJECTS_DATA)
+        super().closeEvent(event)
+
+    def update_current_project(self, index):
+        """Update the last displayed project when switching."""
+        if index >= 0 and index < len(PROJECTS):
+            PROJECTS_DATA[LAST_DISPLAYED_KEY] = PROJECTS[index]["name"]
+            save_projects(PROJECTS_DATA)
 
 if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication

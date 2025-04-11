@@ -44,9 +44,7 @@ from workbench import WorkbenchWindow
 from settings.theme_manager import ThemeManager
 from settings.settings_manager import WWSettingsManager
 
-def main():
-    app = QApplication(sys.argv)
-    
+def writingway_preload_settings(app):
     # Load and apply the saved theme to the application.
     theme = WWSettingsManager.get_appearance_settings()["theme"]
     try:
@@ -54,6 +52,16 @@ def main():
     except Exception as e:
         print("Error applying theme:", e)
     
+    fontsize = WWSettingsManager.get_appearance_settings()["text_size"]
+    if fontsize:
+        font = app.font()
+        font.setPointSize(fontsize)
+        app.setFont(font)
+
+
+def main():
+    app = QApplication(sys.argv)
+    writingway_preload_settings(app)
     window = WorkbenchWindow()
     window.show()
     sys.exit(app.exec_())

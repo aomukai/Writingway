@@ -46,7 +46,12 @@ def move_item_up(window, item):
         parent.takeChild(index)
         parent.insertChild(index - 1, item)
         window.project_tree.tree.setCurrentItem(item)
-        tree_manager.update_structure_from_tree(window.project_tree.tree, window.model.project_name)
+        hierarchy = window.get_item_hierarchy(item)
+        uuid = item.data(0, Qt.UserRole)["uuid"]
+
+        window.model.update_structure(window.project_tree.tree)
+#        tree_manager.update_structure_from_tree(window.project_tree.tree, window.model.project_name)
+        window.model.structureChanged.emit(hierarchy, uuid)
 
 def move_item_down(window, item):
     """Move an item down in the tree."""
@@ -56,4 +61,9 @@ def move_item_down(window, item):
         parent.takeChild(index)
         parent.insertChild(index + 1, item)
         window.project_tree.tree.setCurrentItem(item)
-        tree_manager.update_structure_from_tree(window.project_tree.tree, window.model.project_name)
+        hierarchy = window.get_item_hierarchy(item)
+        uuid = item.data(0, Qt.UserRole)["uuid"]
+        window.model.update_structure(window.project_tree.tree)
+#        tree_manager.update_structure_from_tree(window.project_tree.tree, window.model.project_name)
+        window.model.structureChanged.emit(hierarchy, uuid)
+

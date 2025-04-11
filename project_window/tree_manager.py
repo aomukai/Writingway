@@ -2,6 +2,7 @@
 import os
 import json
 import re
+import uuid
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtCore import Qt
 from settings.settings_manager import WWSettingsManager
@@ -38,30 +39,30 @@ def load_structure(project_name):
     Load the project structure from the file.
     If the file is missing or in an unexpected format, return a default structure.
     """
+    structure = {"acts": [
+        {"name": "Act 1", "summary": "This is the summary for Act 1.",
+        "chapters": [
+            {"name": "Chapter 1", "summary": "This is the summary for Chapter 1.",
+            "scenes": [
+                {"name": "Scene 1"}
+            ]
+            }
+        ]
+        }
+    ]}
     file_path = get_structure_file_path(project_name, True)
     if os.path.exists(file_path):
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                structure = json.load(f)
-            if isinstance(structure, list) or (isinstance(structure, dict) and (not structure.get("acts") or
-                      (len(structure.get("acts")) > 0 and not isinstance(structure.get("acts")[0], dict)))):
-                print("Project structure file is in an unexpected format. Resetting structure.")
-                structure = {"acts": []}
-        except Exception as e:
-            print("Error loading project structure:", e)
-            structure = {"acts": []}
-    else:
-        structure = {"acts": [
-            {"name": "Act 1", "summary": "This is the summary for Act 1.",
-             "chapters": [
-                 {"name": "Chapter 1", "summary": "This is the summary for Chapter 1.",
-                  "scenes": [
-                      {"name": "Scene 1"}
-                  ]
-                 }
-             ]
-            }
-        ]}
+        with open(file_path, "r", encoding="utf-8") as f:
+            structure = json.load(f)
+        
+        # Add UUIDs to existing nodes
+        def add_uuids(node):
+            if "uuid" not in node:
+                node["uuid"] = str(uuid.uuid4())
+            for child in node.get("chapters", []) + node.get("scenes", []):
+                add_uuids(child)
+        for act in structure.get("acts", []):
+            add_uuids(act)
         save_structure(project_name, structure)
     return structure
 
@@ -84,10 +85,12 @@ def populate_tree(tree, structure):
     """
     def ensure_dict(node):
         if not isinstance(node, dict):
-            return {"name": str(node)}
+            return {"name": str(node), "uuid": str(uuid.uuid4())}
         # Ensure a "name" key exists.
         if "name" not in node:
             node["name"] = "Unnamed"
+        if "uuid" not in node:
+            node["uuid"] = str(uuid.uuid4())
         return node
 
     tree.clear()

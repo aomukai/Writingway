@@ -21,6 +21,7 @@ class ContextPanel(QWidget):
         self.project_name = project_name
         self.controller = parent
         self.compendium_manager = CompendiumManager(project_name)
+        self.uuid_map = {}  # Map UUIDs to QTreeWidgetItems
         self.init_ui()
         if hasattr(self.controller, "model") and self.controller.model:
             self.controller.model.structureChanged.connect(self.on_structure_changed)
@@ -55,12 +56,14 @@ class ContextPanel(QWidget):
     def build_project_tree(self):
         """Build a tree from the project structure showing only chapters and scenes."""
         self.project_tree.clear()
+        self.uuid_map.clear()
         for act in self.project_structure.get("acts", []):
             # Create the Act item (not user-checkable)
             act_item = QTreeWidgetItem(
                 self.project_tree, [act.get("name", "Unnamed Act")]
             )
             act_item.setFlags(act_item.flags() & ~Qt.ItemIsUserCheckable)
+            self.uuid_map[act["uuid"]] = act_item
 
             # Add Summary item if it exists
             if "summary" in act and not act["summary"].startswith("This is the summary"):
@@ -70,6 +73,7 @@ class ContextPanel(QWidget):
                 summary_item.setData(
                     0, Qt.UserRole, {"type": "summary", "data": act}
                 )
+                self.uuid_map[act["uuid"] + "_summary"] = summary_item  # Unique key for summary
 
             for chapter in act.get("chapters", []):
                 # Create the Chapter item (not user-checkable)
@@ -80,6 +84,7 @@ class ContextPanel(QWidget):
                 chapter_item.setData(
                     0, Qt.UserRole, {"type": "chapter", "data": chapter}
                 )
+                self.uuid_map[chapter["uuid"]] = chapter_item
 
                 # Add Summary item if it exists
                 if "summary" in chapter and not chapter["summary"].startswith("This is the summary"):
@@ -89,6 +94,7 @@ class ContextPanel(QWidget):
                     summary_item.setData(
                         0, Qt.UserRole, {"type": "summary", "data": chapter}
                     )
+                    self.uuid_map[chapter["uuid"] + "_summary"] = summary_item
 
                 for scene in chapter.get("scenes", []):
                     # Scenes remain checkable
@@ -100,6 +106,7 @@ class ContextPanel(QWidget):
                     scene_item.setData(
                         0, Qt.UserRole, {"type": "scene", "data": scene}
                     )
+                    self.uuid_map[scene["uuid"]] = scene_item
 
         self.project_tree.expandAll()
 
@@ -232,66 +239,64 @@ class ContextPanel(QWidget):
         for i in range(item.childCount()):
             self._traverse_project_item(item.child(i), texts, temp_editor)
 
-    def on_structure_changed(self, hierarchy):
+    def on_structure_changed(self, hierarchy, uuid):
         """Handle structure changes by updating only affected items."""
         if self.isHidden():
             return # Panel will be populated when shown
-        if hierarchy:
-            self._update_item_for_summary(hierarchy)
+        node = self.controller.model._get_node_by_hierarchy(hierarchy)
+        if uuid in self.uuid_map:  # Existing node modified
+            item = self.uuid_map[uuid]
+            if node:  # Update (e.g., rename)
+                item.setText(0, node["name"])
+                item.setData(0, Qt.UserRole, {"type": item.data(0, Qt.UserRole)["type"], "data": node})
+                self._update_item_for_summary(hierarchy, uuid)
+            else:  # Delete
+                parent = item.parent() or self.project_tree.invisibleRootItem()
+                parent.removeChild(item)
+                del self.uuid_map[uuid]
+                if uuid + "_summary" in self.uuid_map:
+                    del self.uuid_map[uuid + "_summary"]
         else:
             # Fallback to full rebuild if no current item
             self.build_project_tree()
+            # Optionally call _update_item_for_summary(hierarchy, uuid) here if node exists
+            if node:
+                self._update_item_for_summary(hierarchy, uuid)
 
-    def _update_item_for_summary(self, hierarchy):
+    def _update_item_for_summary(self, hierarchy, uuid):
         """Update or insert a summary checkbox for the item at the given hierarchy."""
-        root = self.project_tree.invisibleRootItem()
-        current_item = None
-        current_level_items = [root.child(i) for i in range(root.childCount())]
-        
-        # Traverse to find the item matching the hierarchy
-        for level, name in enumerate(hierarchy):
-            for item in current_level_items:
-                if item.text(0) == name:
-                    current_item = item
-                    if level == len(hierarchy) - 1:
-                        break
-                    current_level_items = [current_item.child(i) for i in range(current_item.childCount())]
-                    break
-            else:
-#                print(f"Debug: Item not found for hierarchy: {hierarchy}")
-                return  # Item not found, abort
-
+        node = self.controller.model._get_node_by_hierarchy(hierarchy)
+        if not node or "summary" not in node:
+            return
+        current_item = self.uuid_map.get(uuid)
         if not current_item:
-#            print(f"Debug: No current item found for hierarchy: {hierarchy}")
             return
 
-        # Check if summary already exists in the tree
-        has_summary_item = False
-        child = None
+        # Check for existing "Summary" child
+        summary_exists = False
+        summary_item = None
         for i in range(current_item.childCount()):
             child = current_item.child(i)
             if child.text(0) == "Summary":
-                has_summary_item = True
+                summary_item = child
+                summary_exists = True
+                if node["summary"].startswith("This is the summary"):
+                    current_item.removeChild(child)
+                    del self.uuid_map[uuid + "_summary"]
                 break
 
-        # Get the node's data from the model
-        node_data = self.controller.model._get_node_by_hierarchy(hierarchy)
-        if node_data and "summary" in node_data and not has_summary_item:
-            # Insert a new summary item
-            summary_item = QTreeWidgetItem()  # Create without parent initially
-            summary_item.setText(0, "Summary")
+        # Add new "Summary" item if it doesn't exist and summary is meaningful
+        if not summary_exists and not node["summary"].startswith("This is the summary"):
+            summary_item = QTreeWidgetItem(["Summary"])
             summary_item.setFlags(summary_item.flags() | Qt.ItemIsUserCheckable)
             summary_item.setCheckState(0, Qt.Unchecked)
-            summary_item.setData(
-                0, Qt.UserRole, {"type": "summary", "data": node_data}
-            )
+            summary_item.setData(0, Qt.UserRole, {"type": "summary", "data": node})
             current_item.insertChild(0, summary_item)  # Insert at the top
-            self.project_tree.expandItem(current_item)
-            child = summary_item
+            self.project_tree.expandItem(current_item)  # Expand the parent item
+            self.uuid_map[uuid + "_summary"] = summary_item
 
-        if not child:
-            return
-        
-        font =child.font(0)
-        font.setBold(True)
-        child.setFont(0, font)
+        # Apply bold formatting to the "Summary" item if it exists
+        if summary_item:
+            font = summary_item.font(0)
+            font.setBold(True)
+            summary_item.setFont(0, font)

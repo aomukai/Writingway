@@ -37,7 +37,7 @@ class SceneEditor(QWidget):
         # Font Selection
         self.font_combo = QFontComboBox()
         self.font_combo.setToolTip("Select a font")
-        self.font_combo.currentFontChanged.connect(lambda font: self.editor.setCurrentFont(font))
+        self.font_combo.currentFontChanged.connect(self.controller.update_font_family)
         self.toolbar.addWidget(self.font_combo)
         self.font_size_combo = QComboBox()
         self.font_size_combo.addItems([str(size) for size in [10, 12, 14, 16, 18, 20, 24, 28, 32]])
