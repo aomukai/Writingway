@@ -220,21 +220,6 @@ class BottomStack(QWidget):
                     self.summary_model_combo.addItem(prompt["model"])
                 break
 
-    def apply_preview(self):
-        """Appends the LLM's output to the current scene while preserving formatting and structure."""
-        preview_text = self.preview_text.toPlainText()
-
-        # Format Markdown-style bold and italic text as HTML.
-        formatted_preview = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", preview_text)  # Bold
-        formatted_preview = re.sub(r"\*(.*?)\*", r"<i>\1</i>", formatted_preview)  # Italic
-
-        # Replace newlines with <br> to preserve paragraph breaks in HTML.
-        formatted_preview = formatted_preview.replace("\n", "<br>")
-
-        # Append the formatted text to the scene editor.
-        self.controller.scene_editor.editor.insertHtml(f"<p>{formatted_preview}</p>")
-        self.controller.scene_editor.editor.insertHtml("<br>")  # Add a blank line for spacing.
-
     def _load_summary_prompts(self):
         """
         Load summary prompts from the project's prompts JSON file.
