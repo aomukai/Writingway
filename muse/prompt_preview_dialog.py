@@ -1,16 +1,19 @@
-#!/usr/bin/env python3
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTreeWidget, QTreeWidgetItem, QPushButton, QHBoxLayout, QTextEdit, QLabel
 from PyQt5.QtCore import Qt, QSettings
 from PyQt5.QtGui import QFont, QKeySequence
 from PyQt5.QtWidgets import QShortcut
+from settings.theme_manager import ThemeManager
 import muse.prompt_handler as prompt_handler
 import tiktoken
 
 class PromptPreviewDialog(QDialog):
-    def __init__(self, prompt_config, user_input, additional_vars, current_scene_text, extra_context, parent=None):
+    def __init__(self, controller, conversation_payload=None, prompt_config=None, user_input=None, 
+                 additional_vars=None, current_scene_text=None, extra_context=None, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Prompt Preview")
+        self.setWindowTitle(_("Prompt Preview"))
         self.resize(600, 400)
+        self.controller = controller
+        self.conversation_payload = conversation_payload
         self.prompt_config = prompt_config
         self.user_input = user_input
         self.additional_vars = additional_vars
@@ -36,23 +39,22 @@ class PromptPreviewDialog(QDialog):
         # Buttons and zoom controls
         button_layout = QHBoxLayout()
         self.zoom_in_button = QPushButton()
-        self.zoom_in_button.setIcon(self.parent().get_tinted_icon("assets/icons/zoom-in.svg", self.parent().icon_tint))
-        self.zoom_in_button.setToolTip("Zoom In (Cmd+=)")
+        self.zoom_in_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/zoom-in.svg", self.controller.icon_tint))
+        self.zoom_in_button.setToolTip(_("Zoom In (Cmd+=)"))
         self.zoom_in_button.clicked.connect(self.zoom_in)
 
         self.zoom_out_button = QPushButton()
-        self.zoom_out_button.setIcon(self.parent().get_tinted_icon("assets/icons/zoom-out.svg", self.parent().icon_tint))
-        self.zoom_out_button.setToolTip("Zoom Out (Cmd+-)")
+        self.zoom_out_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/zoom-out.svg", self.controller.icon_tint))
+        self.zoom_out_button.setToolTip(_("Zoom Out (Cmd+-)"))
         self.zoom_out_button.clicked.connect(self.zoom_out)
-        self.ok_button = QPushButton("OK")
+        self.ok_button = QPushButton(_("OK"))
         self.ok_button.clicked.connect(self.ok_button_clicked)
 
         button_layout.addWidget(self.zoom_in_button)
         button_layout.addWidget(self.zoom_out_button)
 
-
         # Token count label (centered)
-        self.token_count_label = QLabel("Token Count: 0")
+        self.token_count_label = QLabel(_("Token Count: 0"))
         self.token_count_label.setFont(QFont("Arial", self.font_size))
         self.token_count_label.setAlignment(Qt.AlignCenter)  # Center the text
         button_layout.addStretch()  # Add stretch before to push label to center
@@ -61,7 +63,6 @@ class PromptPreviewDialog(QDialog):
 
         button_layout.addWidget(self.ok_button)
         layout.addLayout(button_layout)
-
 
         # Shortcuts for zoom
         self.zoom_in_shortcut = QShortcut(QKeySequence("Ctrl+="), self)
@@ -73,12 +74,15 @@ class PromptPreviewDialog(QDialog):
         self.update_font_size()
 
     def populate_tree(self):
-        """Populate the tree with collapsible sections and QTextEdit widgets."""
-        self.final_prompt_text = prompt_handler.preview_final_prompt(
-            self.prompt_config, self.user_input, self.additional_vars,
-            self.current_scene_text, self.extra_context
-        )
-        sections = self.parse_prompt_sections(self.final_prompt_text)
+        """Populate the tree with collapsible sections."""
+        if self.conversation_payload:
+            sections = self.parse_conversation_payload()
+        else:
+            self.final_prompt_text = prompt_handler.preview_final_prompt(
+                self.prompt_config, self.user_input, self.additional_vars,
+                self.current_scene_text, self.extra_context
+            )
+            sections = self.parse_prompt_sections(self.final_prompt_text)
 
         for header, content in sections.items():
             # Create a top-level item for the header
@@ -95,8 +99,8 @@ class PromptPreviewDialog(QDialog):
             text_edit.setStyleSheet("QTextEdit { border: 1px solid #ccc; padding: 4px; }")  # Add boundary box
             self.tree.setItemWidget(content_item, 1, text_edit)
 
-            # Collapse if content is long (>100 chars)
-            if len(content.strip()) > 100:
+            # Collapse if content is long (>300 chars)
+            if len(content.strip()) > 300:
                 header_item.setExpanded(False)
             else:
                 header_item.setExpanded(True)
@@ -110,11 +114,27 @@ class PromptPreviewDialog(QDialog):
             maxheight = min(max(2, int(content_length / 50)), 50) * 30
             text_edit.setMaximumHeight(maxheight)  # Ensure visibility
 
-            if content_length > 100:
+            if content_length > 300:
                 item.setExpanded(False)
             # Resize the content column to fit the widget
             self.tree.resizeColumnToContents(1)
 
+    def parse_conversation_payload(self):
+        """Parse the conversation payload into sections based on message roles."""
+        sections = {}
+        self.final_prompt_text = ""
+
+        for i, message in enumerate(self.conversation_payload):
+            role = message.get("role", "unknown").capitalize()
+            content = message.get("content", "")
+            header = f"{role} Message {i + 1}"
+            sections[header] = content
+            self.final_prompt_text += content + "\n"
+
+        if not sections:
+            sections["Empty"] = "No content available"
+
+        return sections
 
     def parse_prompt_sections(self, prompt_text):
         """Parse the prompt text into sections based on ### headers."""
@@ -168,9 +188,9 @@ class PromptPreviewDialog(QDialog):
             encoding = tiktoken.get_encoding("cl100k_base")  # Use a common encoding, e.g., for GPT models
             tokens = encoding.encode(self.final_prompt_text)
             token_count = len(tokens)
-            self.token_count_label.setText(f"Token Count: {token_count}")
+            self.token_count_label.setText(_("Token Count: {}").format(token_count))
         except Exception as e:
-            self.token_count_label.setText(f"Token Count: Error ({str(e)})")
+            self.token_count_label.setText(_("Token Count: Error ({})").format(str(e)))
 
     def read_settings(self):
         settings = QSettings("MyCompany", "WritingwayProject")

@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QSplitter, QTreeWidget, QTextEdit, QVBoxLayout, QMenu, QTreeWidgetItem, QMessageBox, QDialog
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtCore import Qt, QPoint, pyqtSignal, pyqtSlot
 import json, os, re
 from langchain.prompts import PromptTemplate
 
@@ -15,6 +15,9 @@ def sanitize(text):
     return re.sub(r'\W+', '', text)
 
 class CompendiumPanel(QWidget):
+        # Optional signal if ContextPanel itself updates the compendium in the future
+    compendium_updated = pyqtSignal(str)  # str is the project_name
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMinimumWidth(300)
@@ -52,13 +55,16 @@ class CompendiumPanel(QWidget):
         
         # Set self.compendium_file to the new location.
         self.compendium_file = self.new_compendium_file
-        
+        self.connect_to_compendium_signal()
+        self.init_ui()
+
+    def init_ui(self):
         # Create a horizontal splitter dividing the panel into a tree and an editor.
         self.splitter = QSplitter(Qt.Horizontal, self)
         
         # Left side: Tree for categories and entries.
         self.tree = QTreeWidget()
-        self.tree.setHeaderLabel("Compendium")
+        self.tree.setHeaderLabel(_("Compendium"))
         self.tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tree.customContextMenuRequested.connect(self.show_tree_context_menu)
         self.tree.currentItemChanged.connect(self.on_item_changed)
@@ -66,7 +72,7 @@ class CompendiumPanel(QWidget):
         # Right side: Editor for the selected entry.
         # The editor is now set to read-only so that this panel serves only as a reference.
         self.editor = QTextEdit()
-        self.editor.setPlaceholderText("Select a compendium entry to view.")
+        self.editor.setPlaceholderText(_("Select a compendium entry to view."))
         self.editor.setReadOnly(True)
         
         # Set up the layout.
@@ -83,6 +89,9 @@ class CompendiumPanel(QWidget):
 
     def populate_compendium(self):
         """Load compendium data from the file and populate the tree view."""
+        # Capture current selection
+        selected_item_info = self.get_selected_item_info()
+
         self.tree.clear()
         if os.path.exists(self.compendium_file):
             try:
@@ -143,6 +152,62 @@ class CompendiumPanel(QWidget):
                     print("Error creating default compendium file:", e)
             self.populate_compendium()
 
+        # Restore selection
+        self.restore_selection(selected_item_info)
+
+    def get_selected_item_info(self):
+        """Capture details of the currently selected item."""
+        current_item = self.tree.currentItem()
+        if not current_item:
+            return None
+        item_type = current_item.data(0, Qt.UserRole)
+        item_name = current_item.text(0)
+        if item_type == "entry":
+            parent_item = current_item.parent()
+            parent_name = parent_item.text(0) if parent_item else None
+            return {"type": "entry", "name": item_name, "category": parent_name}
+        return {"type": "category", "name": item_name}
+
+    def restore_selection(self, selected_item_info):
+        """Attempt to reselect the previously selected item."""
+        if not selected_item_info:
+            return
+        item_type = selected_item_info["type"]
+        item_name = selected_item_info["name"]
+
+        if item_type == "category":
+            # Search for category by name
+            for i in range(self.tree.topLevelItemCount()):
+                cat_item = self.tree.topLevelItem(i)
+                if cat_item.text(0) == item_name and cat_item.data(0, Qt.UserRole) == "category":
+                    self.tree.setCurrentItem(cat_item)
+                    return
+        elif item_type == "entry":
+            # Search for entry in the specified category
+            category_name = selected_item_info["category"]
+            for i in range(self.tree.topLevelItemCount()):
+                cat_item = self.tree.topLevelItem(i)
+                if category_name and cat_item.text(0) != category_name:
+                    continue
+                for j in range(cat_item.childCount()):
+                    entry_item = cat_item.child(j)
+                    if entry_item.text(0) == item_name and entry_item.data(0, Qt.UserRole) == "entry":
+                        self.tree.setCurrentItem(entry_item)
+                        return
+            # If exact entry not found, try to find in the same category (handles renaming)
+            if category_name:
+                for i in range(self.tree.topLevelItemCount()):
+                    cat_item = self.tree.topLevelItem(i)
+                    if cat_item.text(0) == category_name:
+                        if cat_item.childCount() > 0:
+                            self.tree.setCurrentItem(cat_item.child(0))  # Select first entry
+                        else:
+                            self.tree.setCurrentItem(cat_item)  # Select category
+                        return
+        # If item not found, clear selection
+        self.tree.clearSelection()
+
+
     def on_item_changed(self, current, previous):
         """Display entry content in the read-only editor when a tree item is selected."""
         if current is None:
@@ -157,8 +222,8 @@ class CompendiumPanel(QWidget):
     def show_tree_context_menu(self, pos: QPoint):
         """Display a simplified context menu with only the option to open the enhanced compendium."""
         menu = QMenu(self)
-        action_open = menu.addAction("Open Enhanced Compendium")
-        action_analyze = menu.addAction("Analyze Scene with AI")
+        action_open = menu.addAction(_("Open Enhanced Compendium"))
+        action_analyze = menu.addAction(_("Analyze Scene with AI"))
         action = menu.exec_(self.tree.viewport().mapToGlobal(pos))
 
         if action == action_open:
@@ -169,22 +234,20 @@ class CompendiumPanel(QWidget):
     def open_in_enhanced_compendium(self):
         """Launch the enhanced compendium window.
         If an entry is selected, the enhanced window will jump to that entry."""
-        self.enhanced_window = EnhancedCompendiumWindow(self.project_name, self.parent())
-        self.enhanced_window.show()
-        # If an entry is selected, try to select it in the enhanced window.
+        entry_name = None
         current_item = self.tree.currentItem()
         if current_item and current_item.data(0, Qt.UserRole) == "entry":
             entry_name = current_item.text(0)
             if entry_name.startswith("* "):
                 entry_name = entry_name[2:]
-            self.enhanced_window.find_and_select_entry(entry_name)
+        self.project_window.enhanced_window.open_with_entry(self.project_name, entry_name)
 
     def analyze_scene_with_ai(self):
         """Analyze current scene content and compendium using AI and show results."""
         # Get the scene editor content from the parent window
         scene_editor = self.project_window.scene_editor.editor
         if not scene_editor or not scene_editor.toPlainText():
-            QMessageBox.warning(self, "Warning", "No scene content available to analyze.")
+            QMessageBox.warning(self, _("Warning"), _("No scene content available to analyze."))
             return
 
         scene_content = scene_editor.toPlainText()
@@ -201,7 +264,7 @@ class CompendiumPanel(QWidget):
         overrides = LLMSettingsDialog.show_dialog(
             self,
             default_provider=WWSettingsManager.get_active_llm_name(),
-            default_model=None,  # Could fetch from settings if desired
+            default_model=WWSettingsManager.get_active_llm_config().get("model", None),
             default_timeout=60
         )
         if not overrides:
@@ -259,14 +322,14 @@ Return only the JSON result without additional commentary. The JSON should maint
             # Attempt to repair incomplete JSON
             repaired_response = self.repair_incomplete_json(cleaned_response)
             if repaired_response is None:
-                QMessageBox.warning(self, "Error", "AI returned invalid JSON that could not be repaired.")
+                QMessageBox.warning(self, _("Error"), _("AI returned invalid JSON that could not be repaired."))
                 return
             
             # Validate JSON response
             try:
                 ai_compendium = json.loads(repaired_response)
             except json.JSONDecodeError:
-                QMessageBox.warning(self, "Error", "AI returned invalid JSON format.")
+                QMessageBox.warning(self, _("Error"), _("AI returned invalid JSON format."))
                 return
 
             # Show the dialog with AI results
@@ -275,7 +338,7 @@ Return only the JSON result without additional commentary. The JSON should maint
                 self.save_ai_analysis(dialog.get_compendium_data())
 
         except Exception as e:
-            QMessageBox.warning(self, "Error", f"Failed to analyze scene: {str(e)}")
+            QMessageBox.warning(self, _("Error"), _("Failed to analyze scene: {}").format(str(e)))
 
     def preprocess_json_string(self, raw_string):
         """Remove Markdown code block markers and extraneous whitespace from the string."""
@@ -300,9 +363,9 @@ Return only the JSON result without additional commentary. The JSON should maint
             open_brackets = repaired.count('[') - repaired.count(']')
             
             # Add missing closing braces and brackets
-            for _ in range(open_braces):
+            for unusued in range(open_braces):
                 repaired += '}'
-            for _ in range(open_brackets):
+            for unused in range(open_brackets):
                 repaired += ']'
             
             try:
@@ -319,20 +382,49 @@ Return only the JSON result without additional commentary. The JSON should maint
                 with open(self.compendium_file, "r", encoding="utf-8") as f:
                     existing = json.load(f)
                 
+                # Ensure extensions section exists
+                if "extensions" not in existing:
+                    existing["extensions"] = {"entries": {}}
+                elif "entries" not in existing["extensions"]:
+                    existing["extensions"]["entries"] = {}
+        
                 # Simple merge strategy: append new categories
                 existing_categories = {cat["name"]: cat for cat in existing.get("categories", [])}
                 for new_cat in ai_compendium.get("categories", []):
                     if new_cat["name"] in existing_categories:
-                        # For existing categories, merge entries
                         existing_entries = {entry["name"]: entry for entry in existing_categories[new_cat["name"]]["entries"]}
-                        for new_entry in new_cat["entries"]:
-                            existing_entries[new_entry["name"]] = new_entry
+                        for new_entry in new_cat.get("entries", []):
+                            entry_name = new_entry["name"]
+                            existing_entries[entry_name] = {
+                                "name": entry_name,
+                                "content": new_entry.get("content", ""),
+                                "relationships": new_entry.get("relationships", [])
+                            }
+                            # Update extensions for EnhancedCompendiumWindow
+                            existing["extensions"]["entries"][entry_name] = {
+                                "relationships": new_entry.get("relationships", []),
+                                **existing["extensions"]["entries"].get(entry_name, {})
+                            }
                         existing_categories[new_cat["name"]]["entries"] = list(existing_entries.values())
                     else:
-                        # Add new category
                         existing["categories"].append(new_cat)
+                        # Add extensions for new entries
+                        for entry in new_cat.get("entries", []):
+                            entry_name = entry["name"]
+                            existing["extensions"]["entries"][entry_name] = {
+                                "relationships": entry.get("relationships", [])
+                            }
             else:
-                existing = ai_compendium
+                existing = {
+                    "categories": ai_compendium.get("categories", []),
+                    "extensions": {
+                        "entries": {
+                            entry["name"]: {"relationships": entry.get("relationships", [])}
+                            for cat in ai_compendium.get("categories", [])
+                            for entry in cat.get("entries", [])
+                        }
+                    }
+                }
 
             # Save the merged compendium
             with open(self.compendium_file, "w", encoding="utf-8") as f:
@@ -340,8 +432,31 @@ Return only the JSON result without additional commentary. The JSON should maint
             
             # Refresh the tree view
             self.populate_compendium()
+
+            # Emit signal to notify EnhancedCompendiumWindow
+            self.compendium_updated.emit(self.project_name)
             
-            QMessageBox.information(self, "Success", "Compendium updated successfully.")
+            QMessageBox.information(self, _("Success"), _("Compendium updated successfully."))
 
         except Exception as e:
-            QMessageBox.warning(self, "Error", f"Failed to save compendium: {str(e)}")
+            QMessageBox.warning(self, _("Error"), _("Failed to save compendium: {}").format(str(e)))
+
+
+    def connect_to_compendium_signal(self):
+        """Connect to the EnhancedCompendiumWindow's compendium_updated signal."""
+        # Traverse up to ProjectWindow to find EnhancedCompendiumWindow
+        current_parent = self.parent()
+        while current_parent:
+            if hasattr(current_parent, 'enhanced_window') and isinstance(current_parent.enhanced_window, EnhancedCompendiumWindow):
+                current_parent.enhanced_window.compendium_updated.connect(self.update_compendium_tree)
+                break
+            current_parent = current_parent.parent()
+        
+        # If not found (e.g., EnhancedCompendiumWindow not open yet), we'll try again later
+        # Alternatively, we could connect when EnhancedCompendiumWindow is opened (see below)
+        
+    @pyqtSlot(str)
+    def update_compendium_tree(self, project_name):
+        """Update the compendium tree if the project name matches."""
+        if project_name == self.project_name and self.isVisible():
+            self.populate_compendium()

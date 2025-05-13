@@ -142,7 +142,7 @@ class BaseTextAnalysis:
                 for i, (start, end, text) in enumerate(positions):
                     if start in processed_positions:
                         continue
-                    window_occurrences = sum(1 for pos, _, _ in positions if abs(pos - start) <= window_size)
+                    window_occurrences = sum(1 for pos, unused, unused in positions if abs(pos - start) <= window_size)
                     if window_occurrences >= threshold:
                         results.append((start, end, word, window_occurrences))
                         processed_positions.add(start)

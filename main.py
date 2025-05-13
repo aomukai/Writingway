@@ -1,51 +1,54 @@
 import sys
-import os
-import json
+import logging
+from settings.translation_manager import TranslationManager
+from settings.settings_manager import WWSettingsManager
+
+def exception_hook(exctype, value, traceback):
+    logging.error("Unhandled exception", exc_info=(exctype, value, traceback))
+    sys.__excepthook__(exctype, value, traceback)
+sys.excepthook = exception_hook
 
 def check_dependencies():
     """Check for required modules and notify the user via Tkinter if any are missing."""
     missing = []
-    # Check for PyQt5
     try:
         import PyQt5
     except ImportError:
         missing.append("PyQt5")
-    # Check for pyttsx3
     try:
         import pyttsx3
     except ImportError:
         missing.append("pyttsx3")
     
     if missing:
-        # Try to use Tkinter (which is included with most Python installations) for a GUI error message.
         try:
             import tkinter as tk
             from tkinter import messagebox
             root = tk.Tk()
-            root.withdraw()  # Hide the main window.
+            root.withdraw()
             messagebox.showerror(
-                "Missing Dependencies",
-                "The application requires the following module(s): " + ", ".join(missing) +
-                "\n\nPlease install them by running:\n\npip install " + " ".join(missing) +
-                "\n\nOn Windows: Win+R to open a console, then type cmd."
+                _("Missing Dependencies"),
+                _("The application requires the following module(s): ") + ", ".join(missing) +
+                _("\n\nPlease install them by running:\n\npip install ") + " ".join(missing) +
+                _("\n\nOn Windows: Win+R to open a console, then type cmd.")
             )
         except Exception:
-            # Fallback to console output if Tkinter isn't available.
             print("The application requires the following module(s): " + ", ".join(missing))
             print("Please install them by running:\n\npip install " + " ".join(missing))
         sys.exit(1)
 
-# Run dependency check before any further imports.
+# Initialize translations
+translation_manager = TranslationManager()
+translation_manager.set_language(WWSettingsManager.get_general_settings().get("language", "en"))
+
+# Run dependency check after gettext is set up
 check_dependencies()
 
-# Now import the modules needed for the application.
 from PyQt5.QtWidgets import QApplication
 from workbench import WorkbenchWindow
 from settings.theme_manager import ThemeManager
-from settings.settings_manager import WWSettingsManager
 
 def writingway_preload_settings(app):
-    # Load and apply the saved theme to the application.
     theme = WWSettingsManager.get_appearance_settings()["theme"]
     try:
         ThemeManager.apply_to_app(theme)
@@ -58,11 +61,10 @@ def writingway_preload_settings(app):
         font.setPointSize(fontsize)
         app.setFont(font)
 
-
 def main():
     app = QApplication(sys.argv)
     writingway_preload_settings(app)
-    window = WorkbenchWindow()
+    window = WorkbenchWindow(translation_manager)
     window.show()
     sys.exit(app.exec_())
 

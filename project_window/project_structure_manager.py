@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTreeWidgetItem
+from PyQt5.QtWidgets import QInputDialog
 from PyQt5.QtCore import Qt
-from . import tree_manager
 
 def add_act(window):
     """Add a new act using ProjectModel."""
-    text, ok = QInputDialog.getText(window, "Add Act", "Enter act name:")
+    text, ok = QInputDialog.getText(window, _("Add Act"), _("Enter act name:"))
     if ok and text.strip():
         window.model.add_act(text.strip())  # Delegate to ProjectModel
         # No need to update the tree here; ProjectModel emits structureChanged
 
 def add_chapter(window, act_item):
     """Add a new chapter using ProjectModel."""
-    text, ok = QInputDialog.getText(window, "Add Chapter", "Enter chapter name:")
+    text, ok = QInputDialog.getText(window, _("Add Chapter"), _("Enter chapter name:"))
     if ok and text.strip():
         act_name = act_item.text(0)
         window.model.add_chapter(act_name, text.strip())  # Delegate to ProjectModel
@@ -20,7 +19,7 @@ def add_chapter(window, act_item):
 
 def add_scene(window, chapter_item):
     """Add a new scene using ProjectModel."""
-    text, ok = QInputDialog.getText(window, "Add Scene", "Enter scene name:")
+    text, ok = QInputDialog.getText(window, _("Add Scene"), _("Enter scene name:"))
     if ok and text.strip():
         chapter_name = chapter_item.text(0)
         act_item = chapter_item.parent()
@@ -32,7 +31,7 @@ def rename_item(window, item):
     """Rename a tree item and sync via ProjectModel."""
     current_name = item.text(0)
     new_name, ok = QInputDialog.getText(
-        window, "Rename", "Enter new name:", text=current_name)
+        window, _("Rename"), _("Enter new name:"), text=current_name)
     if ok and new_name.strip():
         hierarchy = window.get_item_hierarchy(item)
         window.model.rename_node(hierarchy, new_name.strip())

@@ -1,0 +1,1902 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Writingway Project\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-23 15:53-0700\n"
+"PO-Revision-Date: 2025-04-22 22:40+0000\n"
+"Last-Translator: \n"
+"Language-Team: ko\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: settings/provider_dialog.py:24 settings/provider_dialog.py:315
+msgid "Edit Provider"
+msgstr "제공자 편집"
+
+#: settings/provider_dialog.py:26 settings/provider_dialog.py:315
+#: settings/settings_dialog.py:146 settings/settings_dialog.py:341
+msgid "New Provider"
+msgstr "새 제공자"
+
+#: settings/provider_dialog.py:34
+msgid "Provider Details"
+msgstr "제공자 세부 정보"
+
+#: settings/provider_dialog.py:38 settings/provider_dialog.py:316
+#: settings/provider_info_dialog.py:34 settings/provider_info_dialog.py:430
+msgid "Provider"
+msgstr "제공자"
+
+#: settings/provider_dialog.py:44 settings/provider_dialog.py:317
+#: settings/provider_info_dialog.py:23
+msgid "Provider Information"
+msgstr "제공자 정보"
+
+#: settings/provider_dialog.py:52 settings/provider_dialog.py:318
+#: project_window/project_tree_widget.py:25
+#: compendium/ai_compendium_dialog.py:39
+msgid "Name"
+msgstr "이름"
+
+#: settings/provider_dialog.py:57 settings/provider_dialog.py:319
+msgid "Endpoint URL"
+msgstr "엔드포인트 URL"
+
+#: settings/provider_dialog.py:59
+msgid "Leave empty for default"
+msgstr "기본값으로 비워두세요"
+
+#: settings/provider_dialog.py:64 settings/provider_dialog.py:321
+msgid "Endpoint URL Help"
+msgstr "엔드포인트 URL 도움말"
+
+#: settings/provider_dialog.py:64 settings/provider_dialog.py:321
+msgid ""
+"Override URL for provider\n"
+"\n"
+"Only use if you have a proxy server or a Custom provider.\n"
+"Leave empty for default URL.\n"
+"\n"
+"Ex: 'https://localhost:1234/v1'"
+msgstr ""
+"제공자의 URL을 재정의합니다\n"
+"\n"
+"프록시 서버 또는 사용자 지정 제공자가 있는 경우에만 사용하세요.\n"
+"기본 URL의 경우 비워 두세요.\n"
+"\n"
+"예: 'https://localhost:1234/v1'"
+
+#: settings/provider_dialog.py:70 settings/provider_dialog.py:322
+msgid "Model"
+msgstr "모델"
+
+#: settings/provider_dialog.py:74 settings/provider_dialog.py:323
+msgid "Refresh Model List"
+msgstr "모델 목록 새로 고침"
+
+#: settings/provider_dialog.py:85 settings/provider_dialog.py:324
+msgid "API Key"
+msgstr "API 키"
+
+#: settings/provider_dialog.py:89 settings/provider_dialog.py:229
+#: settings/provider_dialog.py:325
+msgid "Reveal"
+msgstr "공개"
+
+#: settings/provider_dialog.py:98 settings/provider_dialog.py:326
+msgid "Timeout (seconds)"
+msgstr "타임아웃(초)"
+
+#: settings/provider_dialog.py:104 settings/provider_dialog.py:327
+#: settings/settings_dialog.py:177
+msgid "Default Provider"
+msgstr "기본 제공자"
+
+#: settings/provider_dialog.py:108 settings/provider_dialog.py:328
+msgid "Test"
+msgstr "테스트"
+
+#: settings/provider_dialog.py:117 settings/provider_dialog.py:331
+msgid "Update"
+msgstr "업데이트"
+
+#: settings/provider_dialog.py:119 settings/provider_dialog.py:333
+#: compendium/enhanced_compendium.py:236
+msgid "Add"
+msgstr "추가"
+
+#: settings/provider_dialog.py:120 settings/provider_dialog.py:334
+#: settings/settings_dialog.py:61 settings/settings_dialog.py:340
+#: compendium/ai_compendium_dialog.py:78
+msgid "Close"
+msgstr "닫기"
+
+#: settings/provider_dialog.py:174 settings/provider_dialog.py:193
+#: settings/provider_dialog.py:259 settings/provider_dialog.py:282
+#: workshop/workshop.py:350 muse/prompts_window.py:424
+#: muse/prompts_window.py:590 compendium/ai_compendium_dialog.py:591
+#: compendium/enhanced_compendium.py:324 compendium/enhanced_compendium.py:361
+#: compendium/enhanced_compendium.py:550 compendium/enhanced_compendium.py:743
+#: compendium/compendium_panel.py:325 compendium/compendium_panel.py:332
+#: compendium/compendium_panel.py:341 compendium/compendium_panel.py:442
+msgid "Error"
+msgstr "오류"
+
+#: settings/provider_dialog.py:199 settings/provider_dialog.py:216
+#: settings/provider_dialog.py:265 settings/provider_info_dialog.py:272
+msgid "API Key Required"
+msgstr "API 키 필요"
+
+#: settings/provider_dialog.py:226 settings/provider_dialog.py:325
+msgid "Hide"
+msgstr "숨기기"
+
+#: settings/provider_dialog.py:287 settings/provider_dialog.py:289
+#: settings/provider_dialog.py:291
+msgid "Test Result"
+msgstr "테스트 결과"
+
+#: settings/provider_dialog.py:287
+msgid "Connection successful!"
+msgstr "연결 성공!"
+
+#: settings/provider_dialog.py:289
+msgid "Connection failed. Check provider settings."
+msgstr "연결 실패. 제공자 설정을 확인하세요."
+
+#: settings/provider_dialog.py:291
+msgid "Connection failed: {}"
+msgstr "연결 실패: {}"
+
+#: settings/settings_dialog.py:25 settings/settings_dialog.py:325
+msgid "Preferences"
+msgstr "환경 설정"
+
+#: settings/settings_dialog.py:50 settings/settings_dialog.py:326
+msgid "General"
+msgstr "일반"
+
+#: settings/settings_dialog.py:51 settings/settings_dialog.py:327
+msgid "Appearance"
+msgstr "모양"
+
+#: settings/settings_dialog.py:52 settings/settings_dialog.py:328
+msgid "Providers"
+msgstr "제공자"
+
+#: settings/settings_dialog.py:59 settings/settings_dialog.py:339
+#: settings/settings_dialog.py:408 muse/prompts_window.py:480
+msgid "Save"
+msgstr "저장"
+
+#: settings/settings_dialog.py:75 settings/settings_dialog.py:329
+msgid "Fast Text to Speech"
+msgstr "빠른 텍스트 음성 변환"
+
+#: settings/settings_dialog.py:79 settings/settings_dialog.py:330
+msgid "Enable Auto-Save"
+msgstr "자동 저장 활성화"
+
+#: settings/settings_dialog.py:83 settings/settings_dialog.py:331
+msgid "Show Random Quotes"
+msgstr "무작위 인용구 표시"
+
+#: settings/settings_dialog.py:92 settings/settings_dialog.py:332
+msgid "Language"
+msgstr "언어"
+
+#: settings/settings_dialog.py:104 settings/settings_dialog.py:333
+msgid "Theme"
+msgstr "테마"
+
+#: settings/settings_dialog.py:107 settings/settings_dialog.py:334
+msgid "Background Color"
+msgstr "배경 색상"
+
+#: settings/settings_dialog.py:121 settings/settings_dialog.py:335
+msgid "Text Size"
+msgstr "텍스트 크기"
+
+#: settings/settings_dialog.py:127 settings/settings_dialog.py:337
+msgid "Sample Text"
+msgstr "샘플 텍스트"
+
+#: settings/settings_dialog.py:137 settings/settings_dialog.py:336
+msgid "Configured Providers"
+msgstr "구성된 제공자"
+
+#: settings/settings_dialog.py:148 settings/settings_dialog.py:342
+msgid "Edit"
+msgstr "편집"
+
+#: settings/settings_dialog.py:150 settings/settings_dialog.py:343
+#: workshop/workshop.py:378 muse/prompts_window.py:479
+#: project_window/project_tree_widget.py:137
+msgid "Delete"
+msgstr "삭제"
+
+#: settings/settings_dialog.py:206 settings/settings_dialog.py:210
+#: settings/settings_dialog.py:285 settings/settings_dialog.py:381
+#: settings/settings_dialog.py:395 compendium/compendium_panel.py:250
+msgid "Warning"
+msgstr "경고"
+
+#: settings/settings_dialog.py:206
+msgid "Provider name cannot be empty."
+msgstr "제공자 이름은 비워둘 수 없습니다."
+
+#: settings/settings_dialog.py:290 compendium/enhanced_compendium.py:763
+#: compendium/enhanced_compendium.py:778
+msgid "Confirm Deletion"
+msgstr "삭제 확인"
+
+#: settings/settings_dialog.py:291
+msgid "Are you sure you want to delete the selected provider?"
+msgstr "선택한 제공자를 삭제하시겠습니까?"
+
+#: settings/settings_dialog.py:391
+msgid "Save Result"
+msgstr "저장 결과"
+
+#: settings/settings_dialog.py:391
+msgid "Settings saved successfully."
+msgstr "설정이 성공적으로 저장되었습니다."
+
+#: settings/settings_dialog.py:395
+msgid "Failed to save settings."
+msgstr "설정 저장에 실패했습니다."
+
+#: settings/settings_dialog.py:406
+msgid "Unsaved Changes"
+msgstr "저장되지 않은 변경 사항"
+
+#: settings/settings_dialog.py:407
+msgid "You have unsaved changes. Do you want to save them before closing?"
+msgstr "저장되지 않은 변경 사항이 있습니다. 닫기 전에 저장하시겠습니까?"
+
+#: settings/settings_dialog.py:409
+msgid "Discard"
+msgstr "버리기"
+
+#: settings/settings_dialog.py:410 project_window/rewrite_feature.py:74
+#: project_window/dialogs.py:19
+msgid "Cancel"
+msgstr "취소"
+
+#: settings/provider_info_dialog.py:43
+msgid "Filter"
+msgstr "필터"
+
+#: settings/provider_info_dialog.py:46 settings/provider_info_dialog.py:325
+#: settings/provider_info_dialog.py:433
+msgid "All Models"
+msgstr "모든 모델"
+
+#: settings/provider_info_dialog.py:47 settings/provider_info_dialog.py:327
+#: settings/provider_info_dialog.py:434
+msgid "Free Models"
+msgstr "무료 모델"
+
+#: settings/provider_info_dialog.py:48 settings/provider_info_dialog.py:329
+#: settings/provider_info_dialog.py:435
+msgid "Chat Capabilities"
+msgstr "채팅 기능"
+
+#: settings/provider_info_dialog.py:49 settings/provider_info_dialog.py:331
+#: settings/provider_info_dialog.py:436
+msgid "Research Capabilities"
+msgstr "연구 기능"
+
+#: settings/provider_info_dialog.py:50 settings/provider_info_dialog.py:333
+#: settings/provider_info_dialog.py:437
+msgid "Instruction Following"
+msgstr "지침 따르기"
+
+#: settings/provider_info_dialog.py:55
+msgid "Group:"
+msgstr "그룹:"
+
+#: settings/provider_info_dialog.py:57 settings/provider_info_dialog.py:186
+#: settings/provider_info_dialog.py:194
+msgid "All"
+msgstr "모두"
+
+#: settings/provider_info_dialog.py:89
+msgid "Collapse all providers"
+msgstr "모든 제공자 접기"
+
+#: settings/provider_info_dialog.py:96
+msgid "Zoom in table content (CMD++)"
+msgstr "테이블 콘텐츠 확대 (CMD++)"
+
+#: settings/provider_info_dialog.py:102
+msgid "Zoom out table content (CMD+-)"
+msgstr "테이블 콘텐츠 축소 (CMD+-)"
+
+#: settings/provider_info_dialog.py:108
+msgid "Reset table content zoom"
+msgstr "테이블 콘텐츠 줌 초기화"
+
+#: settings/provider_info_dialog.py:266
+msgid "No models available or error fetching models."
+msgstr "사용 가능한 모델이 없거나 모델을 가져오는 중 오류가 발생했습니다."
+
+#: settings/provider_info_dialog.py:273
+msgid "An API key is required for "
+msgstr "API 키가 필요합니다: "
+
+#: settings/provider_info_dialog.py:273
+msgid ". Please enter it:"
+msgstr ". 입력하세요:"
+
+#: settings/provider_info_dialog.py:292
+msgid "API key is required for "
+msgstr "API 키가 필요합니다: "
+
+#: settings/provider_info_dialog.py:302
+msgid "Failed to fetch models for "
+msgstr "모델을 가져오지 못했습니다: "
+
+#: settings/provider_info_dialog.py:429
+msgid "Provider and Model Information"
+msgstr "제공자 및 모델 정보"
+
+#: workshop/workshop.py:28
+msgid "Workshop"
+msgstr "워크샵"
+
+#: workshop/workshop.py:93
+msgid "New Chat"
+msgstr "새 채팅"
+
+#: workshop/workshop.py:115
+msgid "Type your message here..."
+msgstr "여기에 메시지를 입력하세요..."
+
+#: workshop/workshop.py:136
+msgid "No Workshop Prompts"
+msgstr "워크샵 프롬프트 없음"
+
+#: workshop/workshop.py:177 muse/prompts_window.py:100
+msgid "Model:"
+msgstr "모델:"
+
+#: workshop/workshop.py:183
+msgid "Language:"
+msgstr "언어:"
+
+#: workshop/workshop.py:201
+msgid "Model: [None]"
+msgstr "모델: [없음]"
+
+#: workshop/workshop.py:233
+msgid "Selected mode:"
+msgstr "선택된 모드:"
+
+#: workshop/workshop.py:289
+msgid "LLM: Generating response..."
+msgstr "LLM: 응답 생성 중..."
+
+#: workshop/workshop.py:316
+msgid "LLM: [Conversation summarized to reduce token count.]"
+msgstr "LLM: [토큰 수를 줄이기 위해 대화 요약됨.]"
+
+#: workshop/workshop.py:350
+msgid "Failed to generate response: {}"
+msgstr "응답 생성 실패: {}"
+
+#: workshop/workshop.py:377 muse/prompts_window.py:476
+#: project_window/project_structure_manager.py:34
+#: project_window/project_tree_widget.py:136
+msgid "Rename"
+msgstr "이름 변경"
+
+#: workshop/workshop.py:387
+msgid "Rename Conversation"
+msgstr "대화 이름 변경"
+
+#: workshop/workshop.py:387
+msgid "Enter new conversation name:"
+msgstr "새 대화 이름을 입력하세요:"
+
+#: workshop/workshop.py:398
+msgid "Delete Conversation"
+msgstr "대화 삭제"
+
+#: workshop/workshop.py:398 workbench.py:122
+msgid "Are you sure you want to delete '{}'?"
+msgstr "'{}'을(를) 삭제하시겠습니까?"
+
+#: workshop/workshop.py:526
+msgid "Transcription Error"
+msgstr "전사 오류"
+
+#: muse/prompt_preview_dialog.py:12
+msgid "Prompt Preview"
+msgstr "프롬프트 미리보기"
+
+#: muse/prompt_preview_dialog.py:41
+msgid "Zoom In (Cmd+=)"
+msgstr "확대 (Cmd+=)"
+
+#: muse/prompt_preview_dialog.py:46
+msgid "Zoom Out (Cmd+-)"
+msgstr "축소 (Cmd+-)"
+
+#: muse/prompt_preview_dialog.py:48
+msgid "OK"
+msgstr "확인"
+
+#: muse/prompt_preview_dialog.py:56
+msgid "Token Count: 0"
+msgstr "토큰 수: 0"
+
+#: muse/prompt_preview_dialog.py:172
+msgid "Token Count: {}"
+msgstr "토큰 수: {}"
+
+#: muse/prompt_preview_dialog.py:174
+msgid "Token Count: Error ({})"
+msgstr "토큰 수: 오류 ({})"
+
+#: muse/prompt_handler.py:70
+msgid "Missing variables for prompt: {}"
+msgstr "프롬프트에 필요한 변수 누락: {}"
+
+#: muse/prompt_utils.py:39
+#, python-brace-format
+msgid ""
+"You are collaborating with the author to write a scene. Write the scene in "
+"{pov} point of view, from the perspective of {pov_character}, and in {tense}."
+msgstr ""
+"당신은 작가와 협력하여 장면을 작성하고 있습니다. {pov} 시점에서, "
+"{pov_character}의 관점으로, {tense}로 장면을 작성하세요."
+
+#: muse/prompt_utils.py:40
+msgid ""
+"Summarize the following chapter for use in a story prompt, covering Goal, "
+"Key Events, Character Dev, Info Revealed, Emotional Arc, and Plot Setup. Be "
+"conscientious of token usage."
+msgstr ""
+"다음 챕터를 스토리 프롬프트에 사용하기 위해 요약하세요. 목표, 주요 사건, "
+"캐릭터 발전, 드러난 정보, 감정적 흐름, 플롯 설정을 다루되, 토큰 사용에 "
+"주의하세요."
+
+#: muse/prompt_utils.py:41
+msgid "Rewrite the passage for clarity."
+msgstr "명확성을 위해 해당 구절을 다시 작성하세요."
+
+#: muse/prompt_utils.py:42
+msgid ""
+"I need your help with my project. Please provide creative brainstorming and "
+"ideas."
+msgstr ""
+"내 프로젝트에 도움이 필요합니다. 창의적인 브레인스토밍과 아이디어를 제공해 "
+"주세요."
+
+#: muse/prompt_utils.py:45
+msgid "Default {} Prompt"
+msgstr "기본 {} 프롬프트"
+
+#: muse/prompt_panel.py:23
+msgid "Select a {} Prompt"
+msgstr "{} 프롬프트 선택"
+
+#: muse/prompt_panel.py:96 muse/prompt_panel.py:99
+msgid "Default Model"
+msgstr "기본 모델"
+
+#: muse/prompts_window.py:19
+msgid "Prompts - "
+msgstr "프롬프트 - "
+
+#: muse/prompts_window.py:49
+msgid "Prompts"
+msgstr "프롬프트"
+
+#: muse/prompts_window.py:66 muse/prompts_window.py:469
+msgid "Replicate"
+msgstr "복제"
+
+#: muse/prompts_window.py:67
+msgid "This is a read-only default prompt. Create a copy to edit it."
+msgstr "이것은 읽기 전용 기본 프롬프트입니다. 편집하려면 복사본을 만드세요."
+
+#: muse/prompts_window.py:82
+msgid "Provider:"
+msgstr "제공자:"
+
+#: muse/prompts_window.py:85
+msgid "Show Model Details"
+msgstr "모델 세부 정보 표시"
+
+#: muse/prompts_window.py:102
+msgid "Refresh model list"
+msgstr "모델 목록 새로 고침"
+
+#: muse/prompts_window.py:125
+msgid "Max Tokens:"
+msgstr "최대 토큰:"
+
+#: muse/prompts_window.py:135
+msgid "Temperature:"
+msgstr "온도:"
+
+#: muse/prompts_window.py:165 muse/prompts_window.py:414
+msgid "Save All"
+msgstr "모두 저장"
+
+#: muse/prompts_window.py:211
+msgid "Loading models..."
+msgstr "모델 로드 중..."
+
+#: muse/prompts_window.py:221
+msgid "Error fetching models: {}"
+msgstr "모델 가져오기 오류: {}"
+
+#: muse/prompts_window.py:227 muse/prompts_window.py:248
+#: project_window/project_window.py:324 project_window/project_window.py:339
+#: project_window/project_window.py:354 project_window/project_window.py:731
+#: project_window/project_window.py:745 project_window/project_window.py:754
+#: project_window/bottom_stack.py:140 project_window/bottom_stack.py:141
+#: project_window/bottom_stack.py:142
+msgid "Custom..."
+msgstr "사용자 지정..."
+
+#: muse/prompts_window.py:250
+msgid "Custom Model"
+msgstr "사용자 지정 모델"
+
+#: muse/prompts_window.py:251
+msgid "Enter the model identifier:"
+msgstr "모델 식별자를 입력하세요:"
+
+#: muse/prompts_window.py:296
+msgid ""
+"\n"
+"Default prompt (read-only): LLM settings cannot be modified."
+msgstr ""
+"\n"
+"기본 프롬프트(읽기 전용): LLM 설정은 수정할 수 없습니다."
+
+#: muse/prompts_window.py:349
+msgid "Default prompts are read-only. LLM settings cannot be modified."
+msgstr "기본 프롬프트는 읽기 전용입니다. LLM 설정은 수정할 수 없습니다."
+
+#: muse/prompts_window.py:414
+msgid "Prompts saved successfully."
+msgstr "프롬프트가 성공적으로 저장되었습니다."
+
+#: muse/prompts_window.py:424
+msgid "Error saving prompts: {}"
+msgstr "프롬프트 저장 오류: {}"
+
+#: muse/prompts_window.py:463 muse/prompts_window.py:498
+msgid "New Prompt"
+msgstr "새 프롬프트"
+
+#: muse/prompts_window.py:470
+msgid "Default prompt (read-only)"
+msgstr "기본 프롬프트(읽기 전용)"
+
+#: muse/prompts_window.py:477 project_window/project_tree_widget.py:138
+#: compendium/ai_compendium_dialog.py:337 compendium/enhanced_compendium.py:405
+#: compendium/enhanced_compendium.py:423 compendium/enhanced_compendium.py:445
+msgid "Move Up"
+msgstr "위로 이동"
+
+#: muse/prompts_window.py:478 project_window/project_tree_widget.py:139
+#: compendium/ai_compendium_dialog.py:338 compendium/enhanced_compendium.py:406
+#: compendium/enhanced_compendium.py:424 compendium/enhanced_compendium.py:446
+msgid "Move Down"
+msgstr "아래로 이동"
+
+#: muse/prompts_window.py:498
+msgid "Enter prompt name:"
+msgstr "프롬프트 이름을 입력하세요:"
+
+#: muse/prompts_window.py:537 muse/prompts_window.py:581
+msgid "Save Prompt"
+msgstr "프롬프트 저장"
+
+#: muse/prompts_window.py:538
+msgid "Cannot save: Either not a prompt or it is a default prompt (read-only)."
+msgstr "저장할 수 없습니다: 프롬프트가 아니거나 기본 프롬프트(읽기 전용)입니다."
+
+#: muse/prompts_window.py:581
+msgid "Prompt '{}' saved successfully."
+msgstr "프롬프트 '{}'가 성공적으로 저장되었습니다."
+
+#: muse/prompts_window.py:590
+msgid "Error saving prompt: {}"
+msgstr "프롬프트 저장 오류: {}"
+
+#: muse/prompts_window.py:596 muse/prompts_window.py:602
+msgid "Rename Prompt"
+msgstr "프롬프트 이름 변경"
+
+#: muse/prompts_window.py:597
+msgid "Default prompts cannot be renamed."
+msgstr "기본 프롬프트는 이름을 변경할 수 없습니다."
+
+#: muse/prompts_window.py:602
+msgid "Enter new prompt name:"
+msgstr "새 프롬프트 이름을 입력하세요:"
+
+#: muse/prompts_window.py:619
+msgid "Move Prompt"
+msgstr "프롬프트 이동"
+
+#: muse/prompts_window.py:620
+msgid "Default prompts cannot be moved."
+msgstr "기본 프롬프트는 이동할 수 없습니다."
+
+#: muse/prompts_window.py:643 muse/prompts_window.py:653
+msgid "Delete Prompt"
+msgstr "프롬프트 삭제"
+
+#: muse/prompts_window.py:644
+msgid "Default prompts cannot be deleted."
+msgstr "기본 프롬프트는 삭제할 수 없습니다."
+
+#: muse/prompts_window.py:653
+msgid "Delete prompt '{}'?"
+msgstr "프롬프트 '{}'를 삭제하시겠습니까?"
+
+#: muse/prompts_window.py:672
+msgid "Replicate Prompt"
+msgstr "프롬프트 복제"
+
+#: muse/prompts_window.py:673
+msgid "Enter name for the new prompt:"
+msgstr "새 프롬프트의 이름을 입력하세요:"
+
+#: muse/prompts_window.py:691
+msgid "Replicated"
+msgstr "복제됨"
+
+#: muse/prompts_window.py:691
+msgid "Prompt replicated. You can now edit the new prompt."
+msgstr "프롬프트가 복제되었습니다. 이제 새 프롬프트를 편집할 수 있습니다."
+
+#: workbench.py:31
+msgid "Load Version Error"
+msgstr "버전 로드 오류"
+
+#: workbench.py:32
+msgid "Error loading version: {}"
+msgstr "버전 로드 오류: {}"
+
+#: workbench.py:62
+msgid "Load Projects Error"
+msgstr "프로젝트 로드 오류"
+
+#: workbench.py:63
+msgid "Error loading projects: {}"
+msgstr "프로젝트 로드 오류: {}"
+
+#: workbench.py:74
+msgid "Save Projects Error"
+msgstr "프로젝트 저장 오류"
+
+#: workbench.py:75
+msgid "Error saving projects: {}"
+msgstr "프로젝트 저장 오류: {}"
+
+#: workbench.py:93 workbench.py:310
+msgid ""
+"Left-click: Open project\n"
+"Right-click: Options (Delete, Export, Stats, Edit Cover)"
+msgstr ""
+"왼쪽 클릭: 프로젝트 열기\n"
+"오른쪽 클릭: 옵션 (삭제, 내보내기, 통계, 표지 편집)"
+
+#: workbench.py:113 workbench.py:223 workbench.py:228 workbench.py:232
+#: workbench.py:245
+msgid "Rename Project"
+msgstr "프로젝트 이름 변경"
+
+#: workbench.py:114 workbench.py:121 workbench.py:130
+msgid "Delete Project"
+msgstr "프로젝트 삭제"
+
+#: workbench.py:115 workbench.py:139
+msgid "Export Project"
+msgstr "프로젝트 내보내기"
+
+#: workbench.py:116
+msgid "Project Statistics"
+msgstr "프로젝트 통계"
+
+#: workbench.py:117
+msgid "Add Book Cover"
+msgstr "책 표지 추가"
+
+#: workbench.py:130
+msgid "Project '{}' deleted."
+msgstr "프로젝트 '{}'가 삭제되었습니다."
+
+#: workbench.py:136
+msgid "Delete Project Error"
+msgstr "프로젝트 삭제 오류"
+
+#: workbench.py:136
+msgid "Error deleting project: {}"
+msgstr "프로젝트 삭제 오류: {}"
+
+#: workbench.py:140
+msgid "Export '{}' functionality will be implemented later."
+msgstr "'{}' 내보내기 기능은 나중에 구현될 예정입니다."
+
+#: workbench.py:164
+msgid ""
+"Could not automatically find the directory for project '{}'. Please select "
+"the project directory manually."
+msgstr ""
+"프로젝트 '{}'의 디렉토리를 자동으로 찾을 수 없습니다. 프로젝트 디렉토리를 "
+"수동으로 선택하세요."
+
+#: workbench.py:165
+msgid "Select Project Directory"
+msgstr "프로젝트 디렉토리 선택"
+
+#: workbench.py:167
+msgid "Select Directory for Project '{}'"
+msgstr "프로젝트 '{}'의 디렉토리 선택"
+
+#: workbench.py:171
+msgid "User cancelled the project directory selection"
+msgstr "사용자가 프로젝트 디렉토리 선택을 취소했습니다"
+
+#: workbench.py:173
+msgid "Invalid project directory: {}"
+msgstr "잘못된 프로젝트 디렉토리: {}"
+
+#: workbench.py:180
+msgid "Statistics Error"
+msgstr "통계 오류"
+
+#: workbench.py:181
+msgid ""
+"Error loading project statistics: {}\n"
+"\n"
+"Project: '{}'\n"
+"Current directory: {}\n"
+"\n"
+"Details (for debugging):\n"
+"{}"
+msgstr ""
+"프로젝트 통계 로드 오류: {}\n"
+"\n"
+"프로젝트: '{}'\n"
+"현재 디렉토리: {}\n"
+"\n"
+"세부 정보 (디버깅용):\n"
+"{}"
+
+#: workbench.py:189
+msgid "Error Adding Cover"
+msgstr "표지 추가 오류"
+
+#: workbench.py:190
+msgid "Error adding book cover: {}"
+msgstr "책 표지 추가 오류: {}"
+
+#: workbench.py:196
+msgid "Error Renaming Project"
+msgstr "프로젝트 이름 변경 오류"
+
+#: workbench.py:197
+msgid "Error renaming project: {}"
+msgstr "프로젝트 이름 변경 오류: {}"
+
+#: workbench.py:201
+msgid "Select Book Cover"
+msgstr "책 표지 선택"
+
+#: workbench.py:201
+msgid "Image Files (*.png *.jpg *.jpeg *.bmp)"
+msgstr "이미지 파일 (*.png *.jpg *.jpeg *.bmp)"
+
+#: workbench.py:211
+msgid "Invalid Image"
+msgstr "잘못된 이미지"
+
+#: workbench.py:212
+msgid "The selected file is not a valid image."
+msgstr "선택한 파일은 유효한 이미지가 아닙니다."
+
+#: workbench.py:223
+msgid "Enter the project's new name:"
+msgstr "프로젝트의 새 이름을 입력하세요:"
+
+#: workbench.py:229 workbench.py:609
+msgid "Project '{}' already exists."
+msgstr "프로젝트 '{}'가 이미 존재합니다."
+
+#: workbench.py:233
+msgid "Project name is unchanged."
+msgstr "프로젝트 이름이 변경되지 않았습니다."
+
+#: workbench.py:245
+msgid "Project {} renamed to '{}'"
+msgstr "프로젝트 {}가 '{}'로 이름이 변경되었습니다."
+
+#: workbench.py:255
+msgid "Project '{}' directory already exists."
+msgstr "프로젝트 '{}' 디렉토리가 이미 존재합니다."
+
+#: workbench.py:317 workbench.py:542
+msgid "Writingway - Workbench"
+msgstr "Writingway - 워크벤치"
+
+#: workbench.py:350 workbench.py:547
+msgid "Click here to configure global options (paths, fonts, themes, etc.)"
+msgstr "전역 옵션(경로, 글꼴, 테마 등)을 구성하려면 여기를 클릭하세요."
+
+#: workbench.py:365 workbench.py:543
+msgid "Previous Project"
+msgstr "이전 프로젝트"
+
+#: workbench.py:378 workbench.py:544
+msgid "Next Project"
+msgstr "다음 프로젝트"
+
+#: workbench.py:383 workbench.py:545 workbench.py:573
+msgid "＋ New Project"
+msgstr "＋ 새 프로젝트"
+
+#: workbench.py:386 workbench.py:546
+msgid "Create a brand-new project"
+msgstr "완전히 새로운 프로젝트를 만드세요"
+
+#: workbench.py:401 workbench.py:548
+msgid "Version: {}"
+msgstr "버전: {}"
+
+#: workbench.py:426 workbench.py:462
+msgid "No quote available"
+msgstr "인용구 없음"
+
+#: workbench.py:427 workbench.py:462
+msgid "Unknown"
+msgstr "알 수 없음"
+
+#: workbench.py:447 workbench.py:457
+msgid "Empty quotes list"
+msgstr "빈 인용구 목록"
+
+#: workbench.py:605 workbench.py:608 workbench.py:618 workbench.py:621
+msgid "New Project"
+msgstr "새 프로젝트"
+
+#: workbench.py:605
+msgid "Enter new project name:"
+msgstr "새 프로젝트 이름을 입력하세요:"
+
+#: workbench.py:618
+msgid "Project '{}' created."
+msgstr "프로젝트 '{}'가 생성되었습니다."
+
+#: workbench.py:621
+msgid "Project creation cancelled."
+msgstr "프로젝트 생성이 취소되었습니다."
+
+#: project_window/summary_controller.py:26
+msgid "Selected prompt not found."
+msgstr "선택한 프롬프트를 찾을 수 없습니다."
+
+#: project_window/summary_controller.py:32
+#: project_window/summary_controller.py:55
+msgid "No child scene content found to summarize."
+msgstr "요약할 하위 장면 콘텐츠를 찾을 수 없습니다."
+
+#: project_window/summary_controller.py:37
+msgid "Generating summary, please wait..."
+msgstr "요약 생성 중, 잠시 기다리세요..."
+
+#: project_window/summary_controller.py:45
+msgid "Select Summary Prompt"
+msgstr "요약 프롬프트 선택"
+
+#: project_window/summary_controller.py:46
+msgid "Please select a summary prompt."
+msgstr "요약 프롬프트를 선택하세요."
+
+#: project_window/summary_controller.py:74
+msgid "Please select an Act or Chapter (not a Scene)."
+msgstr "막 또는 챕터를 선택하세요 (장면이 아님)."
+
+#: project_window/summary_controller.py:85
+msgid "LLM returned no output."
+msgstr "LLM이 출력을 반환하지 않았습니다."
+
+#: project_window/summary_controller.py:91
+msgid "Summary generated successfully."
+msgstr "요약이 성공적으로 생성되었습니다."
+
+#: project_window/summary_controller.py:94 project_window/project_window.py:557
+#: project_window/project_window.py:565 project_window/project_window.py:567
+#: project_window/bottom_stack.py:46
+msgid "Summary"
+msgstr "요약"
+
+#: project_window/summary_controller.py:97
+msgid "Summary Error"
+msgstr "요약 오류"
+
+#: project_window/project_model.py:30 project_window/bottom_stack.py:140
+msgid "Third Person Limited"
+msgstr "3인칭 제한 시점"
+
+#: project_window/project_model.py:31 project_window/project_window.py:386
+#: project_window/project_window.py:428 project_window/bottom_stack.py:203
+msgid "Character"
+msgstr "캐릭터"
+
+#: project_window/project_model.py:32 project_window/project_window.py:387
+#: project_window/project_window.py:429 project_window/bottom_stack.py:142
+#: project_window/bottom_stack.py:204
+msgid "Present Tense"
+msgstr "현재 시제"
+
+#: project_window/project_model.py:207
+msgid "Provide either uuid or hierarchy, not both"
+msgstr "UUID 또는 계층 구조 중 하나만 제공하세요, 둘 다 제공하지 마세요."
+
+#: project_window/project_model.py:209
+msgid "Either uuid or hierarchy must be provided"
+msgstr "UUID 또는 계층 구조 중 하나를 제공해야 합니다."
+
+#: project_window/project_model.py:251
+msgid "An Act named '{}' already exists. Please choose a unique name."
+msgstr "'{}'라는 이름의 막이 이미 존재합니다. 고유한 이름을 선택하세요."
+
+#: project_window/project_model.py:257 project_window/project_model.py:273
+msgid "This is the summary for {}."
+msgstr "이것은 {}에 대한 요약입니다."
+
+#: project_window/project_model.py:268
+msgid ""
+"A Chapter named '{}' already exists in Act '{}'. Please choose a unique name."
+msgstr "'{}'라는 이름의 챕터가 이미 '{}' 막에 존재합니다. 고유한 이름을 선택하세요."
+
+#: project_window/project_model.py:287
+msgid ""
+"A Scene named '{}' already exists in Chapter '{}' of Act '{}'. Please choose "
+"a unique name."
+msgstr "'{}'라는 이름의 장면이 '{}' 막의 '{}' 챕터에 이미 존재합니다. 고유한 이름을 선택하세요."
+
+#: project_window/project_model.py:308
+msgid "A {} named '{}' already exists {}. Please choose a unique name."
+msgstr "'{}'라는 이름의 {}이 이미 {}에 존재합니다. 고유한 이름을 선택하세요."
+
+#: project_window/rewrite_feature.py:27
+msgid "Rewrite Selected Text"
+msgstr "선택한 텍스트 다시 작성"
+
+#: project_window/rewrite_feature.py:34
+msgid "Original Text:"
+msgstr "원본 텍스트:"
+
+#: project_window/rewrite_feature.py:42
+msgid "Select Rewrite Prompt:"
+msgstr "다시 작성 프롬프트 선택:"
+
+#: project_window/rewrite_feature.py:47 project_window/rewrite_feature.py:93
+#: project_window/rewrite_feature.py:116 project_window/rewrite_feature.py:127
+#: project_window/project_window.py:701 project_window/project_window.py:708
+msgid "Rewrite"
+msgstr "다시 작성"
+
+#: project_window/rewrite_feature.py:47
+msgid "No rewrite prompts found."
+msgstr "다시 작성 프롬프트를 찾을 수 없습니다."
+
+#: project_window/rewrite_feature.py:55
+msgid "Generate Rewrite"
+msgstr "다시 작성 생성"
+
+#: project_window/rewrite_feature.py:60
+msgid "Rewritten Text:"
+msgstr "다시 작성된 텍스트:"
+
+#: project_window/rewrite_feature.py:68
+msgid "Apply"
+msgstr "적용"
+
+#: project_window/rewrite_feature.py:71
+msgid "Generate"
+msgstr "생성"
+
+#: project_window/rewrite_feature.py:93
+msgid "Selected prompt has no text."
+msgstr "선택한 프롬프트에 텍스트가 없습니다."
+
+#: project_window/rewrite_feature.py:116
+msgid "Error sending prompt to LLM: {}"
+msgstr "LLM에 프롬프트 전송 오류: {}"
+
+#: project_window/rewrite_feature.py:127
+msgid "No rewritten text to apply."
+msgstr "적용할 다시 작성된 텍스트가 없습니다."
+
+#: project_window/project_structure_manager.py:7
+#: project_window/project_tree_widget.py:134
+msgid "Add Act"
+msgstr "막 추가"
+
+#: project_window/project_structure_manager.py:7
+#: project_window/project_tree_widget.py:134
+msgid "Enter act name:"
+msgstr "막 이름을 입력하세요:"
+
+#: project_window/project_structure_manager.py:14
+#: project_window/project_tree_widget.py:142
+msgid "Add Chapter"
+msgstr "챕터 추가"
+
+#: project_window/project_structure_manager.py:14
+msgid "Enter chapter name:"
+msgstr "챕터 이름을 입력하세요:"
+
+#: project_window/project_structure_manager.py:22
+#: project_window/project_tree_widget.py:144
+msgid "Add Scene"
+msgstr "장면 추가"
+
+#: project_window/project_structure_manager.py:22
+msgid "Enter scene name:"
+msgstr "장면 이름을 입력하세요:"
+
+#: project_window/project_structure_manager.py:34
+msgid "Enter new name:"
+msgstr "새 이름을 입력하세요:"
+
+#: project_window/project_window.py:74
+msgid "Project: {}"
+msgstr "프로젝트: {}"
+
+#: project_window/project_window.py:113 project_window/project_window.py:771
+msgid "Words: {}"
+msgstr "단어 수: {}"
+
+#: project_window/project_window.py:114 project_window/project_window.py:298
+msgid "Last Saved: {}"
+msgstr "마지막 저장: {}"
+
+#: project_window/project_window.py:237
+msgid "Enter scene content..."
+msgstr "장면 콘텐츠를 입력하세요..."
+
+#: project_window/project_window.py:245
+msgid "Enter summary for {}..."
+msgstr "{}에 대한 요약을 입력하세요..."
+
+#: project_window/project_window.py:269 project_window/project_window.py:273
+#: project_window/scene_editor.py:53
+msgid "Manual Save"
+msgstr "수동 저장"
+
+#: project_window/project_window.py:269
+msgid "Please select a scene for manual save."
+msgstr "수동 저장을 위해 장면을 선택하세요."
+
+#: project_window/project_window.py:273
+msgid "There is no content to save."
+msgstr "저장할 콘텐츠가 없습니다."
+
+#: project_window/project_window.py:278
+msgid "Scene manually saved"
+msgstr "장면이 수동으로 저장되었습니다"
+
+#: project_window/project_window.py:292
+msgid "Scene autosaved"
+msgstr "장면이 자동 저장되었습니다"
+
+#: project_window/project_window.py:309
+msgid "Backup Versions"
+msgstr "백업 버전"
+
+#: project_window/project_window.py:309
+msgid "Please select a scene to view backups."
+msgstr "백업을 보려면 장면을 선택하세요."
+
+#: project_window/project_window.py:320
+msgid "Backup Loaded"
+msgstr "백업 로드됨"
+
+#: project_window/project_window.py:320
+msgid ""
+"Backup loaded from:\n"
+"{}"
+msgstr ""
+"백업이 다음에서 로드됨:\n"
+"{}"
+
+#: project_window/project_window.py:325
+msgid "Custom POV"
+msgstr "사용자 지정 시점"
+
+#: project_window/project_window.py:325
+msgid "Enter custom POV:"
+msgstr "사용자 지정 시점을 입력하세요:"
+
+#: project_window/project_window.py:340
+msgid "Custom POV Character"
+msgstr "사용자 지정 시점 캐릭터"
+
+#: project_window/project_window.py:340
+msgid "Enter custom POV Character:"
+msgstr "사용자 지정 시점 캐릭터를 입력하세요:"
+
+#: project_window/project_window.py:368 project_window/bottom_stack.py:180
+msgid "POV: {}"
+msgstr "시점: {}"
+
+#: project_window/project_window.py:369 project_window/bottom_stack.py:182
+msgid "POV Character: {}"
+msgstr "시점 캐릭터: {}"
+
+#: project_window/project_window.py:375 project_window/project_window.py:380
+msgid "LLM Prompt"
+msgstr "LLM 프롬프트"
+
+#: project_window/project_window.py:375
+msgid "Please enter some action beats before sending."
+msgstr "전송 전에 액션 비트를 입력하세요."
+
+#: project_window/project_window.py:380
+msgid "Please select a prompt."
+msgstr "프롬프트를 선택하세요."
+
+#: project_window/project_window.py:385 project_window/project_window.py:427
+#: project_window/bottom_stack.py:202
+msgid "Third Person"
+msgstr "3인칭"
+
+#: project_window/project_window.py:421
+msgid "Generating summary to fit token limit…"
+msgstr "토큰 제한에 맞게 요약 생성 중…"
+
+#: project_window/project_window.py:452
+msgid "Summary generated. Edit if needed, then resend."
+msgstr "요약이 생성되었습니다. 필요하면 편집한 후 다시 보내세요."
+
+#: project_window/project_window.py:496
+msgid "Thread Error"
+msgstr "스레드 오류"
+
+#: project_window/project_window.py:496
+msgid "An error occurred while stopping the LLM thread: {}"
+msgstr "LLM 스레드를 중지하는 동안 오류가 발생했습니다: {}"
+
+#: project_window/project_window.py:504
+msgid "LLM Response"
+msgstr "LLM 응답"
+
+#: project_window/project_window.py:504
+msgid ""
+"The LLM did not return any text. Possible token limit reached or an error "
+"occurred."
+msgstr ""
+"LLM이 텍스트를 반환하지 않았습니다. 토큰 제한에 도달했거나 오류가 발생했을 수 있습니다."
+
+#: project_window/project_window.py:528 project_window/project_window.py:551
+msgid "Apply Preview"
+msgstr "미리보기 적용"
+
+#: project_window/project_window.py:528
+msgid "No preview text to apply."
+msgstr "적용할 미리보기 텍스트가 없습니다."
+
+#: project_window/project_window.py:551 project_window/token_limit_dialog.py:46
+msgid "Error: {}"
+msgstr "오류: {}"
+
+#: project_window/project_window.py:557
+msgid "No Act or Chapter selected."
+msgstr "막 또는 챕터가 선택되지 않았습니다."
+
+#: project_window/project_window.py:563
+msgid "Summary saved successfully"
+msgstr "요약이 성공적으로 저장되었습니다"
+
+#: project_window/project_window.py:565
+msgid "Summary saved successfully."
+msgstr "요약이 성공적으로 저장되었습니다."
+
+#: project_window/project_window.py:567
+msgid "Failed to save summary."
+msgstr "요약 저장에 실패했습니다."
+
+#: project_window/project_window.py:640
+msgid "TTS Warning"
+msgstr "TTS 경고"
+
+#: project_window/project_window.py:640
+msgid "There is no text to read."
+msgstr "읽을 텍스트가 없습니다."
+
+#: project_window/project_window.py:708
+msgid "No text selected to rewrite."
+msgstr "다시 작성할 텍스트가 선택되지 않았습니다."
+
+#: project_window/project_window.py:749
+msgid "-- Select Character --"
+msgstr "-- 캐릭터 선택 --"
+
+#: project_window/bottom_stack.py:52 project_window/bottom_stack.py:109
+msgid "Preview the final prompt"
+msgstr "최종 프롬프트 미리보기"
+
+#: project_window/bottom_stack.py:57 project_window/dialogs.py:7
+msgid "Create Summary"
+msgstr "요약 생성"
+
+#: project_window/bottom_stack.py:59
+msgid "Save Summary"
+msgstr "요약 저장"
+
+#: project_window/bottom_stack.py:75
+msgid "LLM output preview will appear here..."
+msgstr "LLM 출력 미리보기가 여기에 표시됩니다..."
+
+#: project_window/bottom_stack.py:79
+msgid "Appends the LLM's output to your current scene"
+msgstr "LLM의 출력을 현재 장면에 추가합니다"
+
+#: project_window/bottom_stack.py:81
+msgid "Include Action Beats"
+msgstr "액션 비트 포함"
+
+#: project_window/bottom_stack.py:82
+msgid "Include the text from the Action Beats field in the scene text"
+msgstr "액션 비트 필드의 텍스트를 장면 텍스트에 포함"
+
+#: project_window/bottom_stack.py:95
+msgid "Enter your action beats here..."
+msgstr "여기에 액션 비트를 입력하세요..."
+
+#: project_window/bottom_stack.py:103
+msgid "Prose"
+msgstr "산문"
+
+#: project_window/bottom_stack.py:115
+msgid "Sends the action beats to the LLM"
+msgstr "액션 비트를 LLM에 전송합니다"
+
+#: project_window/bottom_stack.py:121
+msgid "Stop the LLM processing"
+msgstr "LLM 처리 중지"
+
+#: project_window/bottom_stack.py:127
+msgid "Toggle context panel"
+msgstr "컨텍스트 패널 토글"
+
+#: project_window/bottom_stack.py:140
+msgid "POV"
+msgstr "시점"
+
+#: project_window/bottom_stack.py:140
+msgid "First Person"
+msgstr "1인칭"
+
+#: project_window/bottom_stack.py:140
+msgid "Omniscient"
+msgstr "전지적"
+
+#: project_window/bottom_stack.py:141
+msgid "POV Character"
+msgstr "시점 캐릭터"
+
+#: project_window/bottom_stack.py:142
+msgid "Tense"
+msgstr "시제"
+
+#: project_window/bottom_stack.py:142
+msgid "Past Tense"
+msgstr "과거 시제"
+
+#: project_window/bottom_stack.py:184
+msgid "Tense: {}"
+msgstr "시제: {}"
+
+#: project_window/token_limit_dialog.py:39
+msgid "Token Limit Exceeded"
+msgstr "토큰 제한 초과"
+
+#: project_window/token_limit_dialog.py:46
+msgid ""
+"\n"
+"The story is too long. Please edit the summary below:"
+msgstr ""
+"\n"
+"스토리가 너무 깁니다. 아래 요약을 편집하세요:"
+
+#: project_window/token_limit_dialog.py:57
+msgid "Use This Summary"
+msgstr "이 요약 사용"
+
+#: project_window/token_limit_dialog.py:59
+msgid "Truncate Story"
+msgstr "스토리 자르기"
+
+#: project_window/token_limit_dialog.py:68
+msgid "Tokens: Calculating..."
+msgstr "토큰: 계산 중..."
+
+#: project_window/token_limit_dialog.py:79
+msgid "Tokens: {}/{}"
+msgstr "토큰: {}/{}"
+
+#: project_window/token_limit_dialog.py:95
+msgid "Empty Summary"
+msgstr "빈 요약"
+
+#: project_window/token_limit_dialog.py:95
+msgid "Please provide a summary before proceeding."
+msgstr "계속하기 전에 요약을 제공하세요."
+
+#: project_window/project_tree_widget.py:25
+msgid "Status"
+msgstr "상태"
+
+#: project_window/project_tree_widget.py:40
+#: project_window/project_tree_widget.py:42
+#: project_window/project_tree_widget.py:102
+#: project_window/project_tree_widget.py:109
+#: project_window/project_tree_widget.py:111
+#: project_window/project_tree_widget.py:147
+msgid "To Do"
+msgstr "할 일"
+
+#: project_window/project_tree_widget.py:43
+#: project_window/project_tree_widget.py:112
+#: project_window/project_tree_widget.py:147
+msgid "In Progress"
+msgstr "진행 중"
+
+#: project_window/project_tree_widget.py:44
+#: project_window/project_tree_widget.py:113
+#: project_window/project_tree_widget.py:147
+msgid "Final Draft"
+msgstr "최종 초안"
+
+#: project_window/project_tree_widget.py:146
+msgid "Set Scene Status"
+msgstr "장면 상태 설정"
+
+#: project_window/project_tree_widget.py:153
+msgid "Duplicate Name Error"
+msgstr "중복 이름 오류"
+
+#: project_window/global_toolbar.py:11
+msgid "Global Actions"
+msgstr "전역 작업"
+
+#: project_window/global_toolbar.py:20
+msgid "Toggle Compendium"
+msgstr "컴펜디엄 토글"
+
+#: project_window/global_toolbar.py:21
+msgid "Prompt Options"
+msgstr "프롬프트 옵션"
+
+#: project_window/global_toolbar.py:22
+msgid "Workshop Chat"
+msgstr "워크샵 채팅"
+
+#: project_window/global_toolbar.py:23 project_window/focus_mode.py:46
+msgid "Focus Mode"
+msgstr "포커스 모드"
+
+#: project_window/scene_editor.py:18
+msgid "Editor Toolbar"
+msgstr "편집기 도구 모음"
+
+#: project_window/scene_editor.py:29
+msgid "Bold"
+msgstr "굵게"
+
+#: project_window/scene_editor.py:30
+msgid "Italic"
+msgstr "기울임"
+
+#: project_window/scene_editor.py:31
+msgid "Underline"
+msgstr "밑줄"
+
+#: project_window/scene_editor.py:33
+msgid "Play TTS (or Stop if playing)"
+msgstr "TTS 재생 (재생 중이면 중지)"
+
+#: project_window/scene_editor.py:35
+msgid "Align Left"
+msgstr "왼쪽 정렬"
+
+#: project_window/scene_editor.py:36
+msgid "Center Align"
+msgstr "중앙 정렬"
+
+#: project_window/scene_editor.py:37
+msgid "Align Right"
+msgstr "오른쪽 정렬"
+
+#: project_window/scene_editor.py:41
+msgid "Select a font"
+msgstr "글꼴 선택"
+
+#: project_window/scene_editor.py:47
+msgid "Select font size"
+msgstr "글꼴 크기 선택"
+
+#: project_window/scene_editor.py:54
+msgid "Show Backups"
+msgstr "백업 표시"
+
+#: project_window/scene_editor.py:55
+msgid "Open Analysis Editor"
+msgstr "분석 편집기 열기"
+
+#: project_window/scene_editor.py:56
+msgid "Open Whisper"
+msgstr "Whisper 열기"
+
+#: project_window/scene_editor.py:57
+msgid "Open Wikipedia"
+msgstr "위키피디아 열기"
+
+#: project_window/scene_editor.py:58
+msgid "Open Internet Archive"
+msgstr "인터넷 아카이브 열기"
+
+#: project_window/scene_editor.py:71
+msgid "Select a node to edit its content..."
+msgstr "콘텐츠를 편집할 노드를 선택하세요..."
+
+#: project_window/dialogs.py:13
+msgid "Edit summarizer prompt:"
+msgstr "요약 프롬프트 편집:"
+
+#: project_window/dialogs.py:18
+msgid "Okay"
+msgstr "확인"
+
+#: project_window/dialogs.py:30
+msgid "Input Error"
+msgstr "입력 오류"
+
+#: project_window/dialogs.py:30
+msgid "The summarizer prompt cannot be empty."
+msgstr "요약 프롬프트는 비워둘 수 없습니다."
+
+#: compendium/ai_compendium_dialog.py:30
+msgid "AI Compendium Analysis"
+msgstr "AI 컴펜디엄 분석"
+
+#: compendium/ai_compendium_dialog.py:50
+msgid "New"
+msgstr "신규"
+
+#: compendium/ai_compendium_dialog.py:54 compendium/ai_compendium_dialog.py:319
+msgid "Select an entry or relationship to view or edit its details."
+msgstr "세부 정보를 보거나 편집하려면 항목 또는 관계를 선택하세요."
+
+#: compendium/ai_compendium_dialog.py:58
+msgid "Current"
+msgstr "현재"
+
+#: compendium/ai_compendium_dialog.py:62
+msgid "Existing compendium entry will appear here."
+msgstr "기존 컴펜디엄 항목이 여기에 표시됩니다."
+
+#: compendium/ai_compendium_dialog.py:74
+msgid "Save to Compendium"
+msgstr "컴펜디엄에 저장"
+
+#: compendium/ai_compendium_dialog.py:120
+#: compendium/ai_compendium_dialog.py:195
+#: compendium/ai_compendium_dialog.py:210
+#: compendium/ai_compendium_dialog.py:435
+#: compendium/ai_compendium_dialog.py:539
+#: compendium/ai_compendium_dialog.py:555 compendium/enhanced_compendium.py:245
+msgid "Relationships"
+msgstr "관계"
+
+#: compendium/ai_compendium_dialog.py:168
+#: compendium/ai_compendium_dialog.py:464
+#: compendium/ai_compendium_dialog.py:519
+#: compendium/ai_compendium_dialog.py:520
+#: compendium/ai_compendium_dialog.py:527
+msgid ""
+"\n"
+"\n"
+"Relationships:\n"
+msgstr ""
+"\n"
+"\n"
+"관계:\n"
+
+#: compendium/ai_compendium_dialog.py:190
+#: compendium/ai_compendium_dialog.py:229
+#: compendium/ai_compendium_dialog.py:269
+#: compendium/ai_compendium_dialog.py:304
+#: compendium/ai_compendium_dialog.py:430
+msgid ""
+"Content:\n"
+"{}\n"
+"\n"
+"Relationships:\n"
+msgstr ""
+"콘텐츠:\n"
+"{}\n"
+"\n"
+"관계:\n"
+
+#: compendium/ai_compendium_dialog.py:203
+#: compendium/ai_compendium_dialog.py:235
+#: compendium/ai_compendium_dialog.py:252
+#: compendium/ai_compendium_dialog.py:275
+#: compendium/ai_compendium_dialog.py:310
+#: compendium/ai_compendium_dialog.py:443
+msgid "None"
+msgstr "없음"
+
+#: compendium/ai_compendium_dialog.py:238
+#: compendium/ai_compendium_dialog.py:278
+#: compendium/ai_compendium_dialog.py:313
+msgid "This entry does not exist in the compendium yet."
+msgstr "이 항목은 아직 컴펜디엄에 존재하지 않습니다."
+
+#: compendium/ai_compendium_dialog.py:241
+msgid "Relationships:\n"
+msgstr "관계:\n"
+
+#: compendium/ai_compendium_dialog.py:288
+msgid "Edit the relationship type for {} (e.g., '{}: Trusted Friend')."
+msgstr "{}에 대한 관계 유형을 편집하세요 (예: '{}: 신뢰할 수 있는 친구')."
+
+#: compendium/ai_compendium_dialog.py:332
+msgid "Restore"
+msgstr "복원"
+
+#: compendium/ai_compendium_dialog.py:334
+msgid "Ignore Update"
+msgstr "업데이트 무시"
+
+#: compendium/ai_compendium_dialog.py:335
+#: compendium/ai_compendium_dialog.py:421 compendium/enhanced_compendium.py:421
+msgid "Rename Entry"
+msgstr "항목 이름 변경"
+
+#: compendium/ai_compendium_dialog.py:336 compendium/enhanced_compendium.py:422
+msgid "Move To..."
+msgstr "이동..."
+
+#: compendium/ai_compendium_dialog.py:342
+msgid "Restore Relationship"
+msgstr "관계 복원"
+
+#: compendium/ai_compendium_dialog.py:344 compendium/enhanced_compendium.py:472
+msgid "Remove Relationship"
+msgstr "관계 제거"
+
+#: compendium/ai_compendium_dialog.py:345
+#: compendium/ai_compendium_dialog.py:448
+msgid "Rename Relationship"
+msgstr "관계 이름 변경"
+
+#: compendium/ai_compendium_dialog.py:421
+#: compendium/ai_compendium_dialog.py:448 compendium/enhanced_compendium.py:793
+msgid "New name:"
+msgstr "새 이름:"
+
+#: compendium/ai_compendium_dialog.py:473
+msgid ""
+"{}\n"
+"\n"
+"Relationships:\n"
+msgstr ""
+"{}\n"
+"\n"
+"관계:\n"
+
+#: compendium/ai_compendium_dialog.py:528
+msgid "Content:\n"
+msgstr "콘텐츠:\n"
+
+#: compendium/ai_compendium_dialog.py:591
+msgid "Failed to save: {}"
+msgstr "저장 실패: {}"
+
+#: compendium/enhanced_compendium.py:56 compendium/enhanced_compendium.py:148
+#: compendium/enhanced_compendium.py:167
+msgid "Enhanced Compendium - {}"
+msgstr "향상된 컴펜디엄 - {}"
+
+#: compendium/enhanced_compendium.py:98
+msgid "Project Toolbar"
+msgstr "프로젝트 도구 모음"
+
+#: compendium/enhanced_compendium.py:100
+msgid "<b>Project:</b>"
+msgstr "<b>프로젝트:</b>"
+
+#: compendium/enhanced_compendium.py:185
+msgid "Search entries and tags..."
+msgstr "항목 및 태그 검색..."
+
+#: compendium/enhanced_compendium.py:188 compendium/compendium_panel.py:67
+msgid "Compendium"
+msgstr "컴펜디엄"
+
+#: compendium/enhanced_compendium.py:201 compendium/enhanced_compendium.py:906
+msgid "No entry selected"
+msgstr "선택된 항목 없음"
+
+#: compendium/enhanced_compendium.py:205
+msgid "Save Changes"
+msgstr "변경 사항 저장"
+
+#: compendium/enhanced_compendium.py:216
+msgid ""
+"This is the text the AI can see if you select this entry to be included in "
+"the prompt inside the context panel"
+msgstr ""
+"이 텍스트는 컨텍스트 패널 내 프롬프트에 이 항목을 포함하도록 선택하면 AI가 볼 수 있는 텍스트입니다"
+
+#: compendium/enhanced_compendium.py:218
+msgid "Overview"
+msgstr "개요"
+
+#: compendium/enhanced_compendium.py:219
+msgid ""
+"this is the text the AI can see if you select this entry to be included in "
+"the prompt inside the context panel"
+msgstr ""
+"이 텍스트는 컨텍스트 패널 내 프롬프트에 이 항목을 포함하도록 선택하면 AI가 볼 수 있는 텍스트입니다"
+
+#: compendium/enhanced_compendium.py:223
+msgid ""
+"Enter details about your entry here... (details about your entry the AI "
+"can't see - this info is only for you)"
+msgstr ""
+"여기에 항목에 대한 세부 정보를 입력하세요... (AI가 볼 수 없는 항목에 대한 세부 정보 - 이 정보는 사용자만을 위한 것입니다)"
+
+#: compendium/enhanced_compendium.py:224
+msgid "Details"
+msgstr "세부 정보"
+
+#: compendium/enhanced_compendium.py:225
+msgid "details about your entry the AI can't see - this info is only for you"
+msgstr "AI가 볼 수 없는 항목에 대한 세부 정보 - 이 정보는 사용자만을 위한 것입니다"
+
+#: compendium/enhanced_compendium.py:230
+msgid "Add Relationship"
+msgstr "관계 추가"
+
+#: compendium/enhanced_compendium.py:234
+msgid "Friend"
+msgstr "친구"
+
+#: compendium/enhanced_compendium.py:234
+msgid "Family"
+msgstr "가족"
+
+#: compendium/enhanced_compendium.py:234
+msgid "Ally"
+msgstr "동맹"
+
+#: compendium/enhanced_compendium.py:234
+msgid "Enemy"
+msgstr "적"
+
+#: compendium/enhanced_compendium.py:234
+msgid "Acquaintance"
+msgstr "지인"
+
+#: compendium/enhanced_compendium.py:234
+msgid "Other"
+msgstr "기타"
+
+#: compendium/enhanced_compendium.py:237
+msgid "Related Entry:"
+msgstr "관련 항목:"
+
+#: compendium/enhanced_compendium.py:238
+msgid "Relationship Type:"
+msgstr "관계 유형:"
+
+#: compendium/enhanced_compendium.py:242
+msgid "Entry"
+msgstr "항목"
+
+#: compendium/enhanced_compendium.py:242
+msgid "Relationship Type"
+msgstr "관계 유형"
+
+#: compendium/enhanced_compendium.py:246
+msgid "details about relationships between entries, not visible to the AI"
+msgstr "항목 간 관계에 대한 세부 정보, AI에게 표시되지 않음"
+
+#: compendium/enhanced_compendium.py:253
+msgid "Add Image"
+msgstr "이미지 추가"
+
+#: compendium/enhanced_compendium.py:254
+msgid "Remove Selected"
+msgstr "선택 항목 제거"
+
+#: compendium/enhanced_compendium.py:266
+msgid "Images"
+msgstr "이미지"
+
+#: compendium/enhanced_compendium.py:267
+msgid "add images for your entries - not visible to the AI"
+msgstr "항목에 대한 이미지 추가 - AI에게 표시되지 않음"
+
+#: compendium/enhanced_compendium.py:277
+msgid "Tags"
+msgstr "태그"
+
+#: compendium/enhanced_compendium.py:281
+msgid "Add new tag..."
+msgstr "새 태그 추가..."
+
+#: compendium/enhanced_compendium.py:285
+msgid "add a tag to your entry"
+msgstr "항목에 태그 추가"
+
+#: compendium/enhanced_compendium.py:324
+msgid "Failed to create default compendium file: {}"
+msgstr "기본 컴펜디엄 파일 생성 실패: {}"
+
+#: compendium/enhanced_compendium.py:361
+msgid "Failed to load compendium data: {}"
+msgstr "컴펜디엄 데이터 로드 실패: {}"
+
+#: compendium/enhanced_compendium.py:395 compendium/enhanced_compendium.py:746
+msgid "New Category"
+msgstr "새 카테고리"
+
+#: compendium/enhanced_compendium.py:402 compendium/enhanced_compendium.py:753
+msgid "New Entry"
+msgstr "새 항목"
+
+#: compendium/enhanced_compendium.py:403
+msgid "Delete Category"
+msgstr "카테고리 삭제"
+
+#: compendium/enhanced_compendium.py:404
+msgid "Rename Category"
+msgstr "카테고리 이름 변경"
+
+#: compendium/enhanced_compendium.py:419
+msgid "Save Entry"
+msgstr "항목 저장"
+
+#: compendium/enhanced_compendium.py:420
+msgid "Delete Entry"
+msgstr "항목 삭제"
+
+#: compendium/enhanced_compendium.py:444
+msgid "Remove Tag"
+msgstr "태그 제거"
+
+#: compendium/enhanced_compendium.py:488
+msgid "Select Tag Color"
+msgstr "태그 색상 선택"
+
+#: compendium/enhanced_compendium.py:494 compendium/enhanced_compendium.py:889
+msgid ""
+"right-click to move the tag within this list - this impacts the colour of "
+"your entry"
+msgstr ""
+"오른쪽 클릭하여 이 목록 내에서 태그를 이동하세요 - 이는 항목의 색상에 영향을 미칩니다"
+
+#: compendium/enhanced_compendium.py:525
+msgid "Select Image"
+msgstr "이미지 선택"
+
+#: compendium/enhanced_compendium.py:550
+msgid "Failed to copy image: {}"
+msgstr "이미지 복사 실패: {}"
+
+#: compendium/enhanced_compendium.py:743
+msgid "Failed to save compendium data: {}"
+msgstr "컴펜디엄 데이터 저장 실패: {}"
+
+#: compendium/enhanced_compendium.py:746
+msgid "Category name:"
+msgstr "카테고리 이름:"
+
+#: compendium/enhanced_compendium.py:753
+msgid "Entry name:"
+msgstr "항목 이름:"
+
+#: compendium/enhanced_compendium.py:764
+msgid "Are you sure you want to delete the category '{}' and all its entries?"
+msgstr "'{}' 카테고리와 모든 항목을 삭제하시겠습니까?"
+
+#: compendium/enhanced_compendium.py:779
+msgid "Are you sure you want to delete the entry '{}'?"
+msgstr "'{}' 항목을 삭제하시겠습니까?"
+
+#: compendium/enhanced_compendium.py:793
+msgid "Rename {}"
+msgstr "{} 이름 변경"
+
+#: compendium/compendium_panel.py:75
+msgid "Select a compendium entry to view."
+msgstr "보려면 컴펜디엄 항목을 선택하세요."
+
+#: compendium/compendium_panel.py:225
+msgid "Open Enhanced Compendium"
+msgstr "향상된 컴펜디엄 열기"
+
+#: compendium/compendium_panel.py:226
+msgid "Analyze Scene with AI"
+msgstr "AI로 장면 분석"
+
+#: compendium/compendium_panel.py:250
+msgid "No scene content available to analyze."
+msgstr "분석할 장면 콘텐츠가 없습니다."
+
+#: compendium/compendium_panel.py:325
+msgid "AI returned invalid JSON that could not be repaired."
+msgstr "AI가 복구할 수 없는 잘못된 JSON을 반환했습니다."
+
+#: compendium/compendium_panel.py:332
+msgid "AI returned invalid JSON format."
+msgstr "AI가 잘못된 JSON 형식을 반환했습니다."
+
+#: compendium/compendium_panel.py:341
+msgid "Failed to analyze scene: {}"
+msgstr "장면 분석 실패: {}"
+
+#: compendium/compendium_panel.py:439
+msgid "Success"
+msgstr "성공"
+
+#: compendium/compendium_panel.py:439
+msgid "Compendium updated successfully."
+msgstr "컴펜디엄이 성공적으로 업데이트되었습니다."
+
+#: compendium/compendium_panel.py:442
+msgid "Failed to save compendium: {}"
+msgstr "컴펜디엄 저장 실패: {}"
+
+#: main.py:25
+msgid "Missing Dependencies"
+msgstr "누락된 종속성"
+
+#: main.py:26
+msgid "The application requires the following module(s): "
+msgstr "애플리케이션에 다음 모듈이 필요합니다: "
+
+#: main.py:27
+msgid ""
+"\n"
+"\n"
+"Please install them by running:\n"
+"\n"
+"pip install "
+msgstr ""
+"\n"
+"\n"
+"다음을 실행하여 설치하세요:\n"
+"\n"
+"pip install "
+
+#: main.py:28
+msgid ""
+"\n"
+"\n"
+"On Windows: Win+R to open a console, then type cmd."
+msgstr ""
+"\n"
+"\n"
+"Windows에서: Win+R을 눌러 콘솔을 열고 cmd를 입력하세요."

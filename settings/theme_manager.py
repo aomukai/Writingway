@@ -1,6 +1,7 @@
-#!/usr/bin/env python3
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QApplication
-
+from PyQt5.QtGui import QIcon, QColor, QPixmap, QPainter, QPainterPath
+from PyQt5.QtSvg import QSvgRenderer
 
 class ThemeManager:
     """
@@ -10,7 +11,9 @@ class ThemeManager:
       - List available themes.
       - Retrieve a stylesheet for a given theme.
       - Apply a theme to a specific widget or the entire application.
+      - Generate tinted SVG icons using QSvgRenderer.
     """
+    _icon_cache = {}  # Cache: (file_path, tint_color) -> QIcon
 
     THEMES = {
         "Standard": "",  # Default styling; no custom stylesheet.
@@ -56,6 +59,26 @@ class ThemeManager:
             QTabBar::tab:selected {
                 background: #555;
             }
+            QToolBar {
+                background-color: #2b2b2b; /* Match QWidget background */
+                border: none;
+                padding: 2px;
+            }
+            QToolBar::separator {
+                background: #555;
+                width: 1px;
+            }
+            QToolButton {
+                background-color: #2b2b2b; /* Match toolbar background */
+                border: none;
+                padding: 4px;
+            }
+            QToolButton:hover {
+                background-color: #444; /* Match QPushButton hover */
+            }
+            QToolButton:pressed {
+                background-color: #555;
+            }
         """,
         "Solarized Dark": """
             QWidget {
@@ -94,6 +117,26 @@ class ThemeManager:
             }
             QTabBar::tab:selected {
                 background: #586e75;
+            }
+            QToolBar {
+                background-color: #002b36; /* Match QWidget background */
+                border: none;
+                padding: 2px;
+            }
+            QToolBar::separator {
+                background: #555;
+                width: 1px;
+            }
+            QToolButton {
+                background-color: #002b36; /* Match toolbar background */
+                border: none;
+                padding: 4px;
+            }
+            QToolButton:hover {
+                background-color: #657b83; /* Match QPushButton hover */
+            }
+            QToolButton:pressed {
+                background-color: #586e75;
             }
         """,
         "Paper White": """
@@ -224,6 +267,8 @@ class ThemeManager:
         "Solarized Dark": "#fdf6e3",
     }
 
+    _current_theme = "Default"  # Track current theme
+
     @classmethod
     def list_themes(cls):
         """
@@ -251,6 +296,9 @@ class ThemeManager:
         """
         Apply the theme to the entire application.
         """
+        if theme_name in cls.THEMES:
+            cls._current_theme = theme_name
+
         stylesheet = cls.get_stylesheet(theme_name)
         app = QApplication.instance()
         if app:
@@ -258,6 +306,75 @@ class ThemeManager:
         else:
             raise RuntimeError(
                 "No QApplication instance found. Create one before applying a theme.")
+
+    @staticmethod
+    def get_tinted_icon(file_path, tint_color=None, theme_name=None, size=None):
+        """
+        Generate a tinted QIcon from a file path.
+        
+        Args:
+            file_path (str): Path to the icon file (e.g., SVG, PNG).
+            tint_color (str or QColor, optional): Color to tint the icon (e.g., 'white', '#ffffff', QColor).
+            theme_name (str, optional): Theme to use for default tint color. Defaults to current theme.
+        
+        Returns:
+            QIcon: Tinted SVG icon, or original icon if tint_color is None.
+        """
+        # Normalize tint_color for cache key
+        theme = theme_name or ThemeManager._current_theme
+        if tint_color is None:
+            tint_color = ThemeManager.ICON_TINTS.get(theme)
+        cache_key = (file_path, str(tint_color) if isinstance(tint_color, QColor) else tint_color)
+        
+        if cache_key in ThemeManager._icon_cache:
+            return ThemeManager._icon_cache[cache_key]
+        
+        # Load SVG renderer
+        renderer = QSvgRenderer(file_path)
+        if not renderer.isValid():
+            return QIcon()  # Return empty icon if SVG loading fails
+        
+        # Use default size from SVG or provided size
+        default_size = renderer.defaultSize()
+        if size is None:
+            size = default_size
+        else:
+            size = size if hasattr(size, 'width') else QSize(size, size)
+        
+        # Create pixmap for rendering
+        pixmap = QPixmap(size)
+        pixmap.fill(Qt.transparent)
+        
+        # Render SVG to pixmap
+        painter = QPainter(pixmap)
+        renderer.render(painter)
+        painter.end()
+        
+        # Apply tint if needed
+        if tint_color:
+            # Convert tint_color to QColor
+            if isinstance(tint_color, str):
+                tint_color = QColor(tint_color)
+            elif not isinstance(tint_color, QColor):
+                tint_color = QColor("white")  # Fallback
+            
+            # Create a tinted pixmap
+            tinted_pixmap = QPixmap(size)
+            tinted_pixmap.fill(Qt.transparent)
+            
+            painter = QPainter(tinted_pixmap)
+            # Draw original pixmap
+            painter.drawPixmap(0, 0, pixmap)
+            # Apply tint overlay with SourceAtop composition mode
+            painter.setCompositionMode(QPainter.CompositionMode_SourceAtop)
+            painter.fillRect(pixmap.rect(), tint_color)
+            painter.end()
+            
+            pixmap = tinted_pixmap
+        
+        icon = QIcon(pixmap)
+        ThemeManager._icon_cache[cache_key] = icon
+        return icon
 
 
 if __name__ == '__main__':

@@ -36,14 +36,14 @@ class TokenLimitDialog(QDialog):
 
     def init_ui(self):
         """Set up the dialog's user interface."""
-        self.setWindowTitle("Token Limit Exceeded")
+        self.setWindowTitle(_("Token Limit Exceeded"))
         self.resize(500, 400)
 
         # Main layout
         layout = QVBoxLayout(self)
 
         # Error message
-        error_label = QLabel(f"Error: {self.error_message}\nThe story is too long. Please edit the summary below:")
+        error_label = QLabel(_("Error: {}").format(self.error_message) + _("\nThe story is too long. Please edit the summary below:"))
         error_label.setWordWrap(True)
         layout.addWidget(error_label)
 
@@ -54,9 +54,9 @@ class TokenLimitDialog(QDialog):
 
         # Buttons
         button_layout = QHBoxLayout()
-        self.use_button = QPushButton("Use This Summary")
+        self.use_button = QPushButton(_("Use This Summary"))
         self.use_button.clicked.connect(self.on_use_summary)
-        self.truncate_button = QPushButton("Truncate Story")
+        self.truncate_button = QPushButton(_("Truncate Story"))
         self.truncate_button.clicked.connect(self.on_truncate_story)
         button_layout.addStretch()
         button_layout.addWidget(self.use_button)
@@ -65,7 +65,7 @@ class TokenLimitDialog(QDialog):
         layout.addLayout(button_layout)
 
         # Token count display
-        self.token_label = QLabel("Tokens: Calculating...")
+        self.token_label = QLabel(_("Tokens: Calculating..."))
         self.token_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.token_label)
 
@@ -76,7 +76,7 @@ class TokenLimitDialog(QDialog):
         """Update the token count display based on the current text."""
         text = self.summary_editor.toPlainText()
         tokens = len(self.encoding.encode(text))
-        self.token_label.setText(f"Tokens: {tokens}/{self.max_tokens}")
+        self.token_label.setText(_("Tokens: {}/{}"). format(tokens, self.max_tokens))
         # Optional: Highlight if over limit
         if tokens > self.max_tokens:
             self.token_label.setStyleSheet("color: red;")
@@ -92,7 +92,7 @@ class TokenLimitDialog(QDialog):
             self.use_summary.emit(summary)
             self.accept()
         else:
-            QMessageBox.warning(self, "Empty Summary", "Please provide a summary before proceeding.")
+            QMessageBox.warning(self, _("Empty Summary"), _("Please provide a summary before proceeding."))
 
     def on_truncate_story(self):
         """Handle the 'Truncate Story' button click."""

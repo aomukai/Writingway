@@ -67,7 +67,7 @@ def assemble_final_prompt(prompt_config, user_input, additional_vars=None, curre
     # Validate that all required variables are provided
     missing_vars = [var for var in prompt_template.input_variables if var not in default_vars]
     if missing_vars:
-        raise ValueError(f"Missing variables for prompt: {missing_vars}")
+        raise ValueError(_("Missing variables for prompt: {}").format(missing_vars))
 
     # Invoke the template with the variables
     final_prompt = prompt_template.invoke(default_vars)

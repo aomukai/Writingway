@@ -2,7 +2,7 @@ import json
 import os, re
 import copy
 import logging
-from typing import Any, Dict, Optional, List, Union
+from typing import Any, Dict, Optional, Union
 from pathlib import Path
 
 # Configure logging
@@ -22,7 +22,8 @@ class SettingsManager:
         "general": {
             "fast_tts": False,
             "enable_autosave": False,
-            "language": "Language"
+            "language": "Language",
+            "enable_debug_logging": False
         },
         "appearance": {
             "theme": "Ocean Breeze",
@@ -72,6 +73,14 @@ class SettingsManager:
         self.file_path = Path(file_path)
         self.settings = copy.deepcopy(self.DEFAULT_SETTINGS)
         self._load_settings()
+        # Configure logging level based on settings
+        self._configure_logging()
+
+    def _configure_logging(self) -> None:
+        """Configure the logging level based on the enable_debug_logging setting."""
+        logging_level = logging.DEBUG if self.settings["general"].get("enable_debug_logging", False) else logging.WARN
+        logging.getLogger().setLevel(logging_level)
+        self.logger.info(f"Logging level set to {logging.getLevelName(logging_level)}")
 
     def _load_settings(self) -> None:
         """Load settings from the file, creating a new one if it doesn't exist."""
@@ -126,6 +135,8 @@ class SettingsManager:
                 json.dump(self.settings, file, indent=4, ensure_ascii=False)
             
             self.logger.info(f"Settings saved successfully to {self.file_path}")
+            # Reconfigure logging after saving settings
+            self._configure_logging()
             return True
         except IOError as e:
             self.logger.error(f"Error saving settings: {str(e)}")
