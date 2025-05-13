@@ -23,9 +23,11 @@ from PyQt5.QtWidgets import (
     QTableWidget, QTableWidgetItem, QHeaderView, QPushButton, QSplitter,
     QFrame, QScrollArea, QProgressBar, QComboBox, QGridLayout, QMessageBox, QFileDialog
 )
-from PyQt5.QtGui import QIcon, QFont, QColor, QPainter, QPen
-from PyQt5.QtCore import Qt, QSize, QRect
+from PyQt5.QtGui import QPainter
+from PyQt5.QtCore import Qt
 from PyQt5.QtChart import QChart, QChartView, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis, QLineSeries
+
+from settings.theme_manager import ThemeManager
 
 # Import text analysis functionality
 # from text_analysis import nlp, comprehensive_analysis
@@ -777,8 +779,7 @@ class StatisticsDialog(QDialog):
             QTableWidget, QTableWidgetItem, QHeaderView, QPushButton, QSplitter,
             QFrame, QScrollArea, QProgressBar, QComboBox, QGridLayout, QFileDialog, QMessageBox
         )
-        from PyQt5.QtGui import QIcon, QFont, QColor, QPainter, QPen
-        from PyQt5.QtCore import Qt, QSize, QRect
+        from PyQt5.QtCore import Qt
         
         layout = QVBoxLayout(self)
         
@@ -794,7 +795,7 @@ class StatisticsDialog(QDialog):
         # Check if the refresh.svg file exists, if not, don't set an icon
         refresh_icon_path = os.path.join("assets", "icons", "refresh.svg")
         if os.path.exists(refresh_icon_path):
-            refresh_button.setIcon(QIcon(refresh_icon_path))
+            refresh_button.setIcon(ThemeManager.get_tinted_icon(refresh_icon_path))
         else:
             print(f"Warning: Icon file not found: {refresh_icon_path}")
         
@@ -822,7 +823,7 @@ class StatisticsDialog(QDialog):
         # Check if the download.svg file exists, if not, don't set an icon
         download_icon_path = os.path.join("assets", "icons", "download.svg")
         if os.path.exists(download_icon_path):
-            export_button.setIcon(QIcon(download_icon_path))
+            export_button.setIcon(ThemeManager.get_tinted_icon(download_icon_path))
         else:
             print(f"Warning: Icon file not found: {download_icon_path}")
         
@@ -1423,7 +1424,7 @@ class StatisticsDialog(QDialog):
         # Get export path
         from PyQt5.QtWidgets import QFileDialog, QMessageBox
         
-        file_path, _ = QFileDialog.getSaveFileName(
+        file_path, unused = QFileDialog.getSaveFileName(
             self, "Export Statistics Report", "", "HTML Files (*.html)"
         )
         

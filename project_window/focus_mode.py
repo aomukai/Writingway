@@ -5,9 +5,9 @@ import re
 from PyQt5.QtCore import Qt, QPropertyAnimation
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QLabel, QGridLayout, QVBoxLayout,
-    QGraphicsOpacityEffect, QApplication, QTextEdit, QShortcut
+    QGraphicsOpacityEffect, QApplication, QTextEdit
 )
-from PyQt5.QtGui import QPixmap, QKeyEvent, QKeySequence
+from PyQt5.QtGui import QPixmap, QKeyEvent
 
 # Subclass QTextEdit to force plain text paste
 
@@ -43,7 +43,7 @@ class PlainTextEdit(QTextEdit):
 class FocusMode(QMainWindow):
     def __init__(self, image_dir, scene_text="", parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Focus Mode")
+        self.setWindowTitle(_("Focus Mode"))
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.showFullScreen()
         # NEW: Callback attribute to be set by the parent window

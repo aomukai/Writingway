@@ -1,9 +1,8 @@
-# tree_manager.py
 import os
 import json
 import re
 import uuid
-from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
+from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtCore import Qt
 from settings.settings_manager import WWSettingsManager
 
@@ -39,6 +38,7 @@ def load_structure(project_name):
     Load the project structure from the file.
     If the file is missing or in an unexpected format, return a default structure.
     """
+    # The words "This is the summary" have special meaning, so we can't localize them
     structure = {"acts": [
         {"name": "Act 1", "summary": "This is the summary for Act 1.",
         "chapters": [

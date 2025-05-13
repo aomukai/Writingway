@@ -1,0 +1,1915 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Writingway Project\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-04-23 15:53-0700\n"
+"PO-Revision-Date: 2025-04-22 22:40+0000\n"
+"Last-Translator: \n"
+"Language-Team: ja\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: settings/provider_dialog.py:24 settings/provider_dialog.py:315
+msgid "Edit Provider"
+msgstr "プロバイダーを編集"
+
+#: settings/provider_dialog.py:26 settings/provider_dialog.py:315
+#: settings/settings_dialog.py:146 settings/settings_dialog.py:341
+msgid "New Provider"
+msgstr "新しいプロバイダー"
+
+#: settings/provider_dialog.py:34
+msgid "Provider Details"
+msgstr "プロバイダーの詳細"
+
+#: settings/provider_dialog.py:38 settings/provider_dialog.py:316
+#: settings/provider_info_dialog.py:34 settings/provider_info_dialog.py:430
+msgid "Provider"
+msgstr "プロバイダー"
+
+#: settings/provider_dialog.py:44 settings/provider_dialog.py:317
+#: settings/provider_info_dialog.py:23
+msgid "Provider Information"
+msgstr "プロバイダーとモデルの情報"
+
+#: settings/provider_dialog.py:52 settings/provider_dialog.py:318
+#: project_window/project_tree_widget.py:25
+#: compendium/ai_compendium_dialog.py:39
+msgid "Name"
+msgstr "名前"
+
+#: settings/provider_dialog.py:57 settings/provider_dialog.py:319
+msgid "Endpoint URL"
+msgstr "エンドポイントURL"
+
+#: settings/provider_dialog.py:59
+msgid "Leave empty for default"
+msgstr "デフォルトの場合は空白のままにしてください"
+
+#: settings/provider_dialog.py:64 settings/provider_dialog.py:321
+msgid "Endpoint URL Help"
+msgstr "エンドポイントURLヘルプ"
+
+#: settings/provider_dialog.py:64 settings/provider_dialog.py:321
+msgid ""
+"Override URL for provider\n"
+"\n"
+"Only use if you have a proxy server or a Custom provider.\n"
+"Leave empty for default URL.\n"
+"\n"
+"Ex: 'https://localhost:1234/v1'"
+msgstr ""
+"プロバイダーのURLをオーバーライド\n"
+"\n"
+"プロキシサーバーまたはカスタムプロバイダーがある場合にのみ使用してください。\n"
+"デフォルトのURLの場合は空白のままにしてください。\n"
+"\n"
+"例: 'https://localhost:1234/v1'"
+
+#: settings/provider_dialog.py:70 settings/provider_dialog.py:322
+msgid "Model"
+msgstr "モデル"
+
+#: settings/provider_dialog.py:74 settings/provider_dialog.py:323
+msgid "Refresh Model List"
+msgstr "モデルリストを更新"
+
+#: settings/provider_dialog.py:85 settings/provider_dialog.py:324
+msgid "API Key"
+msgstr "APIキー"
+
+#: settings/provider_dialog.py:89 settings/provider_dialog.py:229
+#: settings/provider_dialog.py:325
+msgid "Reveal"
+msgstr "表示"
+
+#: settings/provider_dialog.py:98 settings/provider_dialog.py:326
+msgid "Timeout (seconds)"
+msgstr "タイムアウト（秒）"
+
+#: settings/provider_dialog.py:104 settings/provider_dialog.py:327
+#: settings/settings_dialog.py:177
+msgid "Default Provider"
+msgstr "デフォルトのプロバイダー"
+
+#: settings/provider_dialog.py:108 settings/provider_dialog.py:328
+msgid "Test"
+msgstr "テスト"
+
+#: settings/provider_dialog.py:117 settings/provider_dialog.py:331
+msgid "Update"
+msgstr "更新"
+
+#: settings/provider_dialog.py:119 settings/provider_dialog.py:333
+#: compendium/enhanced_compendium.py:236
+msgid "Add"
+msgstr "追加"
+
+#: settings/provider_dialog.py:120 settings/provider_dialog.py:334
+#: settings/settings_dialog.py:61 settings/settings_dialog.py:340
+#: compendium/ai_compendium_dialog.py:78
+msgid "Close"
+msgstr "閉じる"
+
+#: settings/provider_dialog.py:174 settings/provider_dialog.py:193
+#: settings/provider_dialog.py:259 settings/provider_dialog.py:282
+#: workshop/workshop.py:350 muse/prompts_window.py:424
+#: muse/prompts_window.py:590 compendium/ai_compendium_dialog.py:591
+#: compendium/enhanced_compendium.py:324 compendium/enhanced_compendium.py:361
+#: compendium/enhanced_compendium.py:550 compendium/enhanced_compendium.py:743
+#: compendium/compendium_panel.py:325 compendium/compendium_panel.py:332
+#: compendium/compendium_panel.py:341 compendium/compendium_panel.py:442
+msgid "Error"
+msgstr "エラー"
+
+#: settings/provider_dialog.py:199 settings/provider_dialog.py:216
+#: settings/provider_dialog.py:265 settings/provider_info_dialog.py:272
+msgid "API Key Required"
+msgstr "APIキーが必要です"
+
+#: settings/provider_dialog.py:226 settings/provider_dialog.py:325
+msgid "Hide"
+msgstr "非表示"
+
+#: settings/provider_dialog.py:287 settings/provider_dialog.py:289
+#: settings/provider_dialog.py:291
+msgid "Test Result"
+msgstr "テスト結果"
+
+#: settings/provider_dialog.py:287
+msgid "Connection successful!"
+msgstr "接続成功！"
+
+#: settings/provider_dialog.py:289
+msgid "Connection failed. Check provider settings."
+msgstr "接続に失敗しました。プロバイダーの設定を確認してください。"
+
+#: settings/provider_dialog.py:291
+msgid "Connection failed: {}"
+msgstr "接続に失敗しました: {}"
+
+#: settings/settings_dialog.py:25 settings/settings_dialog.py:325
+msgid "Preferences"
+msgstr "設定"
+
+#: settings/settings_dialog.py:50 settings/settings_dialog.py:326
+msgid "General"
+msgstr "一般"
+
+#: settings/settings_dialog.py:51 settings/settings_dialog.py:327
+msgid "Appearance"
+msgstr "外観"
+
+#: settings/settings_dialog.py:52 settings/settings_dialog.py:328
+msgid "Providers"
+msgstr "プロバイダー"
+
+#: settings/settings_dialog.py:59 settings/settings_dialog.py:339
+#: settings/settings_dialog.py:408 muse/prompts_window.py:480
+msgid "Save"
+msgstr "保存"
+
+#: settings/settings_dialog.py:75 settings/settings_dialog.py:329
+msgid "Fast Text to Speech"
+msgstr "高速テキスト読み上げ"
+
+#: settings/settings_dialog.py:79 settings/settings_dialog.py:330
+msgid "Enable Auto-Save"
+msgstr "自動保存を有効にする"
+
+#: settings/settings_dialog.py:83 settings/settings_dialog.py:331
+msgid "Show Random Quotes"
+msgstr "ランダムな引用を表示する"
+
+#: settings/settings_dialog.py:92 settings/settings_dialog.py:332
+msgid "Language"
+msgstr "言語"
+
+#: settings/settings_dialog.py:104 settings/settings_dialog.py:333
+msgid "Theme"
+msgstr "テーマ"
+
+#: settings/settings_dialog.py:107 settings/settings_dialog.py:334
+msgid "Background Color"
+msgstr "背景色"
+
+#: settings/settings_dialog.py:121 settings/settings_dialog.py:335
+msgid "Text Size"
+msgstr "文字サイズ"
+
+#: settings/settings_dialog.py:127 settings/settings_dialog.py:337
+msgid "Sample Text"
+msgstr "サンプルテキスト"
+
+#: settings/settings_dialog.py:137 settings/settings_dialog.py:336
+msgid "Configured Providers"
+msgstr "設定済みのプロバイダー"
+
+#: settings/settings_dialog.py:148 settings/settings_dialog.py:342
+msgid "Edit"
+msgstr "編集"
+
+#: settings/settings_dialog.py:150 settings/settings_dialog.py:343
+#: workshop/workshop.py:378 muse/prompts_window.py:479
+#: project_window/project_tree_widget.py:137
+msgid "Delete"
+msgstr "削除"
+
+#: settings/settings_dialog.py:206 settings/settings_dialog.py:210
+#: settings/settings_dialog.py:285 settings/settings_dialog.py:381
+#: settings/settings_dialog.py:395 compendium/compendium_panel.py:250
+msgid "Warning"
+msgstr "警告"
+
+#: settings/settings_dialog.py:206
+msgid "Provider name cannot be empty."
+msgstr "プロバイダー名は空にできません。"
+
+#: settings/settings_dialog.py:290 compendium/enhanced_compendium.py:763
+#: compendium/enhanced_compendium.py:778
+msgid "Confirm Deletion"
+msgstr "削除の確認"
+
+#: settings/settings_dialog.py:291
+msgid "Are you sure you want to delete the selected provider?"
+msgstr "選択したプロバイダーを削除してもよろしいですか？"
+
+#: settings/settings_dialog.py:391
+msgid "Save Result"
+msgstr "保存結果"
+
+#: settings/settings_dialog.py:391
+msgid "Settings saved successfully."
+msgstr "設定が正常に保存されました。"
+
+#: settings/settings_dialog.py:395
+msgid "Failed to save settings."
+msgstr "設定の保存に失敗しました。"
+
+#: settings/settings_dialog.py:406
+msgid "Unsaved Changes"
+msgstr "保存されていない変更があります。閉じる前に保存しますか？"
+
+#: settings/settings_dialog.py:407
+msgid "You have unsaved changes. Do you want to save them before closing?"
+msgstr "保存されていない変更があります。閉じる前に保存しますか？"
+
+#: settings/settings_dialog.py:409
+msgid "Discard"
+msgstr "破棄"
+
+#: settings/settings_dialog.py:410 project_window/rewrite_feature.py:74
+#: project_window/dialogs.py:19
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: settings/provider_info_dialog.py:43
+msgid "Filter"
+msgstr "フィルタ"
+
+#: settings/provider_info_dialog.py:46 settings/provider_info_dialog.py:325
+#: settings/provider_info_dialog.py:433
+msgid "All Models"
+msgstr "すべてのモデル"
+
+#: settings/provider_info_dialog.py:47 settings/provider_info_dialog.py:327
+#: settings/provider_info_dialog.py:434
+msgid "Free Models"
+msgstr "無料モデル"
+
+#: settings/provider_info_dialog.py:48 settings/provider_info_dialog.py:329
+#: settings/provider_info_dialog.py:435
+msgid "Chat Capabilities"
+msgstr "チャット機能"
+
+#: settings/provider_info_dialog.py:49 settings/provider_info_dialog.py:331
+#: settings/provider_info_dialog.py:436
+msgid "Research Capabilities"
+msgstr "研究機能"
+
+#: settings/provider_info_dialog.py:50 settings/provider_info_dialog.py:333
+#: settings/provider_info_dialog.py:437
+msgid "Instruction Following"
+msgstr "指示の追跡"
+
+#: settings/provider_info_dialog.py:55
+msgid "Group:"
+msgstr "グループ："
+
+#: settings/provider_info_dialog.py:57 settings/provider_info_dialog.py:186
+#: settings/provider_info_dialog.py:194
+msgid "All"
+msgstr "すべて"
+
+#: settings/provider_info_dialog.py:89
+msgid "Collapse all providers"
+msgstr "すべてのプロバイダーを折りたたむ"
+
+#: settings/provider_info_dialog.py:96
+msgid "Zoom in table content (CMD++)"
+msgstr "テーブル内容をズームイン (CMD++)"
+
+#: settings/provider_info_dialog.py:102
+msgid "Zoom out table content (CMD+-)"
+msgstr "テーブル内容をズームアウト (CMD+-)"
+
+#: settings/provider_info_dialog.py:108
+msgid "Reset table content zoom"
+msgstr "テーブル内容のズームをリセット"
+
+#: settings/provider_info_dialog.py:266
+msgid "No models available or error fetching models."
+msgstr "利用可能なモデルがないか、モデルの取得にエラーが発生しました。"
+
+#: settings/provider_info_dialog.py:273
+msgid "An API key is required for "
+msgstr "APIキーが必要です: "
+
+#: settings/provider_info_dialog.py:273
+msgid ". Please enter it:"
+msgstr "。入力してください:"
+
+#: settings/provider_info_dialog.py:292
+msgid "API key is required for "
+msgstr "APIキーが必要です: "
+
+#: settings/provider_info_dialog.py:302
+msgid "Failed to fetch models for "
+msgstr "モデルの取得に失敗しました: "
+
+#: settings/provider_info_dialog.py:429
+msgid "Provider and Model Information"
+msgstr "プロバイダーとモデルの情報"
+
+#: workshop/workshop.py:28
+msgid "Workshop"
+msgstr "ワークショップ"
+
+#: workshop/workshop.py:93
+msgid "New Chat"
+msgstr "新しいチャット"
+
+#: workshop/workshop.py:115
+msgid "Type your message here..."
+msgstr "ここにメッセージを入力..."
+
+#: workshop/workshop.py:136
+msgid "No Workshop Prompts"
+msgstr "ワークショッププロンプトがありません"
+
+#: workshop/workshop.py:177 muse/prompts_window.py:100
+msgid "Model:"
+msgstr "モデル："
+
+#: workshop/workshop.py:183
+msgid "Language:"
+msgstr "言語："
+
+#: workshop/workshop.py:201
+msgid "Model: [None]"
+msgstr "モデル：[なし]"
+
+#: workshop/workshop.py:233
+msgid "Selected mode:"
+msgstr "選択されたモード："
+
+#: workshop/workshop.py:289
+msgid "LLM: Generating response..."
+msgstr "LLM：応答を生成中..."
+
+#: workshop/workshop.py:316
+msgid "LLM: [Conversation summarized to reduce token count.]"
+msgstr "LLM：[トークン数を減らすために会話が要約されました。]"
+
+#: workshop/workshop.py:350
+msgid "Failed to generate response: {}"
+msgstr "応答の生成に失敗しました：{}"
+
+#: workshop/workshop.py:377 muse/prompts_window.py:476
+#: project_window/project_structure_manager.py:34
+#: project_window/project_tree_widget.py:136
+msgid "Rename"
+msgstr "名前変更"
+
+#: workshop/workshop.py:387
+msgid "Rename Conversation"
+msgstr "会話の名前変更"
+
+#: workshop/workshop.py:387
+msgid "Enter new conversation name:"
+msgstr "新しい会話名を入力："
+
+#: workshop/workshop.py:398
+msgid "Delete Conversation"
+msgstr "会話を削除"
+
+#: workshop/workshop.py:398 workbench.py:122
+msgid "Are you sure you want to delete '{}'?"
+msgstr "'{}' を削除してもよろしいですか？"
+
+#: workshop/workshop.py:526
+msgid "Transcription Error"
+msgstr "転写エラー"
+
+#: muse/prompt_preview_dialog.py:12
+msgid "Prompt Preview"
+msgstr "プロンプトプレビュー"
+
+#: muse/prompt_preview_dialog.py:41
+msgid "Zoom In (Cmd+=)"
+msgstr "ズームイン (Cmd+=)"
+
+#: muse/prompt_preview_dialog.py:46
+msgid "Zoom Out (Cmd+-)"
+msgstr "ズームアウト (Cmd+-)"
+
+#: muse/prompt_preview_dialog.py:48
+msgid "OK"
+msgstr "OK"
+
+#: muse/prompt_preview_dialog.py:56
+msgid "Token Count: 0"
+msgstr "トークン数：0"
+
+#: muse/prompt_preview_dialog.py:172
+msgid "Token Count: {}"
+msgstr "トークン数：{}"
+
+#: muse/prompt_preview_dialog.py:174
+msgid "Token Count: Error ({})"
+msgstr "トークン数：エラー（{}）"
+
+#: muse/prompt_handler.py:70
+msgid "Missing variables for prompt: {}"
+msgstr "プロンプトに必要な変数が不足しています：{}"
+
+#: muse/prompt_utils.py:39
+#, python-brace-format
+msgid ""
+"You are collaborating with the author to write a scene. Write the scene in "
+"{pov} point of view, from the perspective of {pov_character}, and in {tense}."
+msgstr ""
+"著者と協力してシーンを書いています。シーンを{pov}の視点で、{pov_character}の観点から、{tense}で書いてください。"
+
+#: muse/prompt_utils.py:40
+msgid ""
+"Summarize the following chapter for use in a story prompt, covering Goal, "
+"Key Events, Character Dev, Info Revealed, Emotional Arc, and Plot Setup. Be "
+"conscientious of token usage."
+msgstr ""
+"次の章をストーリープロンプトに使用するために要約し、目標、主要なイベント、キャラクターの発展、明らかになった情報、感情の弧、プロットの設定をカバーしてください。トークンの使用に注意してください。"
+
+#: muse/prompt_utils.py:41
+msgid "Rewrite the passage for clarity."
+msgstr "文章を明確にするために書き換えてください。"
+
+#: muse/prompt_utils.py:42
+msgid ""
+"I need your help with my project. Please provide creative brainstorming and "
+"ideas."
+msgstr ""
+"私のプロジェクトに協力が必要です。創造的なブレインストーミングとアイデアを提供してください。"
+
+#: muse/prompt_utils.py:45
+msgid "Default {} Prompt"
+msgstr "デフォルト {} プロンプト"
+
+#: muse/prompt_panel.py:23
+msgid "Select a {} Prompt"
+msgstr "{} プロンプトを選択"
+
+#: muse/prompt_panel.py:96 muse/prompt_panel.py:99
+msgid "Default Model"
+msgstr "デフォルトモデル"
+
+#: muse/prompts_window.py:19
+msgid "Prompts - "
+msgstr "プロンプト - "
+
+#: muse/prompts_window.py:49
+msgid "Prompts"
+msgstr "プロンプト"
+
+#: muse/prompts_window.py:66 muse/prompts_window.py:469
+msgid "Replicate"
+msgstr "複製"
+
+#: muse/prompts_window.py:67
+msgid "This is a read-only default prompt. Create a copy to edit it."
+msgstr "これは読み取り専用のデフォルトプロンプトです。編集するにはコピーを作成してください。"
+
+#: muse/prompts_window.py:82
+msgid "Provider:"
+msgstr "プロバイダー："
+
+#: muse/prompts_window.py:85
+msgid "Show Model Details"
+msgstr "モデルの詳細を表示"
+
+#: muse/prompts_window.py:102
+msgid "Refresh model list"
+msgstr "モデルリストを更新"
+
+#: muse/prompts_window.py:125
+msgid "Max Tokens:"
+msgstr "最大トークン数："
+
+#: muse/prompts_window.py:135
+msgid "Temperature:"
+msgstr "温度："
+
+#: muse/prompts_window.py:165 muse/prompts_window.py:414
+msgid "Save All"
+msgstr "すべて保存"
+
+#: muse/prompts_window.py:211
+msgid "Loading models..."
+msgstr "モデルを読み込み中..."
+
+#: muse/prompts_window.py:221
+msgid "Error fetching models: {}"
+msgstr "モデルの取得エラー：{}"
+
+#: muse/prompts_window.py:227 muse/prompts_window.py:248
+#: project_window/project_window.py:324 project_window/project_window.py:339
+#: project_window/project_window.py:354 project_window/project_window.py:731
+#: project_window/project_window.py:745 project_window/project_window.py:754
+#: project_window/bottom_stack.py:140 project_window/bottom_stack.py:141
+#: project_window/bottom_stack.py:142
+msgid "Custom..."
+msgstr "カスタム..."
+
+#: muse/prompts_window.py:250
+msgid "Custom Model"
+msgstr "カスタムモデル"
+
+#: muse/prompts_window.py:251
+msgid "Enter the model identifier:"
+msgstr "モデル識別子を入力："
+
+#: muse/prompts_window.py:296
+msgid ""
+"\n"
+"Default prompt (read-only): LLM settings cannot be modified."
+msgstr ""
+"\n"
+"デフォルトプロンプト（読み取り専用）：LLM設定は変更できません。"
+
+#: muse/prompts_window.py:349
+msgid "Default prompts are read-only. LLM settings cannot be modified."
+msgstr "デフォルトプロンプトは読み取り専用です。LLM設定は変更できません。"
+
+#: muse/prompts_window.py:414
+msgid "Prompts saved successfully."
+msgstr "プロンプトが正常に保存されました。"
+
+#: muse/prompts_window.py:424
+msgid "Error saving prompts: {}"
+msgstr "プロンプトの保存エラー：{}"
+
+#: muse/prompts_window.py:463 muse/prompts_window.py:498
+msgid "New Prompt"
+msgstr "新しいプロンプト"
+
+#: muse/prompts_window.py:470
+msgid "Default prompt (read-only)"
+msgstr "デフォルトプロンプト（読み取り専用）"
+
+#: muse/prompts_window.py:477 project_window/project_tree_widget.py:138
+#: compendium/ai_compendium_dialog.py:337 compendium/enhanced_compendium.py:405
+#: compendium/enhanced_compendium.py:423 compendium/enhanced_compendium.py:445
+msgid "Move Up"
+msgstr "上に移動"
+
+#: muse/prompts_window.py:478 project_window/project_tree_widget.py:139
+#: compendium/ai_compendium_dialog.py:338 compendium/enhanced_compendium.py:406
+#: compendium/enhanced_compendium.py:424 compendium/enhanced_compendium.py:446
+msgid "Move Down"
+msgstr "下に移動"
+
+#: muse/prompts_window.py:498
+msgid "Enter prompt name:"
+msgstr "プロンプト名を入力："
+
+#: muse/prompts_window.py:537 muse/prompts_window.py:581
+msgid "Save Prompt"
+msgstr "プロンプトを保存"
+
+#: muse/prompts_window.py:538
+msgid "Cannot save: Either not a prompt or it is a default prompt (read-only)."
+msgstr "保存できません：プロンプトではないか、デフォルトプロンプト（読み取り専用）です。"
+
+#: muse/prompts_window.py:581
+msgid "Prompt '{}' saved successfully."
+msgstr "プロンプト '{}' が正常に保存されました。"
+
+#: muse/prompts_window.py:590
+msgid "Error saving prompt: {}"
+msgstr "プロンプトの保存エラー：{}"
+
+#: muse/prompts_window.py:596 muse/prompts_window.py:602
+msgid "Rename Prompt"
+msgstr "プロンプトの名前変更"
+
+#: muse/prompts_window.py:597
+msgid "Default prompts cannot be renamed."
+msgstr "デフォルトプロンプトは名前を変更できません。"
+
+#: muse/prompts_window.py:602
+msgid "Enter new prompt name:"
+msgstr "新しいプロンプト名を入力："
+
+#: muse/prompts_window.py:619
+msgid "Move Prompt"
+msgstr "プロンプトを移動"
+
+#: muse/prompts_window.py:620
+msgid "Default prompts cannot be moved."
+msgstr "デフォルトプロンプトは移動できません。"
+
+#: muse/prompts_window.py:643 muse/prompts_window.py:653
+msgid "Delete Prompt"
+msgstr "プロンプトを削除"
+
+#: muse/prompts_window.py:644
+msgid "Default prompts cannot be deleted."
+msgstr "デフォルトプロンプトは削除できません。"
+
+#: muse/prompts_window.py:653
+msgid "Delete prompt '{}'?"
+msgstr "プロンプト '{}' を削除しますか？"
+
+#: muse/prompts_window.py:672
+msgid "Replicate Prompt"
+msgstr "プロンプトを複製"
+
+#: muse/prompts_window.py:673
+msgid "Enter name for the new prompt:"
+msgstr "新しいプロンプトの名前を入力："
+
+#: muse/prompts_window.py:691
+msgid "Replicated"
+msgstr "複製完了"
+
+#: muse/prompts_window.py:691
+msgid "Prompt replicated. You can now edit the new prompt."
+msgstr "プロンプトが複製されました。これで新しいプロンプトを編集できます。"
+
+#: workbench.py:31
+msgid "Load Version Error"
+msgstr "バージョンの読み込みエラー"
+
+#: workbench.py:32
+msgid "Error loading version: {}"
+msgstr "バージョンの読み込みエラー：{}"
+
+#: workbench.py:62
+msgid "Load Projects Error"
+msgstr "プロジェクトの読み込みエラー"
+
+#: workbench.py:63
+msgid "Error loading projects: {}"
+msgstr "プロジェクトの読み込みエラー：{}"
+
+#: workbench.py:74
+msgid "Save Projects Error"
+msgstr "プロジェクトの保存エラー"
+
+#: workbench.py:75
+msgid "Error saving projects: {}"
+msgstr "プロジェクトの保存エラー：{}"
+
+#: workbench.py:93 workbench.py:310
+msgid ""
+"Left-click: Open project\n"
+"Right-click: Options (Delete, Export, Stats, Edit Cover)"
+msgstr ""
+"左クリック：プロジェクトを開く\n"
+"右クリック：オプション（削除、エクスポート、統計、カバーの編集）"
+
+#: workbench.py:113 workbench.py:223 workbench.py:228 workbench.py:232
+#: workbench.py:245
+msgid "Rename Project"
+msgstr "プロジェクトの名前変更"
+
+#: workbench.py:114 workbench.py:121 workbench.py:130
+msgid "Delete Project"
+msgstr "プロジェクトの削除"
+
+#: workbench.py:115 workbench.py:139
+msgid "Export Project"
+msgstr "プロジェクトのエクスポート"
+
+#: workbench.py:116
+msgid "Project Statistics"
+msgstr "プロジェクトの分析"
+
+#: workbench.py:117
+msgid "Add Book Cover"
+msgstr "ブックカバーの追加"
+
+#: workbench.py:130
+msgid "Project '{}' deleted."
+msgstr "プロジェクト '{}' が削除されました。"
+
+#: workbench.py:136
+msgid "Delete Project Error"
+msgstr "プロジェクトの削除エラー"
+
+#: workbench.py:136
+msgid "Error deleting project: {}"
+msgstr "プロジェクトの削除エラー：{}"
+
+#: workbench.py:140
+msgid "Export '{}' functionality will be implemented later."
+msgstr "'{}' のエクスポート機能は後で実装されます。"
+
+#: workbench.py:164
+msgid ""
+"Could not automatically find the directory for project '{}'. Please select "
+"the project directory manually."
+msgstr ""
+"プロジェクト '{}' のディレクトリを自動的に見つけられませんでした。プロジェクトディレクトリを手動で選択してください。"
+
+#: workbench.py:165
+msgid "Select Project Directory"
+msgstr "プロジェクトディレクトリの選択"
+
+#: workbench.py:167
+msgid "Select Directory for Project '{}'"
+msgstr "プロジェクト '{}' のディレクトリを選択"
+
+#: workbench.py:171
+msgid "User cancelled the project directory selection"
+msgstr "ユーザーがプロジェクトディレクトリの選択をキャンセルしました"
+
+#: workbench.py:173
+msgid "Invalid project directory: {}"
+msgstr "無効なプロジェクトディレクトリ：{}"
+
+#: workbench.py:180
+msgid "Statistics Error"
+msgstr "統計エラー"
+
+#: workbench.py:181
+msgid ""
+"Error loading project statistics: {}\n"
+"\n"
+"Project: '{}'\n"
+"Current directory: {}\n"
+"\n"
+"Details (for debugging):\n"
+"{}"
+msgstr ""
+"プロジェクト統計の読み込みエラー：{}\n"
+"\n"
+"プロジェクト：'{}'\n"
+"現在のディレクトリ：{}\n"
+"\n"
+"詳細（デバッグ用）：\n"
+"{}"
+
+#: workbench.py:189
+msgid "Error Adding Cover"
+msgstr "カバーの追加エラー"
+
+#: workbench.py:190
+msgid "Error adding book cover: {}"
+msgstr "ブックカバーの追加エラー：{}"
+
+#: workbench.py:196
+msgid "Error Renaming Project"
+msgstr "プロジェクトの名前変更エラー"
+
+#: workbench.py:197
+msgid "Error renaming project: {}"
+msgstr "プロジェクトの名前変更エラー：{}"
+
+#: workbench.py:201
+msgid "Select Book Cover"
+msgstr "ブックカバーの選択"
+
+#: workbench.py:201
+msgid "Image Files (*.png *.jpg *.jpeg *.bmp)"
+msgstr "画像ファイル (*.png *.jpg *.jpeg *.bmp)"
+
+#: workbench.py:211
+msgid "Invalid Image"
+msgstr "無効な画像"
+
+#: workbench.py:212
+msgid "The selected file is not a valid image."
+msgstr "選択されたファイルは有効な画像ではありません。"
+
+#: workbench.py:223
+msgid "Enter the project's new name:"
+msgstr "プロジェクトの新しい名前を入力："
+
+#: workbench.py:229 workbench.py:609
+msgid "Project '{}' already exists."
+msgstr "プロジェクト '{}' はすでに存在します。"
+
+#: workbench.py:233
+msgid "Project name is unchanged."
+msgstr "プロジェクト名は変更されていません。"
+
+#: workbench.py:245
+msgid "Project {} renamed to '{}'"
+msgstr "プロジェクト {} が '{}' に名前変更されました"
+
+#: workbench.py:255
+msgid "Project '{}' directory already exists."
+msgstr "プロジェクト '{}' のディレクトリはすでに存在します。"
+
+#: workbench.py:317 workbench.py:542
+msgid "Writingway - Workbench"
+msgstr "Writingway - ワークベンチ"
+
+#: workbench.py:350 workbench.py:547
+msgid "Click here to configure global options (paths, fonts, themes, etc.)"
+msgstr "ここをクリックしてグローバルオプション（パス、フォント、テーマなど）を設定してください"
+
+#: workbench.py:365 workbench.py:543
+msgid "Previous Project"
+msgstr "前のプロジェクト"
+
+#: workbench.py:378 workbench.py:544
+msgid "Next Project"
+msgstr "次のプロジェクト"
+
+#: workbench.py:383 workbench.py:545 workbench.py:573
+msgid "＋ New Project"
+msgstr "＋ 新しいプロジェクト"
+
+#: workbench.py:386 workbench.py:546
+msgid "Create a brand-new project"
+msgstr "新しいプロジェクトを作成"
+
+#: workbench.py:401 workbench.py:548
+msgid "Version: {}"
+msgstr "バージョン：{}"
+
+#: workbench.py:426 workbench.py:462
+msgid "No quote available"
+msgstr "引用がありません"
+
+#: workbench.py:427 workbench.py:462
+msgid "Unknown"
+msgstr "不明"
+
+#: workbench.py:447 workbench.py:457
+msgid "Empty quotes list"
+msgstr "引用リストが空です"
+
+#: workbench.py:605 workbench.py:608 workbench.py:618 workbench.py:621
+msgid "New Project"
+msgstr "新しいプロジェクト"
+
+#: workbench.py:605
+msgid "Enter new project name:"
+msgstr "新しいプロジェクト名を入力："
+
+#: workbench.py:618
+msgid "Project '{}' created."
+msgstr "プロジェクト '{}' が作成されました。"
+
+#: workbench.py:621
+msgid "Project creation cancelled."
+msgstr "プロジェクトの作成がキャンセルされました。"
+
+#: project_window/summary_controller.py:26
+msgid "Selected prompt not found."
+msgstr "選択したプロンプトが見つかりません。"
+
+#: project_window/summary_controller.py:32
+#: project_window/summary_controller.py:55
+msgid "No child scene content found to summarize."
+msgstr "要約する子シーンの内容が見つかりません。"
+
+#: project_window/summary_controller.py:37
+msgid "Generating summary, please wait..."
+msgstr "概要を生成中、お待ちください..."
+
+#: project_window/summary_controller.py:45
+msgid "Select Summary Prompt"
+msgstr "概要プロンプトを選択"
+
+#: project_window/summary_controller.py:46
+msgid "Please select a summary prompt."
+msgstr "概要プロンプトを選択してください。"
+
+#: project_window/summary_controller.py:74
+msgid "Please select an Act or Chapter (not a Scene)."
+msgstr "行為または章を選択してください（シーンではありません）。"
+
+#: project_window/summary_controller.py:85
+msgid "LLM returned no output."
+msgstr "LLMが出力を返しませんでした。"
+
+#: project_window/summary_controller.py:91
+msgid "Summary generated successfully."
+msgstr "概要が正常に生成されました。"
+
+#: project_window/summary_controller.py:94 project_window/project_window.py:557
+#: project_window/project_window.py:565 project_window/project_window.py:567
+#: project_window/bottom_stack.py:46
+msgid "Summary"
+msgstr "概要"
+
+#: project_window/summary_controller.py:97
+msgid "Summary Error"
+msgstr "概要エラー"
+
+#: project_window/project_model.py:30 project_window/bottom_stack.py:140
+msgid "Third Person Limited"
+msgstr "三人称限定"
+
+#: project_window/project_model.py:31 project_window/project_window.py:386
+#: project_window/project_window.py:428 project_window/bottom_stack.py:203
+msgid "Character"
+msgstr "キャラクター"
+
+#: project_window/project_model.py:32 project_window/project_window.py:387
+#: project_window/project_window.py:429 project_window/bottom_stack.py:142
+#: project_window/bottom_stack.py:204
+msgid "Present Tense"
+msgstr "現在形"
+
+#: project_window/project_model.py:207
+msgid "Provide either uuid or hierarchy, not both"
+msgstr "UUIDまたは階層のいずれかを指定してください、両方は指定できません"
+
+#: project_window/project_model.py:209
+msgid "Either uuid or hierarchy must be provided"
+msgstr "UUIDまたは階層のいずれかを指定する必要があります"
+
+#: project_window/project_model.py:251
+msgid "An Act named '{}' already exists. Please choose a unique name."
+msgstr "行為 '{}' はすでに存在します。ユニークな名前を選択してください。"
+
+#: project_window/project_model.py:257 project_window/project_model.py:273
+msgid "This is the summary for {}."
+msgstr "{} の概要です。"
+
+#: project_window/project_model.py:268
+msgid ""
+"A Chapter named '{}' already exists in Act '{}'. Please choose a unique name."
+msgstr "行為 '{}' に章 '{}' はすでに存在します。ユニークな名前を選択してください。"
+
+#: project_window/project_model.py:287
+msgid ""
+"A Scene named '{}' already exists in Chapter '{}' of Act '{}'. Please choose "
+"a unique name."
+msgstr "行為 '{}' の章 '{}' にシーン '{}' はすでに存在します。ユニークな名前を選択してください。"
+
+#: project_window/project_model.py:308
+msgid "A {} named '{}' already exists {}. Please choose a unique name."
+msgstr "{} '{}' はすでに {} に存在します。ユニークな名前を選択してください。"
+
+#: project_window/rewrite_feature.py:27
+msgid "Rewrite Selected Text"
+msgstr "選択したテキストを書き換え"
+
+#: project_window/rewrite_feature.py:34
+msgid "Original Text:"
+msgstr "元のテキスト："
+
+#: project_window/rewrite_feature.py:42
+msgid "Select Rewrite Prompt:"
+msgstr "書き換えプロンプトを選択："
+
+#: project_window/rewrite_feature.py:47 project_window/rewrite_feature.py:93
+#: project_window/rewrite_feature.py:116 project_window/rewrite_feature.py:127
+#: project_window/project_window.py:701 project_window/project_window.py:708
+msgid "Rewrite"
+msgstr "書き換え"
+
+#: project_window/rewrite_feature.py:47
+msgid "No rewrite prompts found."
+msgstr "書き換えプロンプトが見つかりません。"
+
+#: project_window/rewrite_feature.py:55
+msgid "Generate Rewrite"
+msgstr "書き換えを生成"
+
+#: project_window/rewrite_feature.py:60
+msgid "Rewritten Text:"
+msgstr "書き換えたテキスト："
+
+#: project_window/rewrite_feature.py:68
+msgid "Apply"
+msgstr "適用"
+
+#: project_window/rewrite_feature.py:71
+msgid "Generate"
+msgstr "生成"
+
+#: project_window/rewrite_feature.py:93
+msgid "Selected prompt has no text."
+msgstr "選択したプロンプトにテキストがありません。"
+
+#: project_window/rewrite_feature.py:116
+msgid "Error sending prompt to LLM: {}"
+msgstr "LLMへのプロンプト送信エラー：{}"
+
+#: project_window/rewrite_feature.py:127
+msgid "No rewritten text to apply."
+msgstr "適用する書き換えテキストがありません。"
+
+#: project_window/project_structure_manager.py:7
+#: project_window/project_tree_widget.py:134
+msgid "Add Act"
+msgstr "行為を追加"
+
+#: project_window/project_structure_manager.py:7
+#: project_window/project_tree_widget.py:134
+msgid "Enter act name:"
+msgstr "行為名を入力："
+
+#: project_window/project_structure_manager.py:14
+#: project_window/project_tree_widget.py:142
+msgid "Add Chapter"
+msgstr "章を追加"
+
+#: project_window/project_structure_manager.py:14
+msgid "Enter chapter name:"
+msgstr "章の名前を入力："
+
+#: project_window/project_structure_manager.py:22
+#: project_window/project_tree_widget.py:144
+msgid "Add Scene"
+msgstr "シーンを追加"
+
+#: project_window/project_structure_manager.py:22
+msgid "Enter scene name:"
+msgstr "シーン名を入力："
+
+#: project_window/project_structure_manager.py:34
+msgid "Enter new name:"
+msgstr "新しい名前を入力："
+
+#: project_window/project_window.py:74
+msgid "Project: {}"
+msgstr "プロジェクト：{}"
+
+#: project_window/project_window.py:113 project_window/project_window.py:771
+msgid "Words: {}"
+msgstr "単語数：{}"
+
+#: project_window/project_window.py:114 project_window/project_window.py:298
+msgid "Last Saved: {}"
+msgstr "最終保存：{}"
+
+#: project_window/project_window.py:237
+msgid "Enter scene content..."
+msgstr "シーンの内容を入力..."
+
+#: project_window/project_window.py:245
+msgid "Enter summary for {}..."
+msgstr "{} の概要を入力..."
+
+#: project_window/project_window.py:269 project_window/project_window.py:273
+#: project_window/scene_editor.py:53
+msgid "Manual Save"
+msgstr "手動保存"
+
+#: project_window/project_window.py:269
+msgid "Please select a scene for manual save."
+msgstr "手動保存のためにシーンを選択してください。"
+
+#: project_window/project_window.py:273
+msgid "There is no content to save."
+msgstr "保存する内容がありません。"
+
+#: project_window/project_window.py:278
+msgid "Scene manually saved"
+msgstr "シーンが手動で保存されました"
+
+#: project_window/project_window.py:292
+msgid "Scene autosaved"
+msgstr "シーンが自動保存されました"
+
+#: project_window/project_window.py:309
+msgid "Backup Versions"
+msgstr "バックアップバージョン"
+
+#: project_window/project_window.py:309
+msgid "Please select a scene to view backups."
+msgstr "バックアップを表示するためにシーンを選択してください。"
+
+#: project_window/project_window.py:320
+msgid "Backup Loaded"
+msgstr "バックアップが読み込まれました"
+
+#: project_window/project_window.py:320
+msgid ""
+"Backup loaded from:\n"
+"{}"
+msgstr ""
+"バックアップが以下から読み込まれました：\n"
+"{}"
+
+#: project_window/project_window.py:325
+msgid "Custom POV"
+msgstr "カスタム視点"
+
+#: project_window/project_window.py:325
+msgid "Enter custom POV:"
+msgstr "カスタム視点を入力："
+
+#: project_window/project_window.py:340
+msgid "Custom POV Character"
+msgstr "カスタム視点キャラクター"
+
+#: project_window/project_window.py:340
+msgid "Enter custom POV Character:"
+msgstr "カスタム視点キャラクターを入力："
+
+#: project_window/project_window.py:368 project_window/bottom_stack.py:180
+msgid "POV: {}"
+msgstr "視点：{}"
+
+#: project_window/project_window.py:369 project_window/bottom_stack.py:182
+msgid "POV Character: {}"
+msgstr "視点キャラクター：{}"
+
+#: project_window/project_window.py:375 project_window/project_window.py:380
+msgid "LLM Prompt"
+msgstr "LLMプロンプト"
+
+#: project_window/project_window.py:375
+msgid "Please enter some action beats before sending."
+msgstr "送信する前にアクションビートを入力してください。"
+
+#: project_window/project_window.py:380
+msgid "Please select a prompt."
+msgstr "プロンプトを選択してください。"
+
+#: project_window/project_window.py:385 project_window/project_window.py:427
+#: project_window/bottom_stack.py:202
+msgid "Third Person"
+msgstr "三人称"
+
+#: project_window/project_window.py:421
+msgid "Generating summary to fit token limit…"
+msgstr "トークン制限に合う概要を生成中…"
+
+#: project_window/project_window.py:452
+msgid "Summary generated. Edit if needed, then resend."
+msgstr "概要が生成されました。必要に応じて編集して再送信してください。"
+
+#: project_window/project_window.py:496
+msgid "Thread Error"
+msgstr "スレッドエラー"
+
+#: project_window/project_window.py:496
+msgid "An error occurred while stopping the LLM thread: {}"
+msgstr "LLMスレッドの停止中にエラーが発生しました：{}"
+
+#: project_window/project_window.py:504
+msgid "LLM Response"
+msgstr "LLM応答"
+
+#: project_window/project_window.py:504
+msgid ""
+"The LLM did not return any text. Possible token limit reached or an error "
+"occurred."
+msgstr ""
+"LLMがテキストを返しませんでした。トークン制限に達したか、エラーが発生した可能性があります。"
+
+#: project_window/project_window.py:528 project_window/project_window.py:551
+msgid "Apply Preview"
+msgstr "プレビューを適用"
+
+#: project_window/project_window.py:528
+msgid "No preview text to apply."
+msgstr "適用するプレビューテキストがありません。"
+
+#: project_window/project_window.py:551 project_window/token_limit_dialog.py:46
+msgid "Error: {}"
+msgstr "エラー：{}"
+
+#: project_window/project_window.py:557
+msgid "No Act or Chapter selected."
+msgstr "行為または章が選択されていません。"
+
+#: project_window/project_window.py:563
+msgid "Summary saved successfully"
+msgstr "概要が正常に保存されました"
+
+#: project_window/project_window.py:565
+msgid "Summary saved successfully."
+msgstr "概要が正常に保存されました。"
+
+#: project_window/project_window.py:567
+msgid "Failed to save summary."
+msgstr "概要の保存に失敗しました。"
+
+#: project_window/project_window.py:640
+msgid "TTS Warning"
+msgstr "TTS警告"
+
+#: project_window/project_window.py:640
+msgid "There is no text to read."
+msgstr "読み込むテキストがありません。"
+
+#: project_window/project_window.py:708
+msgid "No text selected to rewrite."
+msgstr "書き換えるテキストが選択されていません。"
+
+#: project_window/project_window.py:749
+msgid "-- Select Character --"
+msgstr "-- キャラクターを選択 --"
+
+#: project_window/bottom_stack.py:52 project_window/bottom_stack.py:109
+msgid "Preview the final prompt"
+msgstr "最終プロンプトをプレビュー"
+
+#: project_window/bottom_stack.py:57 project_window/dialogs.py:7
+msgid "Create Summary"
+msgstr "概要を作成"
+
+#: project_window/bottom_stack.py:59
+msgid "Save Summary"
+msgstr "概要を保存"
+
+#: project_window/bottom_stack.py:75
+msgid "LLM output preview will appear here..."
+msgstr "LLM出力プレビューがここに表示されます..."
+
+#: project_window/bottom_stack.py:79
+msgid "Appends the LLM's output to your current scene"
+msgstr "LLMの出力を現在のシーンに追加します"
+
+#: project_window/bottom_stack.py:81
+msgid "Include Action Beats"
+msgstr "アクションビートを含める"
+
+#: project_window/bottom_stack.py:82
+msgid "Include the text from the Action Beats field in the scene text"
+msgstr "アクションビートフィールドのテキストをシーンテキストに含める"
+
+#: project_window/bottom_stack.py:95
+msgid "Enter your action beats here..."
+msgstr "ここにアクションビートを入力..."
+
+#: project_window/bottom_stack.py:103
+msgid "Prose"
+msgstr "散文"
+
+#: project_window/bottom_stack.py:115
+msgid "Sends the action beats to the LLM"
+msgstr "アクションビートをLLMに送信"
+
+#: project_window/bottom_stack.py:121
+msgid "Stop the LLM processing"
+msgstr "LLM処理を停止"
+
+#: project_window/bottom_stack.py:127
+msgid "Toggle context panel"
+msgstr "コンテキストパネルを切り替え"
+
+#: project_window/bottom_stack.py:140
+msgid "POV"
+msgstr "視点"
+
+#: project_window/bottom_stack.py:140
+msgid "First Person"
+msgstr "一人称"
+
+#: project_window/bottom_stack.py:140
+msgid "Omniscient"
+msgstr "全知"
+
+#: project_window/bottom_stack.py:141
+msgid "POV Character"
+msgstr "視点キャラクター"
+
+#: project_window/bottom_stack.py:142
+msgid "Tense"
+msgstr "時制"
+
+#: project_window/bottom_stack.py:142
+msgid "Past Tense"
+msgstr "過去形"
+
+#: project_window/bottom_stack.py:184
+msgid "Tense: {}"
+msgstr "時制：{}"
+
+#: project_window/token_limit_dialog.py:39
+msgid "Token Limit Exceeded"
+msgstr "トークン制限超過"
+
+#: project_window/token_limit_dialog.py:46
+msgid ""
+"\n"
+"The story is too long. Please edit the summary below:"
+msgstr ""
+"\n"
+"ストーリーが長すぎます。以下の概要を編集してください："
+
+#: project_window/token_limit_dialog.py:57
+msgid "Use This Summary"
+msgstr "この概要を使用"
+
+#: project_window/token_limit_dialog.py:59
+msgid "Truncate Story"
+msgstr "ストーリーを切り捨て"
+
+#: project_window/token_limit_dialog.py:68
+msgid "Tokens: Calculating..."
+msgstr "トークン：計算中..."
+
+#: project_window/token_limit_dialog.py:79
+msgid "Tokens: {}/{}"
+msgstr "トークン：{}/{}"
+
+#: project_window/token_limit_dialog.py:95
+msgid "Empty Summary"
+msgstr "空の概要"
+
+#: project_window/token_limit_dialog.py:95
+msgid "Please provide a summary before proceeding."
+msgstr "続行する前に概要を入力してください。"
+
+#: project_window/project_tree_widget.py:25
+msgid "Status"
+msgstr "状態"
+
+#: project_window/project_tree_widget.py:40
+#: project_window/project_tree_widget.py:42
+#: project_window/project_tree_widget.py:102
+#: project_window/project_tree_widget.py:109
+#: project_window/project_tree_widget.py:111
+#: project_window/project_tree_widget.py:147
+msgid "To Do"
+msgstr "未着手"
+
+#: project_window/project_tree_widget.py:43
+#: project_window/project_tree_widget.py:112
+#: project_window/project_tree_widget.py:147
+msgid "In Progress"
+msgstr "進行中"
+
+#: project_window/project_tree_widget.py:44
+#: project_window/project_tree_widget.py:113
+#: project_window/project_tree_widget.py:147
+msgid "Final Draft"
+msgstr "最終稿"
+
+#: project_window/project_tree_widget.py:146
+msgid "Set Scene Status"
+msgstr "シーン状態を設定"
+
+#: project_window/project_tree_widget.py:153
+msgid "Duplicate Name Error"
+msgstr "名前重複エラー"
+
+#: project_window/global_toolbar.py:11
+msgid "Global Actions"
+msgstr "グローバルアクション"
+
+#: project_window/global_toolbar.py:20
+msgid "Toggle Compendium"
+msgstr "コンペンディウムを切り替え"
+
+#: project_window/global_toolbar.py:21
+msgid "Prompt Options"
+msgstr "プロンプトオプション"
+
+#: project_window/global_toolbar.py:22
+msgid "Workshop Chat"
+msgstr "ワークショップチャット"
+
+#: project_window/global_toolbar.py:23 project_window/focus_mode.py:46
+msgid "Focus Mode"
+msgstr "フォーカスモード"
+
+#: project_window/scene_editor.py:18
+msgid "Editor Toolbar"
+msgstr "エディターツールバー"
+
+#: project_window/scene_editor.py:29
+msgid "Bold"
+msgstr "太字"
+
+#: project_window/scene_editor.py:30
+msgid "Italic"
+msgstr "斜体"
+
+#: project_window/scene_editor.py:31
+msgid "Underline"
+msgstr "下線"
+
+#: project_window/scene_editor.py:33
+msgid "Play TTS (or Stop if playing)"
+msgstr "TTSを再生（再生中の場合は停止）"
+
+#: project_window/scene_editor.py:35
+msgid "Align Left"
+msgstr "左揃え"
+
+#: project_window/scene_editor.py:36
+msgid "Center Align"
+msgstr "中央揃え"
+
+#: project_window/scene_editor.py:37
+msgid "Align Right"
+msgstr "右揃え"
+
+#: project_window/scene_editor.py:41
+msgid "Select a font"
+msgstr "フォントを選択"
+
+#: project_window/scene_editor.py:47
+msgid "Select font size"
+msgstr "フォントサイズを選択"
+
+#: project_window/scene_editor.py:54
+msgid "Show Backups"
+msgstr "バックアップを表示"
+
+#: project_window/scene_editor.py:55
+msgid "Open Analysis Editor"
+msgstr "分析エディターを開く"
+
+#: project_window/scene_editor.py:56
+msgid "Open Whisper"
+msgstr "Whisperを開く"
+
+#: project_window/scene_editor.py:57
+msgid "Open Wikipedia"
+msgstr "Wikipediaを開く"
+
+#: project_window/scene_editor.py:58
+msgid "Open Internet Archive"
+msgstr "インターネットアーカイブを開く"
+
+#: project_window/scene_editor.py:71
+msgid "Select a node to edit its content..."
+msgstr "内容を編集するノードを選択..."
+
+#: project_window/dialogs.py:13
+msgid "Edit summarizer prompt:"
+msgstr "要約プロンプトを編集："
+
+#: project_window/dialogs.py:18
+msgid "Okay"
+msgstr "OK"
+
+#: project_window/dialogs.py:30
+msgid "Input Error"
+msgstr "入力エラー"
+
+#: project_window/dialogs.py:30
+msgid "The summarizer prompt cannot be empty."
+msgstr "要約プロンプトは空にできません。"
+
+#: compendium/ai_compendium_dialog.py:30
+msgid "AI Compendium Analysis"
+msgstr "AIコンペンディウム分析"
+
+#: compendium/ai_compendium_dialog.py:50
+msgid "New"
+msgstr "新規"
+
+#: compendium/ai_compendium_dialog.py:54 compendium/ai_compendium_dialog.py:319
+msgid "Select an entry or relationship to view or edit its details."
+msgstr "詳細を表示または編集するエントリまたは関係を選択してください。"
+
+#: compendium/ai_compendium_dialog.py:58
+msgid "Current"
+msgstr "現在の"
+
+#: compendium/ai_compendium_dialog.py:62
+msgid "Existing compendium entry will appear here."
+msgstr "既存のコンペンディウムエントリがここに表示されます。"
+
+#: compendium/ai_compendium_dialog.py:74
+msgid "Save to Compendium"
+msgstr "コンペンディウムに保存"
+
+#: compendium/ai_compendium_dialog.py:120
+#: compendium/ai_compendium_dialog.py:195
+#: compendium/ai_compendium_dialog.py:210
+#: compendium/ai_compendium_dialog.py:435
+#: compendium/ai_compendium_dialog.py:539
+#: compendium/ai_compendium_dialog.py:555 compendium/enhanced_compendium.py:245
+msgid "Relationships"
+msgstr "関係"
+
+#: compendium/ai_compendium_dialog.py:168
+#: compendium/ai_compendium_dialog.py:464
+#: compendium/ai_compendium_dialog.py:519
+#: compendium/ai_compendium_dialog.py:520
+#: compendium/ai_compendium_dialog.py:527
+msgid ""
+"\n"
+"\n"
+"Relationships:\n"
+msgstr ""
+"\n"
+"\n"
+"関係：\n"
+
+#: compendium/ai_compendium_dialog.py:190
+#: compendium/ai_compendium_dialog.py:229
+#: compendium/ai_compendium_dialog.py:269
+#: compendium/ai_compendium_dialog.py:304
+#: compendium/ai_compendium_dialog.py:430
+msgid ""
+"Content:\n"
+"{}\n"
+"\n"
+"Relationships:\n"
+msgstr ""
+"内容：\n"
+"{}\n"
+"\n"
+"関係：\n"
+
+#: compendium/ai_compendium_dialog.py:203
+#: compendium/ai_compendium_dialog.py:235
+#: compendium/ai_compendium_dialog.py:252
+#: compendium/ai_compendium_dialog.py:275
+#: compendium/ai_compendium_dialog.py:310
+#: compendium/ai_compendium_dialog.py:443
+msgid "None"
+msgstr "なし"
+
+#: compendium/ai_compendium_dialog.py:238
+#: compendium/ai_compendium_dialog.py:278
+#: compendium/ai_compendium_dialog.py:313
+msgid "This entry does not exist in the compendium yet."
+msgstr "このエントリはまだコンペンディウムに存在しません。"
+
+#: compendium/ai_compendium_dialog.py:241
+msgid "Relationships:\n"
+msgstr "関係：\n"
+
+#: compendium/ai_compendium_dialog.py:288
+msgid "Edit the relationship type for {} (e.g., '{}: Trusted Friend')."
+msgstr "{} の関係タイプを編集（例：'{}：信頼できる友人'）。"
+
+#: compendium/ai_compendium_dialog.py:332
+msgid "Restore"
+msgstr "復元"
+
+#: compendium/ai_compendium_dialog.py:334
+msgid "Ignore Update"
+msgstr "更新を無視"
+
+#: compendium/ai_compendium_dialog.py:335
+#: compendium/ai_compendium_dialog.py:421 compendium/enhanced_compendium.py:421
+msgid "Rename Entry"
+msgstr "エントリの名前変更"
+
+#: compendium/ai_compendium_dialog.py:336 compendium/enhanced_compendium.py:422
+msgid "Move To..."
+msgstr "移動先..."
+
+#: compendium/ai_compendium_dialog.py:342
+msgid "Restore Relationship"
+msgstr "関係を復元"
+
+#: compendium/ai_compendium_dialog.py:344 compendium/enhanced_compendium.py:472
+msgid "Remove Relationship"
+msgstr "関係を削除"
+
+#: compendium/ai_compendium_dialog.py:345
+#: compendium/ai_compendium_dialog.py:448
+msgid "Rename Relationship"
+msgstr "関係の名前変更"
+
+#: compendium/ai_compendium_dialog.py:421
+#: compendium/ai_compendium_dialog.py:448 compendium/enhanced_compendium.py:793
+msgid "New name:"
+msgstr "新しい名前："
+
+#: compendium/ai_compendium_dialog.py:473
+msgid ""
+"{}\n"
+"\n"
+"Relationships:\n"
+msgstr ""
+"{}\n"
+"\n"
+"関係：\n"
+
+#: compendium/ai_compendium_dialog.py:528
+msgid "Content:\n"
+msgstr "内容：\n"
+
+#: compendium/ai_compendium_dialog.py:591
+msgid "Failed to save: {}"
+msgstr "保存に失敗しました：{}"
+
+#: compendium/enhanced_compendium.py:56 compendium/enhanced_compendium.py:148
+#: compendium/enhanced_compendium.py:167
+msgid "Enhanced Compendium - {}"
+msgstr "強化コンペンディウム - {}"
+
+#: compendium/enhanced_compendium.py:98
+msgid "Project Toolbar"
+msgstr "プロジェクトツールバー"
+
+#: compendium/enhanced_compendium.py:100
+msgid "<b>Project:</b>"
+msgstr "<b>プロジェクト：</b>"
+
+#: compendium/enhanced_compendium.py:185
+msgid "Search entries and tags..."
+msgstr "エントリとタグを検索..."
+
+#: compendium/enhanced_compendium.py:188 compendium/compendium_panel.py:67
+msgid "Compendium"
+msgstr "コンペンディウム"
+
+#: compendium/enhanced_compendium.py:201 compendium/enhanced_compendium.py:906
+msgid "No entry selected"
+msgstr "エントリが選択されていません"
+
+#: compendium/enhanced_compendium.py:205
+msgid "Save Changes"
+msgstr "変更を保存"
+
+#: compendium/enhanced_compendium.py:216
+msgid ""
+"This is the text the AI can see if you select this entry to be included in "
+"the prompt inside the context panel"
+msgstr ""
+"このエントリをコンテキストパネル内でプロンプトに含めるために選択した場合、AIが見ることができるテキストです"
+
+#: compendium/enhanced_compendium.py:218
+msgid "Overview"
+msgstr "概要"
+
+#: compendium/enhanced_compendium.py:219
+msgid ""
+"this is the text the AI can see if you select this entry to be included in "
+"the prompt inside the context panel"
+msgstr ""
+"このエントリをコンテキストパネル内でプロンプトに含めるために選択した場合、AIが見ることができるテキストです"
+
+#: compendium/enhanced_compendium.py:223
+msgid ""
+"Enter details about your entry here... (details about your entry the AI "
+"can't see - this info is only for you)"
+msgstr ""
+"ここにエントリの詳細を入力してください...（AIが見ることができないエントリの詳細 - この情報はあなただけのためのものです）"
+
+#: compendium/enhanced_compendium.py:224
+msgid "Details"
+msgstr "詳細"
+
+#: compendium/enhanced_compendium.py:225
+msgid "details about your entry the AI can't see - this info is only for you"
+msgstr "AIが見ることができないエントリの詳細 - この情報はあなただけのためのものです"
+
+#: compendium/enhanced_compendium.py:230
+msgid "Add Relationship"
+msgstr "関係を追加"
+
+#: compendium/enhanced_compendium.py:234
+msgid "Friend"
+msgstr "友人"
+
+#: compendium/enhanced_compendium.py:234
+msgid "Family"
+msgstr "家族"
+
+#: compendium/enhanced_compendium.py:234
+msgid "Ally"
+msgstr "同盟者"
+
+#: compendium/enhanced_compendium.py:234
+msgid "Enemy"
+msgstr "敵"
+
+#: compendium/enhanced_compendium.py:234
+msgid "Acquaintance"
+msgstr "知人"
+
+#: compendium/enhanced_compendium.py:234
+msgid "Other"
+msgstr "その他"
+
+#: compendium/enhanced_compendium.py:237
+msgid "Related Entry:"
+msgstr "関連エントリ："
+
+#: compendium/enhanced_compendium.py:238
+msgid "Relationship Type:"
+msgstr "関係タイプ："
+
+#: compendium/enhanced_compendium.py:242
+msgid "Entry"
+msgstr "エントリ"
+
+#: compendium/enhanced_compendium.py:242
+msgid "Relationship Type"
+msgstr "関係タイプ"
+
+#: compendium/enhanced_compendium.py:246
+msgid "details about relationships between entries, not visible to the AI"
+msgstr "エントリ間の関係の詳細、AIには表示されません"
+
+#: compendium/enhanced_compendium.py:253
+msgid "Add Image"
+msgstr "画像を追加"
+
+#: compendium/enhanced_compendium.py:254
+msgid "Remove Selected"
+msgstr "選択したものを削除"
+
+#: compendium/enhanced_compendium.py:266
+msgid "Images"
+msgstr "画像"
+
+#: compendium/enhanced_compendium.py:267
+msgid "add images for your entries - not visible to the AI"
+msgstr "エントリに画像を追加 - AIには表示されません"
+
+#: compendium/enhanced_compendium.py:277
+msgid "Tags"
+msgstr "タグ"
+
+#: compendium/enhanced_compendium.py:281
+msgid "Add new tag..."
+msgstr "新しいタグを追加..."
+
+#: compendium/enhanced_compendium.py:285
+msgid "add a tag to your entry"
+msgstr "エントリにタグを追加"
+
+#: compendium/enhanced_compendium.py:324
+msgid "Failed to create default compendium file: {}"
+msgstr "デフォルトコンペンディウムファイルの作成に失敗しました：{}"
+
+#: compendium/enhanced_compendium.py:361
+msgid "Failed to load compendium data: {}"
+msgstr "コンペンディウムデータの読み込みに失敗しました：{}"
+
+#: compendium/enhanced_compendium.py:395 compendium/enhanced_compendium.py:746
+msgid "New Category"
+msgstr "新しいカテゴリ"
+
+#: compendium/enhanced_compendium.py:402 compendium/enhanced_compendium.py:753
+msgid "New Entry"
+msgstr "新しいエントリ"
+
+#: compendium/enhanced_compendium.py:403
+msgid "Delete Category"
+msgstr "カテゴリを削除"
+
+#: compendium/enhanced_compendium.py:404
+msgid "Rename Category"
+msgstr "カテゴリの名前変更"
+
+#: compendium/enhanced_compendium.py:419
+msgid "Save Entry"
+msgstr "エントリを保存"
+
+#: compendium/enhanced_compendium.py:420
+msgid "Delete Entry"
+msgstr "エントリを削除"
+
+#: compendium/enhanced_compendium.py:444
+msgid "Remove Tag"
+msgstr "タグを削除"
+
+#: compendium/enhanced_compendium.py:488
+msgid "Select Tag Color"
+msgstr "タグの色を選択"
+
+#: compendium/enhanced_compendium.py:494 compendium/enhanced_compendium.py:889
+msgid ""
+"right-click to move the tag within this list - this impacts the colour of "
+"your entry"
+msgstr ""
+"右クリックでこのリスト内でタグを移動 - これによりエントリの色に影響します"
+
+#: compendium/enhanced_compendium.py:525
+msgid "Select Image"
+msgstr "画像を選択"
+
+#: compendium/enhanced_compendium.py:550
+msgid "Failed to copy image: {}"
+msgstr "画像のコピーに失敗しました：{}"
+
+#: compendium/enhanced_compendium.py:743
+msgid "Failed to save compendium data: {}"
+msgstr "コンペンディウムデータの保存に失敗しました：{}"
+
+#: compendium/enhanced_compendium.py:746
+msgid "Category name:"
+msgstr "カテゴリ名："
+
+#: compendium/enhanced_compendium.py:753
+msgid "Entry name:"
+msgstr "エントリ名："
+
+#: compendium/enhanced_compendium.py:764
+msgid "Are you sure you want to delete the category '{}' and all its entries?"
+msgstr "カテゴリ '{}' とそのすべてのエントリを削除してもよろしいですか？"
+
+#: compendium/enhanced_compendium.py:779
+msgid "Are you sure you want to delete the entry '{}'?"
+msgstr "エントリ '{}' を削除してもよろしいですか？"
+
+#: compendium/enhanced_compendium.py:793
+msgid "Rename {}"
+msgstr "{} の名前変更"
+
+#: compendium/compendium_panel.py:75
+msgid "Select a compendium entry to view."
+msgstr "表示するコンペンディウムエントリを選択してください。"
+
+#: compendium/compendium_panel.py:225
+msgid "Open Enhanced Compendium"
+msgstr "強化コンペンディウムを開く"
+
+#: compendium/compendium_panel.py:226
+msgid "Analyze Scene with AI"
+msgstr "AIでシーンを分析"
+
+#: compendium/compendium_panel.py:250
+msgid "No scene content available to analyze."
+msgstr "分析するシーン内容がありません。"
+
+#: compendium/compendium_panel.py:325
+msgid "AI returned invalid JSON that could not be repaired."
+msgstr "AIが修復できない無効なJSONを返しました。"
+
+#: compendium/compendium_panel.py:332
+msgid "AI returned invalid JSON format."
+msgstr "AIが無効なJSON形式を返しました。"
+
+#: compendium/compendium_panel.py:341
+msgid "Failed to analyze scene: {}"
+msgstr "シーンの分析に失敗しました：{}"
+
+#: compendium/compendium_panel.py:439
+msgid "Success"
+msgstr "成功"
+
+#: compendium/compendium_panel.py:439
+msgid "Compendium updated successfully."
+msgstr "コンペンディウムが正常に更新されました。"
+
+#: compendium/compendium_panel.py:442
+msgid "Failed to save compendium: {}"
+msgstr "コンペンディウムの保存に失敗しました：{}"
+
+#: main.py:25
+msgid "Missing Dependencies"
+msgstr "依存関係の欠落"
+
+#: main.py:26
+msgid "The application requires the following module(s): "
+msgstr "アプリケーションには以下のモジュールが必要です："
+
+#: main.py:27
+msgid ""
+"\n"
+"\n"
+"Please install them by running:\n"
+"\n"
+"pip install "
+msgstr ""
+"\n"
+"\n"
+"以下のコマンドを実行してインストールしてください：\n"
+"\n"
+"pip install "
+
+#: main.py:28
+msgid ""
+"\n"
+"\n"
+"On Windows: Win+R to open a console, then type cmd."
+msgstr ""
+"\n"
+"\n"
+"Windowsの場合：Win+Rを押してコンソールを開き、cmdと入力してください。"
+
+#~ msgid "Last Saved: Never"
+#~ msgstr "最終保存：なし"
+
+#~ msgid "Enter custom Tense:"
+#~ msgstr "カスタム時制を入力："
+
+#~ msgid "https://example.com/v1"
+#~ msgstr "https://example.com/v1"
+
+#~ msgid "My First Project"
+#~ msgstr "マイファーストプロジェクト"
+
+#~ msgid "Sci-Fi Epic"
+#~ msgstr "SFエピック"
+
+#~ msgid "Mystery Novel"
+#~ msgstr "ミステリーノベル"

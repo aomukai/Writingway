@@ -1,9 +1,6 @@
-import os
-import json
 import re
 import tiktoken
 from PyQt5.QtCore import Qt
-from settings.settings_manager import WWSettingsManager
 
 class SummaryModel:
     def __init__(self, project_name, max_tokens=16000, encoding_name="cl100k_base"):
@@ -11,22 +8,6 @@ class SummaryModel:
         self.max_tokens = max_tokens
         self.encoding = tiktoken.get_encoding(encoding_name)
         self.structure = None  # Set by controller
-        self.prompts = self._load_summary_prompts()
-
-    def _load_summary_prompts(self):
-        prompts_file = WWSettingsManager.get_project_path(file="prompts.json")
-        if not os.path.exists(prompts_file):
-            return []
-        try:
-            with open(prompts_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            return data.get("Summary", [])
-        except Exception as e:
-            print(f"Error loading summary prompts: {e}")
-            return []
-
-    def get_prompt_by_name(self, prompt_name):
-        return next((p for p in self.prompts if p.get("name") == prompt_name), None)
 
     def optimize_text(self, html_content):
         """Convert HTML to optimized plain text for LLM."""

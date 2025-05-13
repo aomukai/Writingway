@@ -20,17 +20,33 @@ This section provides a step-by-step guide on how to install and run Writingway.
 
 **4. Install Writingway (Placeholder):**
 
+Windows users:
 Run setup_writingway.bat
+
+Mac OS users:
+Mac OS requires an audito tool that is not available for install by the Writingway setup script. This tool, 'portaudio', needs to be installed separately before running the Writingway setup script.
+1. Install Homebrew for Mac OS if you haven't already
+2. Run this command: 'brew install portaudito'
+
+Mac OS/Linux users:
+Execute this commmand in a terminal window from the Wrightingway root directory
+
+source setup_wrightingway.sh
 
 **5. Run Writingway:**
 
+Windws users:
 Double click on the start.bat file to run the program. You can also right click and select Create Shortcut, then move the shortcut to your desktop.
+
+Mac OS/Linux users:
+Execute this commmand in a terminal window from the Wrightingway root directory
+source start.sh
 
 **Troubleshooting:**
 
 - If you encounter any errors during installation, make sure you have a stable internet connection.
 - If `pip` is not recognized, ensure that Python's Scripts directory is added to your system's PATH environment variable. (This is usually done automatically during Python installation if you checked the "Add Python to PATH" option.)
-- If you're on Linux, you might need to use `pip3` instead of `pip` in some cases (e.g., `pip3 install PyQt5 pyttsx3 requests`).
+- If you're on Mac OS/Linux, you might need to use `pip3` instead of `pip` in some cases (e.g., `pip3 install PyQt5 pyttsx3 requests`).
 
 If you still have trouble, please consult the project's issue tracker or support channels for assistance.
 

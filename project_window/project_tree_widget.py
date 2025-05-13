@@ -1,10 +1,10 @@
-import uuid
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QTreeWidget, QMenu, 
                              QMessageBox, QInputDialog)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from . import tree_manager
 from . import project_structure_manager as psm
+from settings.theme_manager import ThemeManager
 
 class ProjectTreeWidget(QWidget):
     """Left panel with the project structure tree."""
@@ -22,7 +22,7 @@ class ProjectTreeWidget(QWidget):
         layout.addWidget(self.tree)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        self.tree.setHeaderLabels(["Name", "Status"])
+        self.tree.setHeaderLabels([_("Name"), _("Status")])
         self.tree.setColumnCount(2)
         self.tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tree.customContextMenuRequested.connect(self.show_context_menu)
@@ -37,13 +37,13 @@ class ProjectTreeWidget(QWidget):
     def update_scene_status_icon(self, item):
         """Update the status icon for a scene item."""
         tint = self.controller.icon_tint
-        status = item.data(0, Qt.UserRole).get("status", "To Do")
+        status = item.data(0, Qt.UserRole).get("status", _("To Do"))
         icons = {
-            "To Do": "assets/icons/circle.svg",
-            "In Progress": "assets/icons/loader.svg",
-            "Final Draft": "assets/icons/check-circle.svg"
+            _("To Do"): "assets/icons/circle.svg",
+            _("In Progress"): "assets/icons/loader.svg",
+            _("Final Draft"): "assets/icons/check-circle.svg"
         }
-        item.setIcon(1, self.controller.get_tinted_icon(icons.get(status, ""), tint) if status in icons else QIcon())
+        item.setIcon(1, ThemeManager.get_tinted_icon(icons.get(status, ""), tint) if status in icons else QIcon())
         item.setText(1, "")
 
     def get_item_level(self, item):
@@ -99,20 +99,20 @@ class ProjectTreeWidget(QWidget):
     def assign_item_icon(self, item, level):
         """Assign an icon to a tree item based on its level and status."""
         tint = self.controller.icon_tint
-        scene_data = item.data(0, Qt.UserRole) or {"name": item.text(0), "status": "To Do"}
+        scene_data = item.data(0, Qt.UserRole) or {"name": item.text(0), "status": _("To Do")}
 
         if level < 2:  # Act or Chapter
-            item.setIcon(0, self.controller.get_tinted_icon("assets/icons/book.svg", tint))
+            item.setIcon(0, ThemeManager.get_tinted_icon("assets/icons/book.svg", tint))
             item.setText(1, "")  # No status for acts or chapters
         else:  # Scene
-            item.setIcon(0, self.controller.get_tinted_icon("assets/icons/edit.svg", tint))
-            status = scene_data.get("status", "To Do")
+            item.setIcon(0, ThemeManager.get_tinted_icon("assets/icons/edit.svg", tint))
+            status = scene_data.get("status", _("To Do"))
             icons = {
-                "To Do": "assets/icons/circle.svg",
-                "In Progress": "assets/icons/loader.svg",
-                "Final Draft": "assets/icons/check-circle.svg"
+                _("To Do"): "assets/icons/circle.svg",
+                _("In Progress"): "assets/icons/loader.svg",
+                _("Final Draft"): "assets/icons/check-circle.svg"
             }
-            item.setIcon(1, self.controller.get_tinted_icon(icons.get(status, ""), tint) if status in icons else QIcon())
+            item.setIcon(1, ThemeManager.get_tinted_icon(icons.get(status, ""), tint) if status in icons else QIcon())
             item.setText(1, "")
 
     def assign_all_icons(self):
@@ -131,23 +131,23 @@ class ProjectTreeWidget(QWidget):
         menu = QMenu()
         hierarchy = self.controller.get_item_hierarchy(item) if item else []
         if not item:
-            menu.addAction("Add Act", lambda: self.model.add_act(QInputDialog.getText(self, "Add Act", "Enter act name:")[0]))
+            menu.addAction(_("Add Act"), lambda: self.model.add_act(QInputDialog.getText(self, _("Add Act"), _("Enter act name:"))[0]))
         else:
-            menu.addAction("Rename", lambda: psm.rename_item(self.controller, item))
-            menu.addAction("Delete", lambda: self.model.delete_node(hierarchy))
-            menu.addAction("Move Up", lambda: psm.move_item_up(self.controller, item))
-            menu.addAction("Move Down", lambda: psm.move_item_down(self.controller, item))
+            menu.addAction(_("Rename"), lambda: psm.rename_item(self.controller, item))
+            menu.addAction(_("Delete"), lambda: self.model.delete_node(hierarchy))
+            menu.addAction(_("Move Up"), lambda: psm.move_item_up(self.controller, item))
+            menu.addAction(_("Move Down"), lambda: psm.move_item_down(self.controller, item))
             level = self.get_item_level(item)
             if level == 0:
-                menu.addAction("Add Chapter", lambda: psm.add_chapter(self.controller, item))
+                menu.addAction(_("Add Chapter"), lambda: psm.add_chapter(self.controller, item))
             elif level == 1:
-                menu.addAction("Add Scene", lambda: psm.add_scene(self.controller, item))
+                menu.addAction(_("Add Scene"), lambda: psm.add_scene(self.controller, item))
             if level >= 2:
-                status_menu = menu.addMenu("Set Scene Status")
-                for status in ["To Do", "In Progress", "Final Draft"]:
+                status_menu = menu.addMenu(_("Set Scene Status"))
+                for status in [_("To Do"), _("In Progress"), _("Final Draft")]:
                     status_menu.addAction(status, lambda s=status: self.controller.set_scene_status(item, s))
         menu.exec_(self.tree.viewport().mapToGlobal(pos))
 
     def show_error_message(self, message):
         """Display an error message to the user."""
-        QMessageBox.warning(self, "Duplicate Name Error", message)
+        QMessageBox.warning(self, _("Duplicate Name Error"), message)

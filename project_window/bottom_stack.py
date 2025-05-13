@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QStackedWidget, QHBoxLayout, QPushButton, 
-                            QTextEdit, QComboBox, QLabel, QCheckBox, QSizePolicy, QGroupBox,
-                            QSpinBox, QFormLayout)
+                            QTextEdit, QComboBox, QCheckBox, QSizePolicy,
+                            QFormLayout, QSplitter)
 from PyQt5.QtGui import QColor
+from PyQt5.QtCore import Qt
+from settings.theme_manager import ThemeManager
 from .focus_mode import PlainTextEdit
-from .context_panel import ContextPanel
+from compendium.context_panel import ContextPanel
 from .summary_controller import SummaryController
 from .summary_model import SummaryModel
-from settings.settings_manager import WWSettingsManager
-from settings.llm_api_aggregator import WWApiAggregator
+from muse.prompt_panel import PromptPanel
 from muse.prompt_preview_dialog import PromptPreviewDialog
-import json
-import os
-import re
 
 class BottomStack(QWidget):
     """Stacked widget for summary and LLM panels."""
@@ -46,35 +44,21 @@ class BottomStack(QWidget):
         layout = QHBoxLayout(panel)
 
         # LLM Settings Group
-        llm_settings_group = QGroupBox()
-        llm_settings_layout = QFormLayout()
-
-        self.summary_prompt_dropdown = QComboBox()
-        self.summary_prompt_dropdown.setToolTip("Select a summary prompt")
-        self.summary_prompt_dropdown.addItem("Select Summary Prompt")
-        self.summary_prompt_dropdown.addItems([prompt["name"] for prompt in self._load_summary_prompts()])
-        self.summary_prompt_dropdown.currentIndexChanged.connect(self.summary_prompt_changed)
-        self.summary_prompt_dropdown.setMinimumWidth(300)
-        llm_settings_layout.addWidget(self.summary_prompt_dropdown)
-
-        self.summary_model_combo = QComboBox()
-        self.summary_model_combo.setMinimumWidth(300)
-        llm_settings_layout.addWidget(self.summary_model_combo)
-
-        llm_settings_group.setLayout(llm_settings_layout)
-        llm_settings_group.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
-        layout.addWidget(llm_settings_group)
+        self.summary_prompt_panel = PromptPanel("Summary")
+        self.summary_prompt_panel.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        self.summary_prompt_panel.setMaximumWidth(300)
+        layout.addWidget(self.summary_prompt_panel)
 
         self.summary_preview_button = QPushButton()
-        self.summary_preview_button.setIcon(self.controller.get_tinted_icon("assets/icons/eye.svg", self.tint_color))
-        self.summary_preview_button.setToolTip("Preview the final prompt")
+        self.summary_preview_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/eye.svg", self.tint_color))
+        self.summary_preview_button.setToolTip(_("Preview the final prompt"))
         self.summary_preview_button.clicked.connect(self.summary_controller.preview_summary)
         layout.addWidget(self.summary_preview_button)
 
         layout.addStretch()
-        self.create_summary_button = QPushButton("Create Summary")
+        self.create_summary_button = QPushButton(_("Create Summary"))
         self.create_summary_button.clicked.connect(self.summary_controller.create_summary)
-        self.save_summary_button = QPushButton("Save Summary")
+        self.save_summary_button = QPushButton(_("Save Summary"))
         self.save_summary_button.clicked.connect(self.controller.save_summary)
         layout.addWidget(self.create_summary_button)
         layout.addWidget(self.save_summary_button)
@@ -90,14 +74,14 @@ class BottomStack(QWidget):
         # Preview Area
         self.preview_text = QTextEdit()
         self.preview_text.setReadOnly(True)
-        self.preview_text.setPlaceholderText("LLM output preview will appear here...")
+        self.preview_text.setPlaceholderText(_("LLM output preview will appear here..."))
         preview_buttons = QHBoxLayout()
         self.apply_button = QPushButton()
-        self.apply_button.setIcon(self.controller.get_tinted_icon("assets/icons/save.svg", self.tint_color))
-        self.apply_button.setToolTip("Appends the LLM's output to your current scene")
+        self.apply_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/save.svg", self.tint_color))
+        self.apply_button.setToolTip(_("Appends the LLM's output to your current scene"))
         self.apply_button.clicked.connect(self.controller.apply_preview)
-        self.include_prompt_checkbox = QCheckBox("Include Action Beats")
-        self.include_prompt_checkbox.setToolTip("Include the text from the Action Beats field in the scene text")
+        self.include_prompt_checkbox = QCheckBox(_("Include Action Beats"))
+        self.include_prompt_checkbox.setToolTip(_("Include the text from the Action Beats field in the scene text"))
         self.include_prompt_checkbox.setChecked(True)
         preview_buttons.addWidget(self.apply_button)
         preview_buttons.addWidget(self.include_prompt_checkbox)
@@ -110,95 +94,120 @@ class BottomStack(QWidget):
         left_layout = QVBoxLayout(left_container)
         left_layout.setContentsMargins(0, 0, 0, 0)
         self.prompt_input = PlainTextEdit()
-        self.prompt_input.setPlaceholderText("Enter your action beats here...")
+        self.prompt_input.setPlaceholderText(_("Enter your action beats here..."))
         self.prompt_input.setFixedHeight(100)
         self.prompt_input.textChanged.connect(self.controller.on_prompt_input_text_changed)
         left_layout.addWidget(self.prompt_input)
 
         buttons_layout = QHBoxLayout()
-        self.prompt_dropdown = QComboBox()
-        self.prompt_dropdown.setToolTip("Select a prose prompt")
-        self.prompt_dropdown.addItem("Select Prose Prompt")
-        self.prompt_dropdown.currentIndexChanged.connect(self.controller.prompt_dropdown_changed)
-        buttons_layout.addWidget(self.prompt_dropdown)
+
+        # LLM Settings Group
+        self.prose_prompt_panel = PromptPanel("Prose")
+        self.prose_prompt_panel.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        self.prose_prompt_panel.setMaximumWidth(300)
+        buttons_layout.addWidget(self.prose_prompt_panel)
 
         self.preview_button = QPushButton()
-        self.preview_button.setIcon(self.controller.get_tinted_icon("assets/icons/eye.svg", self.tint_color))
-        self.preview_button.setToolTip("Preview the final prompt")
-        self.preview_button.clicked.connect(self.controller.preview_prompt)
+        self.preview_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/eye.svg", self.tint_color))
+        self.preview_button.setToolTip(_("Preview the final prompt"))
+        self.preview_button.clicked.connect(self.preview_prompt)
         buttons_layout.addWidget(self.preview_button)
 
         self.send_button = QPushButton()
-        self.send_button.setIcon(self.controller.get_tinted_icon("assets/icons/send.svg", self.tint_color))
-        self.send_button.setToolTip("Sends the action beats to the LLM")
+        self.send_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/send.svg", self.tint_color))
+        self.send_button.setToolTip(_("Sends the action beats to the LLM"))
         self.send_button.clicked.connect(self.controller.send_prompt)
         buttons_layout.addWidget(self.send_button)
 
         self.stop_button = QPushButton()
-        self.stop_button.setIcon(self.controller.get_tinted_icon("assets/icons/x-octagon.svg", self.tint_color))
-        self.stop_button.setToolTip("Stop the LLM processing")
+        self.stop_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/x-octagon.svg", self.tint_color))
+        self.stop_button.setToolTip(_("Stop the LLM processing"))
         self.stop_button.clicked.connect(self.controller.stop_llm)
         buttons_layout.addWidget(self.stop_button)
 
         self.context_toggle_button = QPushButton()
-        self.context_toggle_button.setIcon(self.controller.get_tinted_icon("assets/icons/book.svg", self.tint_color))
-        self.context_toggle_button.setToolTip("Toggle context panel")
+        self.context_toggle_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/book.svg", self.tint_color))
+        self.context_toggle_button.setToolTip(_("Toggle context panel"))
         self.context_toggle_button.setCheckable(True)
-        self.context_toggle_button.clicked.connect(self.controller.toggle_context_panel)
+        self.context_toggle_button.clicked.connect(self.toggle_context_panel)
         buttons_layout.addWidget(self.context_toggle_button)
 
-        self.model_indicator = QLabel("")
-        self.model_indicator.setStyleSheet("font-weight: bold; padding-left: 10px;")
-        self.model_indicator.setToolTip("Selected prompt's model")
-        buttons_layout.addWidget(self.model_indicator)
-        buttons_layout.addStretch()
+        # POV, Character, Tense Pulldowns
+        buttons_layout.addStretch()  # Push combos to the right
+        pulldown_widget = QWidget()
+        pulldown_layout = QFormLayout(pulldown_widget)
+        pulldown_layout.setContentsMargins(0, 0, 20, 0)
+        # Tell combo boxes to expand to the same size
+        pulldown_layout.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
+
+        self.pov_combo = self.add_combo(pulldown_layout, _("POV"), [_("First Person"), _("Third Person Limited"), _("Omniscient"), _("Custom...")], self.controller.handle_pov_change)
+        self.pov_character_combo = self.add_combo(pulldown_layout, _("POV Character"), ["Alice", "Bob", "Charlie", _("Custom...")], self.controller.handle_pov_character_change)
+        self.tense_combo = self.add_combo(pulldown_layout, _("Tense"), [_("Past Tense"), _("Present Tense"), _("Custom...")], self.controller.handle_tense_change)
+        buttons_layout.addWidget(pulldown_widget)
+
         left_layout.addLayout(buttons_layout)
+        splitter = QSplitter(Qt.Horizontal)
+        splitter.addWidget(left_container)
 
         self.context_panel = ContextPanel(self.model.structure, self.model.project_name, self.controller)
         self.context_panel.setVisible(False)
+        splitter.addWidget(self.context_panel)
+        splitter.setSizes([500, 300])
+
+
         left_container.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
-        action_layout.addWidget(left_container, stretch=2)
-        action_layout.addWidget(self.context_panel, stretch=1)
+        action_layout.addWidget(splitter)
 
         layout.addWidget(self.preview_text)
         layout.addLayout(preview_buttons)
         layout.addLayout(action_layout)
         return panel
 
+    def add_combo(self, layout, label_text, items, callback):
+        combo = QComboBox()
+        combo.addItems(items)
+        combo.currentIndexChanged.connect(callback)
+        layout.addRow(f"{label_text}:", combo)
+        return combo
+    
     def update_tint(self, tint_color):
         """Update icon tints when theme changes."""
         self.tint_color = tint_color
-        self.apply_button.setIcon(self.controller.get_tinted_icon("assets/icons/save.svg", tint_color))
-        self.send_button.setIcon(self.controller.get_tinted_icon("assets/icons/send.svg", tint_color))
-        self.stop_button.setIcon(self.controller.get_tinted_icon("assets/icons/x-octagon.svg", tint_color))
-        self.context_toggle_button.setIcon(self.controller.get_tinted_icon(
+        self.apply_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/save.svg", tint_color))
+        self.send_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/send.svg", tint_color))
+        self.stop_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/x-octagon.svg", tint_color))
+        self.context_toggle_button.setIcon(ThemeManager.get_tinted_icon(
             "assets/icons/book-open.svg" if self.context_panel.isVisible() else "assets/icons/book.svg", tint_color))
+        # Update combo tooltips if needed
+        if self.pov_combo:
+            self.pov_combo.setToolTip(_("POV: {}").format(self.model.settings.get('global_pov', 'Third Person')))
+        if self.pov_character_combo:
+            self.pov_character_combo.setToolTip(_("POV Character: {}").format(self.model.settings.get('global_pov_character', 'Character')))
+        if self.tense_combo:
+            self.tense_combo.setToolTip(_("Tense: {}").format(self.model.settings.get('global_tense', 'Present Tense')))
 
     def _update_status(self, message):
         self.controller.statusBar().showMessage(message, 5000)
 
-    def update_model_combo(self, provider_name):
-        """Update the model dropdown based on the selected provider."""
-        self.model_combo.clear()
-        provider = WWApiAggregator.aggregator.get_provider(provider_name)
-        if provider:
-            try:
-                models = provider.get_available_models()
-                self.model_combo.addItems(models)
-            except Exception as e:
-                self.model_combo.addItem("Default Model")
-                print(f"Error fetching models for {provider_name}: {e}")
+    def toggle_context_panel(self):
+        context_panel = self.context_panel
+        if context_panel.isVisible():
+            context_panel.setVisible(False)
+            self.context_toggle_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/book.svg"))
         else:
-            self.model_combo.addItem("Default Model")
+            context_panel.build_project_tree()
+            context_panel.build_compendium_tree()
+            context_panel.setVisible(True)
+            self.context_toggle_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/book-open.svg"))
 
-    def get_llm_settings(self):
-        """Return the current LLM settings from the summary panel."""
+    def get_additional_vars(self):
         return {
-            "provider": self.provider_combo.currentText(),
-            "model": self.model_combo.currentText(),
-            "timeout": self.timeout_spin.value()
+            "pov": self.pov_combo.currentText(),
+            "pov_character": self.pov_character_combo.currentText(),
+            "tense": self.tense_combo.currentText()
         }
     
+<<<<<<< HEAD
     def summary_prompt_changed(self):
         """Handle changes in the summary prompt dropdown."""
         selected_prompt = self.summary_prompt_dropdown.currentText()
@@ -239,3 +248,21 @@ class BottomStack(QWidget):
             print(f"Error loading summary prompts: {e}")
             return []
 
+=======
+    def preview_prompt(self):
+        additional_vars = self.get_additional_vars()
+        prompt_config = self.prose_prompt_panel.get_prompt()
+        action_beats = self.prompt_input.toPlainText().strip()
+        current_scene_text = self.scene_editor.editor.toPlainText().strip() if self.controller.project_tree.tree.currentItem() and self.controller.project_tree.get_item_level(self.controller.project_tree.tree.currentItem()) >= 2 else None
+        extra_context = self.context_panel.get_selected_context_text()
+        
+        # Show the preview dialog
+        dialog = PromptPreviewDialog(
+            self.controller,
+            prompt_config=prompt_config, 
+            user_input=action_beats, 
+            additional_vars=additional_vars, 
+            current_scene_text=current_scene_text, 
+            extra_context=extra_context)
+        dialog.exec_()
+>>>>>>> 55d0572421381460816e7174fb7d9d8eb97e1f4f

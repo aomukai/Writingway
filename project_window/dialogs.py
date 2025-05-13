@@ -4,19 +4,19 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QPushButton, QHBoxL
 class CreateSummaryDialog(QDialog):
     def __init__(self, default_prompt, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Create Summary")
+        self.setWindowTitle(_("Create Summary"))
         self.prompt = ""
         self.init_ui(default_prompt)
         
     def init_ui(self, default_prompt):
         layout = QVBoxLayout(self)
-        label = QLabel("Edit summarizer prompt:")
+        label = QLabel(_("Edit summarizer prompt:"))
         layout.addWidget(label)
         self.prompt_edit = QLineEdit(default_prompt)
         layout.addWidget(self.prompt_edit)
         button_layout = QHBoxLayout()
-        ok_button = QPushButton("Okay")
-        cancel_button = QPushButton("Cancel")
+        ok_button = QPushButton(_("Okay"))
+        cancel_button = QPushButton(_("Cancel"))
         ok_button.clicked.connect(self.accept)
         cancel_button.clicked.connect(self.reject)
         button_layout.addStretch()
@@ -27,6 +27,6 @@ class CreateSummaryDialog(QDialog):
     def accept(self):
         self.prompt = self.prompt_edit.text().strip()
         if not self.prompt:
-            QMessageBox.warning(self, "Input Error", "The summarizer prompt cannot be empty.")
+            QMessageBox.warning(self, _("Input Error"), _("The summarizer prompt cannot be empty."))
             return
         super().accept()

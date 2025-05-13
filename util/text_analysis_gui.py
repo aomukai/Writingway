@@ -685,49 +685,49 @@ class TextAnalysisApp(QWidget):
                 stats["weak_formulations"] += 1
         
         if enabled_analyses.get("speech_verbs", False):
-            for start, end, _ in results["nonstandard_speech"]:
+            for start, end, unused in results["nonstandard_speech"]:
                 cursor.setPosition(start)
                 cursor.setPosition(end, QTextCursor.KeepAnchor)
                 cursor.mergeCharFormat(formats["nonstandard"])
                 stats["nonstandard_speech"] += 1
         
         if enabled_analyses.get("filter_words", False):
-            for start, end, _ in results["filter_words"]:
+            for start, end, unused in results["filter_words"]:
                 cursor.setPosition(start)
                 cursor.setPosition(end, QTextCursor.KeepAnchor)
                 cursor.mergeCharFormat(formats["filter"])
                 stats["filter_words"] += 1
         
         if enabled_analyses.get("telling", False):
-            for start, end, _ in results["telling_not_showing"]:
+            for start, end, unused in results["telling_not_showing"]:
                 cursor.setPosition(start)
                 cursor.setPosition(end, QTextCursor.KeepAnchor)
                 cursor.mergeCharFormat(formats["telling"])
                 stats["telling_not_showing"] += 1
         
         if enabled_analyses.get("weak_verbs", False):
-            for start, end, _, _ in results["weak_verbs"]:
+            for start, end, unused, unused in results["weak_verbs"]:
                 cursor.setPosition(start)
                 cursor.setPosition(end, QTextCursor.KeepAnchor)
                 cursor.mergeCharFormat(formats["weak_verb"])
                 stats["weak_verbs"] += 1
         
         if enabled_analyses.get("overused", False):
-            for start, end, _, _ in results["overused_words"]:
+            for start, end, unused, unused in results["overused_words"]:
                 cursor.setPosition(start)
                 cursor.setPosition(end, QTextCursor.KeepAnchor)
                 cursor.mergeCharFormat(formats["overused"])
                 stats["overused_words"] += 1
         
         if enabled_analyses.get("pronoun_clarity", False):
-            for start, end, _ in results["pronoun_clarity"]:
+            for start, end, unused in results["pronoun_clarity"]:
                 cursor.setPosition(start)
                 cursor.setPosition(end, QTextCursor.KeepAnchor)
                 cursor.mergeCharFormat(formats["pronoun"])
                 stats["pronoun_clarity"] += 1
         
         if enabled_analyses.get("repetitive", False):
-            for start, end, _ in results["repeated_sentence_starts"]:
+            for start, end, unused in results["repeated_sentence_starts"]:
                 cursor.setPosition(start)
                 cursor.setPosition(end, QTextCursor.KeepAnchor)
                 cursor.mergeCharFormat(formats["repetitive"])
