@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QGroupBox, QHBoxLayout, QLine
                              QSpinBox, QProgressBar, QSplitter, QFileDialog, QMessageBox, QGridLayout, QScrollArea, 
                              QCheckBox, QLabel)
 
-from .rag_utils import PdfProcessor, TokenCounter, PdfProcessingWorker, SettingsManager, HistoryDialog, AppSettings, LlmClient
+from .rag_utils import PdfProcessor, TokenCounter, PdfProcessingWorker, SettingsManager, HistoryDialog, AppSettings, LlmClient, DocumentProcessorFactory
 
 class LlmWorker(QThread):
     result_ready = pyqtSignal(int, str, str)
@@ -43,7 +43,7 @@ class ManualProcessingWidget(QWidget):
         upper_layout = QVBoxLayout(upper_widget)
 
         self.manual_pdf_path_edit = QLineEdit()
-        self.manual_pdf_path_edit.setPlaceholderText("Select PDF file...")
+        self.manual_pdf_path_edit.setPlaceholderText("Select document file...")
         self.manual_pdf_path_edit.textChanged.connect(self.on_manual_pdf_path_changed)
         self.manual_pdf_path_edit.returnPressed.connect(
             lambda: self.process_manual_pdf() if self.manual_process_btn.isEnabled() else None
@@ -57,7 +57,7 @@ class ManualProcessingWidget(QWidget):
         browse_btn = QPushButton("Browse")
         browse_btn.clicked.connect(self.browse_manual_pdf)
 
-        pdf_group = QGroupBox("PDF Selection")
+        pdf_group = QGroupBox("Document Selection")
         pdf_layout = QHBoxLayout()
         pdf_layout.addWidget(self.manual_pdf_path_edit, 1)
         pdf_layout.addWidget(clear_path_btn)
@@ -65,9 +65,9 @@ class ManualProcessingWidget(QWidget):
         pdf_group.setLayout(pdf_layout)
         upper_layout.addWidget(pdf_group)
 
-        settings_group = QGroupBox("Page & Token Settings")
+        settings_group = QGroupBox("Token Settings")
         settings_layout = QGridLayout()
-        settings_layout.addWidget(QLabel("Pages from:"), 0, 0)
+        settings_layout.addWidget(QLabel("From:"), 0, 0)
         self.manual_spin_from = QSpinBox()
         self.manual_spin_from.setMinimum(0)
         settings_layout.addWidget(self.manual_spin_from, 0, 1)
@@ -83,7 +83,7 @@ class ManualProcessingWidget(QWidget):
         settings_group.setLayout(settings_layout)
         upper_layout.addWidget(settings_group)
 
-        self.manual_process_btn = QPushButton("Process PDF")
+        self.manual_process_btn = QPushButton("Process Document")
         self.manual_process_btn.clicked.connect(self.process_manual_pdf)
         self.manual_process_btn.setEnabled(False)
         upper_layout.addWidget(self.manual_process_btn)
@@ -158,51 +158,72 @@ class ManualProcessingWidget(QWidget):
         self.manual_default_prompt_edit.setPlainText(self.parent_app.settings.default_prompt)
 
     def browse_manual_pdf(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Select PDF", "", "PDF Files (*.pdf)")
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select Document",
+            "",
+            "Supported files (*.pdf *.epub *.docx *.txt *.md *.html);;"
+            "PDF Files (*.pdf);;"
+            "EPUB Files (*.epub);;"
+            "Word Documents (*.docx);;"
+            "Text Files (*.txt *.md);;"
+            "HTML Files (*.html);;"
+            "All Files (*)"
+        )
         if path:
             self.manual_pdf_path_edit.setText(path)
-            self.load_manual_pdf_info()
+            self.on_manual_pdf_path_changed()
 
     def on_manual_pdf_path_changed(self):
         path = self.manual_pdf_path_edit.text().strip()
-        is_valid = path.lower().endswith('.pdf') and os.path.isfile(path)
-        self.manual_process_btn.setEnabled(is_valid)
+        supported_extensions = ['.pdf', '.epub', '.docx', '.txt', '.md', '.html']
+        is_valid_file = any(path.lower().endswith(ext) for ext in supported_extensions) and os.path.isfile(path)
+        self.manual_process_btn.setEnabled(is_valid_file)
         self.manual_markdown_toggle_btn.setEnabled(False)
         self.manual_send_btn.setEnabled(False)
+
         if not path:
             self.manual_token_label.setText("No document selected")
             self.manual_token_label.setStyleSheet("color: #888888; font-style: italic;")
-        elif is_valid:
+        elif is_valid_file:
             name = os.path.basename(path)
             self.manual_token_label.setText(f"Ready to process: {name}")
             self.manual_token_label.setStyleSheet("color: #006400; font-style: normal;")
             self.load_manual_pdf_info()
+            # Update section labels based on file type
+            extension = os.path.splitext(path)[1].lower()
+            self.update_section_labels(extension)
         else:
-            self.manual_token_label.setText("Invalid PDF file selected")
+            self.manual_token_label.setText("Invalid file selected")
             self.manual_token_label.setStyleSheet("color: #8B0000; font-style: italic;")
 
     def load_manual_pdf_info(self):
+        # Load document info for any supported file type
         path = self.manual_pdf_path_edit.text().strip()
-        if not path.lower().endswith('.pdf') or not os.path.isfile(path):
+        if not os.path.isfile(path):
             return
         
-        page_count, error = PdfProcessor.load_document(path)
-        if error:
-            QMessageBox.warning(self, "PDF Error", error)
-            return
-        
-        last_page = page_count
-        self.manual_spin_from.setMaximum(last_page)
-        self.manual_spin_to.setMaximum(last_page)
-        
-        self.manual_spin_from.setProperty("max_page", last_page)
-        self.manual_spin_to.setProperty("max_page", last_page)
-        
-        self.manual_spin_from.setValue(1)
-        self.manual_spin_to.setValue(last_page)
-        
-        self.parent_app.settings.last_pdf_path_manual = path
-        SettingsManager.save_settings(self.parent_app.settings)
+        try:
+            processor = DocumentProcessorFactory.get_processor(path)
+            section_count, error = processor.load_document(path)
+            if error:
+                QMessageBox.warning(self, "Document Error", error)
+                return
+            
+            last_section = section_count
+            self.manual_spin_from.setMaximum(last_section)
+            self.manual_spin_to.setMaximum(last_section)
+            
+            self.manual_spin_from.setProperty("max_page", last_section)
+            self.manual_spin_to.setProperty("max_page", last_section)
+            
+            self.manual_spin_from.setValue(1)
+            self.manual_spin_to.setValue(last_section)
+            
+            self.parent_app.settings.last_pdf_path_manual = path  # Keeping name for compatibility
+            SettingsManager.save_settings(self.parent_app.settings)
+        except ValueError as e:
+            QMessageBox.warning(self, "Unsupported Format", str(e))
 
     def correct_spinbox_value(self):
         sender = self.sender()
@@ -219,49 +240,72 @@ class ManualProcessingWidget(QWidget):
         is_visible = self.manual_markdown_editor.isVisible()
         self.manual_markdown_editor.setVisible(not is_visible)
 
+    def update_section_labels(self, file_extension: str):
+        # Update spinbox labels based on file extension for better user experience
+        if file_extension == '.epub':
+            self.manual_spin_from.setPrefix("Chapter ")
+            self.manual_spin_to.setPrefix("Chapter ")
+        elif file_extension == '.docx':
+            self.manual_spin_from.setPrefix("Paragraph ")
+            self.manual_spin_to.setPrefix("Paragraph ")
+        elif file_extension in ['.txt', '.md']:
+            self.manual_spin_from.setPrefix("Line ")
+            self.manual_spin_to.setPrefix("Line ")
+        elif file_extension == '.html':
+            self.manual_spin_from.setPrefix("Section ")
+            self.manual_spin_to.setPrefix("Section ")
+        else:  # Default to pages for PDF and others
+            self.manual_spin_from.setPrefix("Page ")
+            self.manual_spin_to.setPrefix("Page ")
+
     def process_manual_pdf(self):
-        pdf_path = self.manual_pdf_path_edit.text().strip()
-        if not pdf_path or not os.path.isfile(pdf_path):
-            QMessageBox.warning(self, "Error", "Invalid PDF file selected.")
+        # Process any supported document type, keeping method name for compatibility
+        file_path = self.manual_pdf_path_edit.text().strip()
+        if not file_path or not os.path.isfile(file_path):
+            QMessageBox.warning(self, "Error", "Invalid file selected.")
             return
         
-        page_count, error = PdfProcessor.load_document(pdf_path)
-        if error:
-            QMessageBox.warning(self, "Error", f"Failed to load PDF: {error}")
-            return
-        
-        from_page = self.manual_spin_from.value()
-        to_page = self.manual_spin_to.value()
-        
-        if from_page > page_count:
-            from_page = page_count
-            self.manual_spin_from.setValue(from_page)
+        try:
+            processor = DocumentProcessorFactory.get_processor(file_path)
+            section_count, error = processor.load_document(file_path)
+            if error:
+                QMessageBox.warning(self, "Error", f"Failed to load document: {error}")
+                return
             
-        if to_page > page_count:
-            to_page = page_count
-            self.manual_spin_to.setValue(to_page)
-        
-        if from_page > to_page:
-            from_page = to_page
-            self.manual_spin_from.setValue(from_page)
-        
-        self.parent_app.settings.last_chunk_size = self.manual_chunk_spin.value()
-        self.parent_app.settings.default_prompt = self.manual_default_prompt_edit.toPlainText()
-        SettingsManager.save_settings(self.parent_app.settings)
-        
-        pdf_from_page = from_page - 1
-        pdf_to_page = to_page - 1
-        pages = list(range(pdf_from_page, pdf_to_page + 1))
-        
-        self.manual_progress_bar.setVisible(True)
-        self.manual_progress_bar.setRange(0, 0)
-        self.manual_process_btn.setEnabled(False)
-        
-        self.manual_worker = PdfProcessingWorker(pdf_path, pages, self.manual_chunk_spin.value())
-        self.manual_worker.finished.connect(self.on_manual_pdf_processing_finished)
-        self.manual_worker.start()
+            from_section = self.manual_spin_from.value()
+            to_section = self.manual_spin_to.value()
+            
+            if from_section > section_count:
+                from_section = section_count
+                self.manual_spin_from.setValue(from_section)
+                
+            if to_section > section_count:
+                to_section = section_count
+                self.manual_spin_to.setValue(to_section)
+            
+            if from_section > to_section:
+                from_section = to_section
+                self.manual_spin_from.setValue(from_section)
+            
+            self.parent_app.settings.last_chunk_size = self.manual_chunk_spin.value()
+            self.parent_app.settings.default_prompt = self.manual_default_prompt_edit.toPlainText()
+            SettingsManager.save_settings(self.parent_app.settings)
+            
+            # Adjust for zero-based indexing
+            sections = list(range(from_section - 1, to_section))
+            
+            self.manual_progress_bar.setVisible(True)
+            self.manual_progress_bar.setRange(0, 0)
+            self.manual_process_btn.setEnabled(False)
+            
+            self.manual_worker = PdfProcessingWorker(file_path, sections, self.manual_chunk_spin.value())
+            self.manual_worker.finished.connect(self.on_manual_pdf_processing_finished)
+            self.manual_worker.start()
+        except ValueError as e:
+            QMessageBox.warning(self, "Unsupported Format", str(e))
 
     def on_manual_pdf_processing_finished(self, markdown: str, chunks: List[str], error: str):
+        # Handle processing completion for any document type
         self.manual_progress_bar.setVisible(False)
         self.manual_process_btn.setEnabled(True)
 
