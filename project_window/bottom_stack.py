@@ -207,6 +207,48 @@ class BottomStack(QWidget):
             "tense": self.tense_combo.currentText()
         }
     
+<<<<<<< HEAD
+    def summary_prompt_changed(self):
+        """Handle changes in the summary prompt dropdown."""
+        selected_prompt = self.summary_prompt_dropdown.currentText()
+        if selected_prompt == "Select Summary Prompt":
+            self.summary_model_combo.clear()
+            self.summary_model_combo.addItem("Default Model")
+            return
+
+        prompts = self._load_summary_prompts()
+        self.summary_model_combo.clear()
+
+        for prompt in prompts:
+            if prompt["name"] == selected_prompt:
+                llm = WWApiAggregator.aggregator.get_provider(prompt["provider"])
+                if llm:
+                    self.summary_model_combo.addItems(llm.get_available_models())
+                    self.summary_model_combo.setCurrentText(prompt["model"])
+                else:
+                    self.summary_model_combo.addItem(prompt["model"])
+                break
+
+    def _load_summary_prompts(self):
+        """
+        Load summary prompts from the project's prompts JSON file.
+
+        Returns:
+            list: A list of summary prompt dictionaries, or an empty list if loading fails.
+        """
+        prompts_file = WWSettingsManager.get_project_path(file="prompts.json")
+        if not os.path.exists(prompts_file):
+            return []
+
+        try:
+            with open(prompts_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data.get("Summary", [])
+        except Exception as e:
+            print(f"Error loading summary prompts: {e}")
+            return []
+
+=======
     def preview_prompt(self):
         additional_vars = self.get_additional_vars()
         prompt_config = self.prose_prompt_panel.get_prompt()
@@ -223,3 +265,4 @@ class BottomStack(QWidget):
             current_scene_text=current_scene_text, 
             extra_context=extra_context)
         dialog.exec_()
+>>>>>>> 55d0572421381460816e7174fb7d9d8eb97e1f4f
