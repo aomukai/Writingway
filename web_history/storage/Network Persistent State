@@ -1,0 +1,1 @@
+{"net":{"http_server_properties":{"servers":[{"isolation":[],"server":"https://upload.wikimedia.org","supports_spdy":true},{"isolation":[],"server":"https://en.wikipedia.org","supports_spdy":true},{"isolation":[],"server":"https://www.wikipedia.org","supports_spdy":true}],"version":5},"network_qualities":{"CAASABiAgICA+P////8B":"4G"}}}
