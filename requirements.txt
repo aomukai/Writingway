@@ -31,3 +31,6 @@ soundfile
 PyQtWebEngine
 boilerpy3
 spylls
+ebooklib
+beautifulsoup4
+python-docx

@@ -1,4 +1,9 @@
+from abc import ABC, abstractmethod
 import os
+import ebooklib
+from ebooklib import epub
+from bs4 import BeautifulSoup
+import docx
 import json
 import re
 import math
@@ -13,6 +18,184 @@ import pymupdf4llm
 from PyQt5.QtCore import QThread, pyqtSignal, Qt, QPoint
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QListWidget, QMessageBox, QMenu, QAction, QInputDialog, QTextEdit, QHBoxLayout, QCheckBox, QListWidgetItem, QWidget, QShortcut
 from PyQt5.QtGui import QTextDocument, QTextCursor, QKeySequence
+
+from abc import ABC, abstractmethod
+import os
+import ebooklib
+from ebooklib import epub
+from bs4 import BeautifulSoup
+import docx
+
+# Abstract base class for all document processors
+class DocumentProcessor(ABC):
+    @abstractmethod
+    def load_document(self, file_path: str) -> Tuple[int, Optional[str]]:
+        # Returns the number of sections (pages, chapters, etc.) and an optional error message
+        pass
+    
+    @abstractmethod
+    def convert_to_markdown(self, file_path: str, pages_or_sections: List[int]) -> Tuple[str, Optional[str]]:
+        # Converts specified sections to markdown, returns markdown text and an optional error message
+        pass
+
+# EPUB processor using ebooklib and BeautifulSoup
+class EpubProcessor(DocumentProcessor):
+    @staticmethod
+    def load_document(epub_path: str) -> Tuple[int, Optional[str]]:
+        # Load EPUB and count chapters as sections
+        try:
+            book = epub.read_epub(epub_path)
+            chapters = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
+            return len(chapters), None
+        except Exception as e:
+            return 0, f"Error loading EPUB: {e}"
+    
+    @staticmethod
+    def convert_to_markdown(epub_path: str, chapters: List[int] = None) -> Tuple[str, Optional[str]]:
+        """
+        For each chapter indicated:
+        - parses the HTML
+        - extracts a list of <p>...</p>.
+        - gives each paragraph a separate entry
+        """
+        try:
+            book = epub.read_epub(epub_path)
+            all_items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
+            # wybieramy rozdziały
+            if chapters is not None:
+                selected = [all_items[i] for i in chapters if 0 <= i < len(all_items)]
+            else:
+                selected = all_items
+            
+            markdown_sections: List[str] = []
+            for chap in selected:
+                raw = chap.get_content().decode('utf-8')
+                soup = BeautifulSoup(raw, 'html.parser')
+                paras = soup.find_all('p')
+                for p in paras:
+                    text = p.get_text(strip=True)
+                    if text:
+                        markdown_sections.append(text)
+                # optional: insert separator between chapters
+                markdown_sections.append('---')
+            
+            # remove the last separator, if any
+            if markdown_sections and markdown_sections[-1] == '---':
+                markdown_sections.pop()
+            
+            return '\n\n'.join(markdown_sections), None
+        except Exception as e:
+            return "", f"Error converting EPUB: {e}"
+
+# DOCX processor using python-docx
+class DocxProcessor(DocumentProcessor):
+    @staticmethod
+    def load_document(docx_path: str) -> Tuple[int, Optional[str]]:
+        # Load DOCX and count paragraphs as sections
+        try:
+            doc = docx.Document(docx_path)
+            return len(doc.paragraphs), None
+        except Exception as e:
+            return 0, f"Error loading DOCX: {e}"
+    
+    @staticmethod
+    def convert_to_markdown(docx_path: str, paragraphs: List[int] = None) -> Tuple[str, Optional[str]]:
+        # Convert specified paragraphs (or all if None) to markdown
+        try:
+            doc = docx.Document(docx_path)
+            all_paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
+            
+            if paragraphs is not None:
+                selected_paragraphs = [all_paragraphs[i] for i in paragraphs if i < len(all_paragraphs)]
+            else:
+                selected_paragraphs = all_paragraphs
+            
+            return '\n\n'.join(selected_paragraphs), None
+        except Exception as e:
+            return "", f"Error converting DOCX: {e}"
+
+# TXT/Markdown processor for plain text files
+class TextProcessor(DocumentProcessor):
+    @staticmethod
+    def load_document(text_path: str) -> Tuple[int, Optional[str]]:
+        # Load text file and count lines as sections
+        try:
+            with open(text_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            lines = content.splitlines()
+            return len(lines), None
+        except Exception as e:
+            return 0, f"Error loading text file: {e}"
+    
+    @staticmethod
+    def convert_to_markdown(text_path: str, lines: List[int] = None) -> Tuple[str, Optional[str]]:
+        # Convert specified lines (or all if None) to markdown (essentially pass-through)
+        try:
+            with open(text_path, 'r', encoding='utf-8') as f:
+                all_lines = f.readlines()
+            
+            if lines is not None:
+                selected_lines = [all_lines[i] for i in lines if i < len(all_lines)]
+            else:
+                selected_lines = all_lines
+            
+            return ''.join(selected_lines), None
+        except Exception as e:
+            return "", f"Error converting text file: {e}"
+
+# HTML processor using BeautifulSoup
+class HtmlProcessor(DocumentProcessor):
+    @staticmethod
+    def load_document(html_path: str) -> Tuple[int, Optional[str]]:
+        # Load HTML and count significant sections (p, div, section tags) as sections
+        try:
+            with open(html_path, 'r', encoding='utf-8') as f:
+                soup = BeautifulSoup(f, 'html.parser')
+            return len(soup.find_all(['p', 'div', 'section'])), None
+        except Exception as e:
+            return 0, f"Error loading HTML: {e}"
+    
+    @staticmethod
+    def convert_to_markdown(html_path: str, sections: List[int] = None) -> Tuple[str, Optional[str]]:
+        # Convert specified sections (or all if None) to markdown
+        try:
+            with open(html_path, 'r', encoding='utf-8') as f:
+                soup = BeautifulSoup(f, 'html.parser')
+            all_sections = soup.find_all(['p', 'div', 'section'])
+            
+            if sections is not None:
+                selected_sections = [all_sections[i] for i in sections if i < len(all_sections)]
+            else:
+                selected_sections = all_sections
+            
+            markdown_content = []
+            for section in selected_sections:
+                text = section.get_text(separator='\n\n')
+                markdown_content.append(text)
+            
+            return '\n\n---\n\n'.join(markdown_content), None
+        except Exception as e:
+            return "", f"Error converting HTML: {e}"
+
+# Factory to instantiate the correct processor based on file extension
+class DocumentProcessorFactory:
+    @staticmethod
+    def get_processor(file_path: str) -> DocumentProcessor:
+        # Determine file extension and return appropriate processor
+        extension = os.path.splitext(file_path)[1].lower()
+        
+        if extension == '.pdf':
+            return PdfProcessor()
+        elif extension == '.epub':
+            return EpubProcessor()
+        elif extension == '.docx':
+            return DocxProcessor()
+        elif extension in ['.txt', '.md']:
+            return TextProcessor()
+        elif extension == '.html':
+            return HtmlProcessor()
+        else:
+            raise ValueError(f"Unsupported file format: {extension}")
 
 @dataclass
 class AppSettings:
@@ -38,7 +221,7 @@ class TokenCounter:
     def get_encoder(encoding_name: str = 'cl100k_base'):
         return tiktoken.get_encoding(encoding_name)
 
-class PdfProcessor:
+class PdfProcessor(DocumentProcessor):
     ABBREVIATIONS = {'np', 'dr', 'mgr', 'itp', 'e.g', 'i.e', 'etc'}
     SENTENCE_SPLIT_REGEX = re.compile(r'(?<=[\.\!\?])\s+')
     STRUCTURE_REGEX = re.compile(r'^(#{1,6}\s+|```|\|)', re.MULTILINE)
@@ -46,6 +229,7 @@ class PdfProcessor:
 
     @staticmethod
     def load_document(pdf_path: str) -> Tuple[int, Optional[str]]:
+        # Load PDF and count pages (unchanged implementation)
         try:
             doc = fitz.open(pdf_path)
             page_count = doc.page_count
@@ -56,6 +240,7 @@ class PdfProcessor:
 
     @staticmethod
     def convert_to_markdown(pdf_path: str, pages: List[int]) -> Tuple[str, Optional[str]]:
+        # Convert specified pages to markdown (unchanged implementation)
         try:
             markdown_text = pymupdf4llm.to_markdown(pdf_path, pages=pages)
             if not markdown_text.strip():
@@ -66,10 +251,12 @@ class PdfProcessor:
 
     @staticmethod
     def preprocess(text: str) -> str:
+        # Preprocess text by removing hyphenated line breaks
         return re.sub(r'-\n\s*', '', text)
 
     @classmethod
     def split_paragraphs(cls, text: str) -> List[str]:
+        # Split text into paragraphs
         parts = re.split(r'\n{2,}|\.(?=\s+[A-Z])|(?<=[.!?])\s+(?=[A-Z])', text)
         paragraphs: List[str] = []
         current_paragraph = ""
@@ -94,6 +281,7 @@ class PdfProcessor:
 
     @classmethod
     def is_structural(cls, text: str) -> bool:
+        # Check if text contains structural markdown elements
         for line in text.splitlines():
             if cls.STRUCTURE_REGEX.match(line):
                 return True
@@ -101,6 +289,7 @@ class PdfProcessor:
 
     @classmethod
     def split_sentences(cls, text: str) -> List[str]:
+        # Split text into sentences, preserving abbreviations
         parts = cls.SENTENCE_SPLIT_REGEX.split(text)
         sentences: List[str] = []
         i = 0
@@ -117,6 +306,7 @@ class PdfProcessor:
 
     @staticmethod
     def chunk_text_intelligently(text: str, max_tokens: int) -> List[str]:
+        # Chunk text intelligently based on token count
         encoder = TokenCounter.get_encoder()
         text = PdfProcessor.preprocess(text)
         total_tokens = TokenCounter.count_tokens(text)
@@ -261,22 +451,129 @@ class PdfProcessingWorker(QThread):
     finished = pyqtSignal(str, list, str)
     progress = pyqtSignal(int)
     
-    def __init__(self, pdf_path: str, pages: List[int], max_tokens: int = None):
+    def __init__(self, file_path: str, pages: List[int], max_tokens: int = None):
+        # Initialize with file path, sections, and optional max tokens
         super().__init__()
-        self.pdf_path = pdf_path
-        self.pages = pages
+        self.file_path = file_path
+        self.pages = pages  # Now interpreted as sections (pages, chapters, etc.) depending on processor
         self.max_tokens = max_tokens
+        self.processor = DocumentProcessorFactory.get_processor(file_path)
     
     def run(self):
-        markdown, error = PdfProcessor.convert_to_markdown(self.pdf_path, self.pages)
-        if error:
-            self.finished.emit("", [], error)
-            return
-        if self.max_tokens:
-            chunks = PdfProcessor.chunk_text_intelligently(markdown, self.max_tokens)
-        else:
-            chunks = []
-        self.finished.emit(markdown, chunks, "")
+        # Process document using the appropriate processor
+        try:
+            markdown, error = self.processor.convert_to_markdown(self.file_path, self.pages)
+            if error:
+                self.finished.emit("", [], error)
+                return
+            if self.max_tokens:
+                chunks = PdfProcessor.chunk_text_intelligently(markdown, self.max_tokens)
+            else:
+                chunks = []
+            self.finished.emit(markdown, chunks, "")
+        except Exception as e:
+            self.finished.emit("", [], f"Error processing document: {str(e)}")
+
+class EpubProcessingWorker(QThread):
+    """
+    QThread that reads an EPUB file, splits each selected chapter into
+    individual <p>…</p> paragraphs, and emits:
+      finished(markdown_str, list_of_paragraphs, error_str)
+    """
+    finished = pyqtSignal(str, list, str)
+
+    def __init__(self, file_path: str, chapters: List[int]):
+        super().__init__()
+        self.file_path = file_path
+        self.chapters  = chapters
+
+    def run(self):
+        try:
+            # 1) Convert selected chapters into a single markdown string
+            full_md, err = EpubProcessor.convert_to_markdown(
+                self.file_path,
+                chapters=self.chapters
+            )
+            if err:
+                # on error, emit empty markdown + empty list + error
+                self.finished.emit("", [], err)
+                return
+
+            # 2) Split on double-newline (paragraph separators)
+            paras = [
+                p.strip()
+                for p in full_md.split("\n\n")
+                if p.strip() and p.strip() != "---"
+            ]
+
+            # 3) Emit full markdown and list of small paragraphs
+            self.finished.emit(full_md, paras, "")
+
+        except Exception as e:
+            self.finished.emit("", [], str(e))
+
+class GenericProcessingWorker(QThread):
+    """
+    QThread that uses the DocumentProcessor API to convert any supported
+    format (DOCX, TXT/MD, HTML…) into markdown, then splits that markdown
+    into paragraphs/sections and emits (full_markdown, list_of_chunks, error).
+    """
+    finished = pyqtSignal(str, list, str)
+
+    def __init__(self, file_path: str, sections: List[int]):
+        super().__init__()
+        self.file_path = file_path
+        self.sections  = sections
+
+    def run(self):
+        """
+        Convert DOCX, TXT/MD, or HTML into semantic blocks and emit them.
+        Uses native APIs for each format to extract logical paragraphs/sections.
+        """
+        try:
+            ext = os.path.splitext(self.file_path)[1].lower()
+
+            # 1) DOCX: use python-docx to get real paragraphs
+            if ext == '.docx':
+                import docx as _docx
+                doc = _docx.Document(self.file_path)
+                blocks = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+
+            # 2) TXT or MD: split by lines, ignore empties
+            elif ext in ['.txt', '.md']:
+                with open(self.file_path, 'r', encoding='utf-8') as f:
+                    lines = f.read().splitlines()
+                blocks = [line.strip() for line in lines if line.strip()]
+
+            # 3) HTML: extract semantic tags via BeautifulSoup
+            elif ext == '.html':
+                from bs4 import BeautifulSoup as _BS
+                with open(self.file_path, 'r', encoding='utf-8') as f:
+                    soup = _BS(f, 'html.parser')
+                tags = soup.find_all(['p', 'h1', 'h2', 'h3', 'li', 'blockquote', 'div'])
+                blocks = [tag.get_text(strip=True) for tag in tags if tag.get_text(strip=True)]
+
+            # 4) Fallback: use DocumentProcessorFactory + split markdown
+            else:
+                from .rag_utils import DocumentProcessorFactory
+                import re as _re
+                processor = DocumentProcessorFactory.get_processor(self.file_path)
+                full_md, err = processor.convert_to_markdown(self.file_path, chapters=self.sections)
+                if err:
+                    self.finished.emit("", [], err)
+                    return
+                blocks = [
+                    chunk.strip()
+                    for chunk in _re.split(r'\n{2,}', full_md)
+                    if chunk.strip()
+                ]
+
+            # 5) Reassemble full markdown and emit
+            full_md = "\n\n".join(blocks)
+            self.finished.emit(full_md, blocks, "")
+
+        except Exception as e:
+            self.finished.emit("", [], str(e))
 
 class SettingsManager:
     SETTINGS_FILE = "pdf_rag_settings.json"

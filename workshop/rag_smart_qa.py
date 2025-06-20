@@ -1,5 +1,5 @@
 import os
-from typing import List, Dict
+from typing import List, Dict, Optional
 from difflib import SequenceMatcher
 import re
 import json
@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QGroupBox, QHBoxLayout, QLine
                              QPlainTextEdit, QLabel, QSpinBox, QSplitter)
 from PyQt5.QtGui import QTextOption
 
-from .rag_utils import TokenCounter, PdfProcessingWorker, LlmClient, SettingsManager, HistoryDialog, AppSettings, PdfProcessor
+from .rag_utils import TokenCounter, PdfProcessingWorker, LlmClient, SettingsManager, HistoryDialog, AppSettings, PdfProcessor, DocumentProcessorFactory, EpubProcessingWorker, GenericProcessingWorker
 
 class EnhancedPdfProcessor:
     @staticmethod
@@ -137,50 +137,50 @@ class SimpleQaSystem:
     def generate_answer(
         question: str,
         context: List[Dict],
-        max_context_tokens: int = 4000,
         extra_instructions: str = ""
-    ) -> str:
+    ) -> tuple[str, dict]:
         """
-        Generate an answer based ONLY on the provided context.
-        If extra_instructions is non-empty, prepend them before sending the prompt,
-        and omit the standard Rules section entirely.
+        Always send every entry in context, no token-limit.
+        Returns tuple: (answer, token_stats)
         """
         if not context:
-            return "No relevant information found in the document."
+            return "No relevant information found in the document.", {
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "total_tokens": 0
+            }
 
-        encoder = TokenCounter.get_encoder()
         context_str = ""
-        total_tokens = 0
-
         for entry in context:
-            entry_tokens = TokenCounter.count_tokens(entry["text"])
-            if total_tokens + entry_tokens > max_context_tokens:
-                break
             context_str += f"\n\n[Paragraph {entry['paragraph_id']}] {entry['text']}"
-            total_tokens += entry_tokens
 
-        prompt_sections = [
+        prompt_parts = [
             f"**Question:**\n{question}",
             f"**Context:**{context_str}"
         ]
-
         if extra_instructions:
-            prompt_sections.append(
-                "**User Instructions (priority):**\n"
-                f"{extra_instructions}"
-            )
+            prompt_parts.append(f"**User Instructions (priority):**\n{extra_instructions}")
         else:
-            prompt_sections.append(
-                "**Rules:**\n"
-                "1. Be precise.\n"
-                "2. If unsure, say “I don’t know.”\n"
-                "3. Mention relevant paragraph numbers."
-            )
+            prompt_parts.append("**Rules:**\n1. Be precise.\n2. If unsure, say \"I don't know.\"\n3. Mention paragraph numbers.")
 
-        prompt = "\n\n".join(prompt_sections)
-
+        prompt = "\n\n".join(prompt_parts)
+        
+        # Count prompt tokens before sending to LLM
+        prompt_tokens = TokenCounter.count_tokens(prompt)
+        
         response, _ = LlmClient.send_prompt(prompt)
-        return response
+        
+        # Count completion tokens from the actual response
+        completion_tokens = TokenCounter.count_tokens(response)
+        total_tokens = prompt_tokens + completion_tokens
+        
+        token_stats = {
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens
+        }
+        
+        return response, token_stats
 
 class QaWorker(QThread):
     finished = pyqtSignal(str, list)
@@ -245,16 +245,24 @@ class QaWorker(QThread):
             if snippet_mode:
                 llm_context = [
                     {
-                        "paragraph_id": s["paragraph_id"],
-                        "text": s["text"][:self.snippet_length],
-                        "score": s.get("score", 1.0)
+                        "paragraph_id": sec["paragraph_id"],
+                        "text": sec["text"][:self.snippet_length],
+                        "score": sec.get("score", 1.0)
                     }
-                    for s in relevant_sections
+                    for sec in relevant_sections
                 ]
             else:
-                llm_context = relevant_sections
+                llm_context = []
+                for sec in relevant_sections:
+                    block = sec.get("context", sec["text"])
+                    llm_context.append({
+                        "paragraph_id": sec["paragraph_id"],
+                        "text": block,
+                        "score": sec.get("score", 1.0)
+                    })
 
-            answer = SimpleQaSystem.generate_answer(
+            # Get answer and token statistics
+            answer, token_stats = SimpleQaSystem.generate_answer(
                 question=self.question,
                 context=llm_context,
                 extra_instructions=self.custom_instr
@@ -269,6 +277,13 @@ class QaWorker(QThread):
                     f"(score: {sec.get('score', 1.0):.2f}):\n"
                     f"{sec['text']}\n"
                 )
+            
+            # Add token information
+            result_text += f"\n\n--- Token Usage ---\n"
+            result_text += f"Prompt tokens: {token_stats['prompt_tokens']:,}\n"
+            result_text += f"Completion tokens: {token_stats['completion_tokens']:,}\n"
+            result_text += f"Total tokens: {token_stats['total_tokens']:,}\n"
+            result_text += "~ Note: Token counts are approximate and may vary across models, due to different tokenization methods."
 
             self.finished.emit(result_text, relevant_sections)
 
@@ -302,12 +317,12 @@ class SmartQAWidget(QWidget):
         upper_layout.setContentsMargins(0, 0, 0, 0)
 
         # --- PDF Selection Group ---
-        pdf_group = QGroupBox("PDF Selection", upper_container)
+        pdf_group = QGroupBox("Document Selection", upper_container)
         pdf_layout = QHBoxLayout()
         pdf_layout.setSpacing(8)
 
         self.qa_pdf_path_edit = QLineEdit()
-        self.qa_pdf_path_edit.setPlaceholderText("Select PDF file...")
+        self.qa_pdf_path_edit.setPlaceholderText("Select document file...")
         self.qa_pdf_path_edit.textChanged.connect(self.on_qa_pdf_path_changed)
         self.qa_pdf_path_edit.returnPressed.connect(
             lambda: self.process_qa_pdf() if self.qa_process_btn.isEnabled() else None
@@ -331,7 +346,7 @@ class SmartQAWidget(QWidget):
         process_layout = QHBoxLayout()
         process_layout.setSpacing(8)
 
-        self.qa_process_btn = QPushButton("Process PDF")
+        self.qa_process_btn = QPushButton("Process Document")
         self.qa_process_btn.clicked.connect(self.process_qa_pdf)
         self.qa_process_btn.setEnabled(False)
         process_layout.addWidget(self.qa_process_btn)
@@ -407,8 +422,8 @@ class SmartQAWidget(QWidget):
         settings_layout.addWidget(QLabel("Context Mode:"), 4, 0)
         self.context_mode_combo = QComboBox()
         self.context_mode_combo.setToolTip(
-            "Snippet: send first N chars of each paragraph.\n"
-            "Full Paragraph: send entire paragraph only.\n"
+            "Snippet: send first N chars of each paragraph only.\n"
+            "Full Paragraph: send entire paragraph.\n"
             "Full Paragraph + Surrounding X: send paragraph plus X paragraphs before/after."
         )
         settings_layout.addWidget(self.context_mode_combo, 4, 1)
@@ -529,60 +544,104 @@ class SmartQAWidget(QWidget):
         self.min_similarity_spin.setSpecialValueText("0% (Include All)")
 
     def browse_qa_pdf(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Select PDF", "", "PDF Files (*.pdf)")
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select Document",
+            "",
+            "Supported files (*.pdf *.epub *.docx *.txt *.md *.html);;"
+            "PDF Files (*.pdf);;"
+            "EPUB Files (*.epub);;"
+            "Word Documents (*.docx);;"
+            "Text Files (*.txt *.md);;"
+            "HTML Files (*.html);;"
+            "All Files (*)"
+        )
         if path:
             self.qa_pdf_path_edit.setText(path)
             self.on_qa_pdf_path_changed()
 
     def on_qa_pdf_path_changed(self):
         path = self.qa_pdf_path_edit.text().strip()
-        is_valid_pdf = path.lower().endswith('.pdf') and os.path.isfile(path)
-        self.qa_process_btn.setEnabled(is_valid_pdf)
+        supported_extensions = ['.pdf', '.epub', '.docx', '.txt', '.md', '.html']
+        is_valid_file = any(path.lower().endswith(ext) for ext in supported_extensions) and os.path.isfile(path)
+        self.qa_process_btn.setEnabled(is_valid_file)
         self.qa_search_btn.setEnabled(False)
-        
+
         if not path:
             self.qa_status_label.setText("No document loaded")
             self.qa_status_label.setStyleSheet("color: #888888; font-style: italic;")
-        elif is_valid_pdf:
+        elif is_valid_file:
             self.qa_status_label.setText(f"Ready to process: {os.path.basename(path)}")
             self.qa_status_label.setStyleSheet("color: #006400; font-style: normal;")
             self.load_qa_pdf_info()
         else:
-            self.qa_status_label.setText("Invalid PDF file selected")
+            self.qa_status_label.setText("Invalid file selected")
             self.qa_status_label.setStyleSheet("color: #8B0000; font-style: italic;")
 
     def load_qa_pdf_info(self):
+        # Load document info for any supported file type
         path = self.qa_pdf_path_edit.text().strip()
-        page_count, error = PdfProcessor.load_document(path)
-        if error:
-            QMessageBox.warning(self, "PDF Error", error)
-            return
-        self.parent_app.settings.last_pdf_path_qa = path
-        SettingsManager.save_settings(self.parent_app.settings)
-        self.qa_document_path = path
+        try:
+            processor = DocumentProcessorFactory.get_processor(path)
+            section_count, error = processor.load_document(path)
+            if error:
+                QMessageBox.warning(self, "Document Error", error)
+                return
+            self.parent_app.settings.last_pdf_path_qa = path  # Keeping name for compatibility
+            SettingsManager.save_settings(self.parent_app.settings)
+            self.qa_document_path = path
+        except ValueError as e:
+            QMessageBox.warning(self, "Unsupported Format", str(e))
 
     def process_qa_pdf(self):
-        pdf_path = self.qa_pdf_path_edit.text().strip()
-        if not pdf_path or not os.path.isfile(pdf_path):
-            QMessageBox.warning(self, "Error", "Invalid PDF file selected.")
+        """
+        Called when user clicks “Process”. Chooses the correct worker
+        (PDF vs EPUB vs others) based on file extension.
+        """
+        file_path = self.qa_pdf_path_edit.text().strip()
+        if not file_path or not os.path.isfile(file_path):
+            QMessageBox.warning(self, "Error", "Invalid file selected.")
             return
-        
-        page_count, error = PdfProcessor.load_document(pdf_path)
-        if error:
-            QMessageBox.warning(self, "PDF Error", error)
-            return
-        pages = list(range(0, page_count))
-        
-        self.qa_progress_bar.setVisible(True)
-        self.qa_progress_bar.setRange(0, 0)
-        self.qa_process_btn.setEnabled(False)
-        self.qa_search_btn.setEnabled(False)
-        
-        self.qa_worker = PdfProcessingWorker(pdf_path, pages)
-        self.qa_worker.finished.connect(self.on_qa_pdf_processing_finished)
-        self.qa_worker.start()
+
+        try:
+            ext = os.path.splitext(file_path)[1].lower()
+            processor = DocumentProcessorFactory.get_processor(file_path)
+            section_count, error = processor.load_document(file_path)
+            if error:
+                QMessageBox.warning(self, "Document Error", error)
+                return
+
+            # build list of all sections (chapters/pages/etc.)
+            sections = list(range(0, section_count))
+
+            # show progress
+            self.qa_progress_bar.setVisible(True)
+            self.qa_progress_bar.setRange(0, 0)
+            self.qa_process_btn.setEnabled(False)
+            self.qa_search_btn.setEnabled(False)
+
+            # choose worker
+            if ext == '.epub':
+                from .rag_utils import EpubProcessingWorker
+                self.qa_worker = EpubProcessingWorker(file_path, sections)
+
+            elif ext == '.pdf':
+                from .rag_utils import PdfProcessingWorker
+                self.qa_worker = PdfProcessingWorker(file_path, sections)
+
+            else:
+                from .rag_utils import GenericProcessingWorker
+                self.qa_worker = GenericProcessingWorker(file_path, sections)
+
+            # connect and start
+            self.qa_worker.finished.connect(self.on_qa_pdf_processing_finished)
+            self.qa_worker.start()
+
+        except ValueError as e:
+            QMessageBox.warning(self, "Unsupported Format", str(e))
 
     def on_qa_pdf_processing_finished(self, markdown: str, chunks: List[str], error: str):
+        # Handle processing completion for any document type
         self.qa_progress_bar.setVisible(False)
         self.qa_process_btn.setEnabled(True)
         
@@ -594,7 +653,7 @@ class SmartQAWidget(QWidget):
             return
         
         self.qa_markdown_text = markdown
-        self.parent_app.status_bar.showMessage("PDF processed for Smart QA", 5000)
+        self.parent_app.status_bar.showMessage("Document processed for Smart QA", 5000)
         self.qa_search_btn.setEnabled(True)
         self.qa_status_label.setText(f"Document ready: {os.path.basename(self.qa_document_path)}")
         self.qa_status_label.setStyleSheet("color: #006400; font-style: normal;")
@@ -668,7 +727,6 @@ class SmartQAWidget(QWidget):
         self.parent_app.restore_cursor()
         self.qa_results.setPlainText(result_text)
         self.qa_status_label.setText("Ready")
-        self.qa_markdown_text = result_text
         self.qa_export_btn.setVisible(True)
         self.qa_export_btn.setEnabled(True)
         self.qa_search_btn.setEnabled(True)
