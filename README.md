@@ -100,3 +100,20 @@ This project utilizes the following libraries:
 ## Contact
 
 For any questions or support, please post to the issues or discussions page on github project page, or join our Discord server: <https://discord.gg/xkkGaRFXNX>
+
+## Prompt Parameters
+
+When using the prompt generation feature in Writingway, users can customize the AI's behavior by specifying various parameters. Below is a list of available parameters and their meanings:
+
+| Parameter         | Description                                                                 |
+|-------------------|-----------------------------------------------------------------------------|
+| pov               | Point of view for narration (e.g., first-person, third-person)              |
+| pov_character     | The character whose perspective is used for narration                       |
+| tense             | Narrative tense (e.g., past, present)                                       |
+| system_prompt     | System-level prompt that defines the AI's role or task                      |
+| context           | Additional context information, such as story background or setting         |
+| story_so_far      | Summary of the story written so far                                         |
+| user_input        | The user's current input or instruction                                     |
+| additional_vars   | Any other custom variables you provide; these will be included in the prompt|
+
+These parameters allow you to fine-tune the AI's output to better fit your story's needs. Most parameters can be set automatically by the system, but you can also provide custom values for more control.

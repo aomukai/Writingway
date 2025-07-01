@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QToolBar, QAction, QWidget, QVBoxLayout
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
 from settings.theme_manager import ThemeManager
+from gettext import gettext as _
 
 class ActivityBar(QWidget):
     """Vertical icon panel for switching between views, similar to VS Code Activity Bar."""
@@ -44,6 +45,11 @@ class ActivityBar(QWidget):
             _("Prompt Options"),
             self.controller.toggle_prompts_view
         )
+        self.content_view_action = self.add_action(
+            "assets/icons/activity.svg",
+            _("Content View"),
+            self.controller.toggle_content_view
+        )
 
         # Set initial state
         self.outline_action.setChecked(True)
@@ -62,7 +68,7 @@ class ActivityBar(QWidget):
         self.controller.clear_search_highlights()  # Clear search highlights
         if action.isChecked():
             # Uncheck other actions
-            for act in [self.outline_action, self.search_action, self.compendium_action, self.prompts_action]:
+            for act in [self.outline_action, self.search_action, self.compendium_action, self.prompts_action, self.content_view_action]:
                 if act != action:
                     act.setChecked(False)
             # Set current view
@@ -70,7 +76,8 @@ class ActivityBar(QWidget):
                 self.outline_action: "outline",
                 self.search_action: "search",
                 self.compendium_action: "compendium",
-                self.prompts_action: "prompts"
+                self.prompts_action: "prompts",
+                self.content_view_action: "content_view"
             }
             self.current_view = view_map.get(action)
             callback(True)  # Show the view
@@ -86,3 +93,4 @@ class ActivityBar(QWidget):
         self.search_action.setIcon(ThemeManager.get_tinted_icon("assets/icons/search.svg", tint_color))
         self.compendium_action.setIcon(ThemeManager.get_tinted_icon("assets/icons/book-open.svg", tint_color))
         self.prompts_action.setIcon(ThemeManager.get_tinted_icon("assets/icons/ai-script-icon.svg", tint_color))
+        self.content_view_action.setIcon(ThemeManager.get_tinted_icon("assets/icons/activity.svg", tint_color))

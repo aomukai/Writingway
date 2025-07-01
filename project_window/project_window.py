@@ -5,10 +5,24 @@ import tiktoken
 import re
 import logging
 import threading
+import gettext
+import builtins
 
-from PyQt5.QtWidgets import (QMainWindow, QWidget, QSplitter, QLabel, QShortcut, 
-                             QMessageBox, QInputDialog, QApplication, QDialog,
-                             QTreeWidgetItem, QTextEdit, QStackedWidget, QHBoxLayout)
+from PyQt5.QtWidgets import (
+    QMainWindow,
+    QWidget,
+    QSplitter,
+    QLabel,
+    QShortcut,
+    QMessageBox,
+    QInputDialog,
+    QApplication,
+    QDialog,
+    QTreeWidgetItem,
+    QTextEdit,
+    QStackedWidget,
+    QHBoxLayout,
+)
 from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSlot
 from PyQt5.QtGui import QColor, QTextCharFormat, QFont, QTextCursor, QKeySequence
 from .project_model import ProjectModel
@@ -19,6 +33,7 @@ from .bottom_stack import BottomStack
 from .focus_mode import FocusMode
 from .rewrite_feature import RewriteDialog
 from .activity_bar import ActivityBar
+from .content_view_widget import ContentViewWidget
 from .search_replace_panel import SearchReplacePanel
 from .embedded_prompts_panel import EmbeddedPromptsPanel
 from compendium.compendium_panel import CompendiumPanel
@@ -40,10 +55,16 @@ import muse.prompt_handler as prompt_handler
 
 # Set the path to PyQt5 plugins
 import PyQt5
+
+if not hasattr(builtins, "_"):
+    builtins._ = gettext.gettext
+_ = builtins._
+
+
 pyqt_dir = os.path.dirname(PyQt5.__file__)
 possible_paths = [
     os.path.join(pyqt_dir, "Qt5", "plugins", "platforms"),
-    os.path.join(pyqt_dir, "Qt", "plugins", "platforms")
+    os.path.join(pyqt_dir, "Qt", "plugins", "platforms"),
 ]
 plugin_path = ""
 for path in possible_paths:
@@ -53,12 +74,15 @@ for path in possible_paths:
 if plugin_path:
     os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
 
+
 class ProjectWindow(QMainWindow):
     def __init__(self, project_name, compendium_window):
         super().__init__()
         self.model = ProjectModel(project_name)
         self.current_theme = WWSettingsManager.get_appearance_settings()["theme"]
-        self.icon_tint = QColor(ThemeManager.ICON_TINTS.get(self.current_theme, "black"))
+        self.icon_tint = QColor(
+            ThemeManager.ICON_TINTS.get(self.current_theme, "black")
+        )
         self.tts_playing = False
         self.unsaved_preview = False
         self.enhanced_window = compendium_window
@@ -98,17 +122,22 @@ class ProjectWindow(QMainWindow):
         left_layout.addWidget(self.activity_bar)
         self.scene_editor = SceneEditor(self, self.icon_tint)
 
+        self.content_view_panel = ContentViewWidget(self.model)
+        self.content_view_panel.content_changed.connect(self.on_content_view_changed)
 
         self.side_bar = QStackedWidget()
         self.side_bar.setMinimumWidth(200)
         self.project_tree = ProjectTreeWidget(self, self.model)
         self.search_panel = SearchReplacePanel(self, self.model, self.icon_tint)
-        self.compendium_panel = CompendiumPanel(self, enhanced_window=self.enhanced_window)
+        self.compendium_panel = CompendiumPanel(
+            self, enhanced_window=self.enhanced_window
+        )
         self.prompts_panel = EmbeddedPromptsPanel(self.model.project_name, self)
         self.side_bar.addWidget(self.project_tree)
         self.side_bar.addWidget(self.search_panel)
         self.side_bar.addWidget(self.compendium_panel)
         self.side_bar.addWidget(self.prompts_panel)
+        self.side_bar.addWidget(self.content_view_panel)
         left_layout.addWidget(self.side_bar)
 
         self.main_splitter.addWidget(self.left_widget)
@@ -116,7 +145,9 @@ class ProjectWindow(QMainWindow):
         right_vertical_splitter = QSplitter(Qt.Vertical)
         self.compendium_editor = QTextEdit()
         self.compendium_editor.setReadOnly(True)
-        self.compendium_editor.setPlaceholderText(_("Select a compendium entry to view..."))
+        self.compendium_editor.setPlaceholderText(
+            _("Select a compendium entry to view...")
+        )
         self.prompts_editor = self.prompts_panel.editor_widget
         self.editor_stack = QStackedWidget()
         self.editor_stack.addWidget(self.scene_editor)
@@ -142,77 +173,56 @@ class ProjectWindow(QMainWindow):
         if self.side_bar.isVisible():
             self.last_sidebar_width = self.main_splitter.sizes()[0]
 
-    def toggle_outline_view(self, show):
-        self.side_bar.setVisible(show)
-        if show:
-            self.side_bar.setCurrentWidget(self.project_tree)
-            self.editor_stack.setCurrentWidget(self.scene_editor)
-            self.bottom_stack.setVisible(True)
-            self.main_splitter.setSizes([self.last_sidebar_width, self.main_splitter.sizes()[1]])
+    def _set_sidebar_visibility(self, visible):
+        """Helper to show or collapse the sidebar."""
+        self.side_bar.setVisible(visible)
+        if visible:
+            # Restore sidebar width and make it resizable
+            self.main_splitter.setSizes(
+                [self.last_sidebar_width, self.main_splitter.sizes()[1]]
+            )
             self.main_splitter.setCollapsible(0, False)
             self.left_widget.setMinimumWidth(250)
             self.left_widget.setMaximumWidth(16777215)
         else:
+            # Save current width and collapse sidebar
             self.last_sidebar_width = self.main_splitter.sizes()[0]
             self.main_splitter.setSizes([50, self.main_splitter.sizes()[1]])
             self.main_splitter.setCollapsible(0, True)
             self.left_widget.setMinimumWidth(50)
             self.left_widget.setMaximumWidth(50)
+
+    def toggle_outline_view(self, show):
+        self._set_sidebar_visibility(show)
+        if show:
+            self.side_bar.setCurrentWidget(self.project_tree)
+            self.editor_stack.setCurrentWidget(self.scene_editor)
         self.activity_bar.outline_action.setChecked(show)
         self.bottom_stack.setVisible(True)
 
     def toggle_search_view(self, show):
-        self.side_bar.setVisible(show)
+        self._set_sidebar_visibility(show)
         if show:
             self.side_bar.setCurrentWidget(self.search_panel)
             self.editor_stack.setCurrentWidget(self.scene_editor)
-            self.main_splitter.setSizes([self.last_sidebar_width, self.main_splitter.sizes()[1]])
-            self.main_splitter.setCollapsible(0, False)
-            self.left_widget.setMinimumWidth(250)
-            self.left_widget.setMaximumWidth(16777215)
-        else:
-            self.last_sidebar_width = self.main_splitter.sizes()[0]
-            self.main_splitter.setSizes([50, self.main_splitter.sizes()[1]])
-            self.main_splitter.setCollapsible(0, True)
-            self.left_widget.setMinimumWidth(50)
-            self.left_widget.setMaximumWidth(50)
         self.activity_bar.search_action.setChecked(show)
         self.bottom_stack.setVisible(True)
 
     def toggle_compendium_view(self, show):
-        self.side_bar.setVisible(show)
+        self._set_sidebar_visibility(show)
         if show:
             self.side_bar.setCurrentWidget(self.compendium_panel)
             self.editor_stack.setCurrentWidget(self.compendium_editor)
-            self.main_splitter.setSizes([self.last_sidebar_width, self.main_splitter.sizes()[1]])
-            self.main_splitter.setCollapsible(0, False)
-            self.left_widget.setMinimumWidth(250)
-            self.left_widget.setMaximumWidth(16777215)
-        else:
-            self.last_sidebar_width = self.main_splitter.sizes()[0]
-            self.main_splitter.setSizes([50, self.main_splitter.sizes()[1]])
-            self.main_splitter.setCollapsible(0, True)
-            self.left_widget.setMinimumWidth(50)
-            self.left_widget.setMaximumWidth(50)
         self.activity_bar.compendium_action.setChecked(show)
         self.bottom_stack.setVisible(True)
 
     def toggle_prompts_view(self, show):
-        self.side_bar.setVisible(show)
+        self._set_sidebar_visibility(show)
         if show:
             self.side_bar.setCurrentWidget(self.prompts_panel)
             self.editor_stack.setCurrentWidget(self.prompts_editor)
-            self.main_splitter.setSizes([self.last_sidebar_width, self.main_splitter.sizes()[1]])
-            self.main_splitter.setCollapsible(0, False)
-            self.left_widget.setMinimumWidth(250)
-            self.left_widget.setMaximumWidth(16777215)
             self.bottom_stack.setVisible(False)
         else:
-            self.last_sidebar_width = self.main_splitter.sizes()[0]
-            self.main_splitter.setSizes([50, self.main_splitter.sizes()[1]])
-            self.main_splitter.setCollapsible(0, True)
-            self.left_widget.setMinimumWidth(50)
-            self.left_widget.setMaximumWidth(50)
             self.bottom_stack.setVisible(True)
         self.activity_bar.prompts_action.setChecked(show)
 
@@ -227,6 +237,20 @@ class ProjectWindow(QMainWindow):
         self.focus_mode_shortcut = QShortcut(QKeySequence("F11"), self)
         self.focus_mode_shortcut.activated.connect(self.open_focus_mode)
 
+    def toggle_content_view(self, show):
+        self._set_sidebar_visibility(show)
+        if show:
+            self.side_bar.setCurrentWidget(self.content_view_panel)
+            self.editor_stack.setCurrentWidget(self.scene_editor)
+        self.bottom_stack.setVisible(True)
+        self.activity_bar.content_view_action.setChecked(show)
+
+    def on_content_view_changed(self, hierarchy, content_type, new_text):
+        if content_type == "scene":
+            self.model.save_scene(hierarchy, new_text)
+        elif content_type == "summary":
+            self.model.save_summary(hierarchy, new_text)
+
     def load_scene_from_hierarchy(self, hierarchy):
         """Load a scene into the editor based on its hierarchy."""
         if len(hierarchy) < 3:
@@ -238,7 +262,11 @@ class ProjectWindow(QMainWindow):
 
     def on_compendium_updated(self, project_name):
         if project_name == self.model.project_name:
-            current_pov = self.bottom_stack.pov_character_combo.currentText() if self.bottom_stack.pov_character_combo else ""
+            current_pov = (
+                self.bottom_stack.pov_character_combo.currentText()
+                if self.bottom_stack.pov_character_combo
+                else ""
+            )
             self.update_pov_character_dropdown()
             if self.bottom_stack.pov_character_combo:
                 self.restore_pov_character(current_pov)
@@ -247,8 +275,12 @@ class ProjectWindow(QMainWindow):
 
     def load_initial_state(self):
         self.bottom_stack.pov_combo.setCurrentText(self.model.settings["global_pov"])
-        self.bottom_stack.pov_character_combo.setCurrentText(self.model.settings["global_pov_character"])
-        self.bottom_stack.tense_combo.setCurrentText(self.model.settings["global_tense"])
+        self.bottom_stack.pov_character_combo.setCurrentText(
+            self.model.settings["global_pov_character"]
+        )
+        self.bottom_stack.tense_combo.setCurrentText(
+            self.model.settings["global_tense"]
+        )
         self.update_pov_character_dropdown()
         self.bottom_stack.prompt_input.setPlainText(self.load_prompt_input())
         if self.model.autosave_enabled:
@@ -283,13 +315,16 @@ class ProjectWindow(QMainWindow):
         settings.setValue(f"{self.model.project_name}/geometry", self.saveGeometry())
         settings.setValue(f"{self.model.project_name}/windowState", self.saveState())
         if hasattr(self, "main_splitter"):
-            settings.setValue(f"{self.model.project_name}/mainSplitterState", self.main_splitter.saveState())
+            settings.setValue(
+                f"{self.model.project_name}/mainSplitterState",
+                self.main_splitter.saveState(),
+            )
 
     def closeEvent(self, event):
         if not self.check_unsaved_changes():
             event.ignore()
             return
-        if hasattr(self, 'autosave_timer') and self.autosave_timer.isActive():
+        if hasattr(self, "autosave_timer") and self.autosave_timer.isActive():
             self.autosave_timer.stop()
         self.write_settings()
         event.accept()
@@ -334,7 +369,9 @@ class ProjectWindow(QMainWindow):
                 editor.setHtml(content)
             else:
                 editor.setPlainText(content)
-            editor.setPlaceholderText(_("Enter summary for {}...").format(current.text(0)))
+            editor.setPlaceholderText(
+                _("Enter summary for {}...").format(current.text(0))
+            )
             self.bottom_stack.stack.setCurrentIndex(0)
         self.update_setting_tooltips()
         self.scene_editor.update_toolbar_state()
@@ -346,7 +383,7 @@ class ProjectWindow(QMainWindow):
             hierarchy.insert(0, current.text(0).strip())
             current = current.parent()
         return hierarchy
-    
+
     def get_current_scene_hierarchy(self):
         """Return the hierarchy of the currently selected scene, or None if no scene is selected."""
         current_item = self.project_tree.tree.currentItem()
@@ -357,9 +394,10 @@ class ProjectWindow(QMainWindow):
             return None
         return self.get_item_hierarchy(current_item)
 
-
     def set_scene_status(self, item, new_status):
-        english_status = ProjectTreeWidget.REVERSE_STATUS_MAP.get(new_status, new_status)
+        english_status = ProjectTreeWidget.REVERSE_STATUS_MAP.get(
+            new_status, new_status
+        )
         scene_data = item.data(0, Qt.UserRole) or {"name": item.text(0)}
         scene_data["status"] = english_status
         item.setData(0, Qt.UserRole, scene_data)
@@ -369,11 +407,15 @@ class ProjectWindow(QMainWindow):
     def manual_save_scene(self):
         current_item = self.project_tree.tree.currentItem()
         if not current_item or self.project_tree.get_item_level(current_item) < 2:
-            QMessageBox.warning(self, _("Manual Save"), _("Please select a scene for manual save."))
+            QMessageBox.warning(
+                self, _("Manual Save"), _("Please select a scene for manual save.")
+            )
             return
         content = self.scene_editor.editor.toHtml()
         if not content.strip():
-            QMessageBox.warning(self, _("Manual Save"), _("There is no content to save."))
+            QMessageBox.warning(
+                self, _("Manual Save"), _("There is no content to save.")
+            )
             return
         hierarchy = self.get_item_hierarchy(current_item)
         filepath = self.model.save_scene(hierarchy, content)
@@ -390,7 +432,9 @@ class ProjectWindow(QMainWindow):
         if not content.strip():
             return
         hierarchy = self.get_item_hierarchy(current_item)
-        filepath = self.model.save_scene(hierarchy, content, expected_project_name=self.model.project_name)
+        filepath = self.model.save_scene(
+            hierarchy, content, expected_project_name=self.model.project_name
+        )
         if filepath:
             self.update_save_status(_("Scene autosaved"))
             self.model.unsaved_changes = False
@@ -406,9 +450,13 @@ class ProjectWindow(QMainWindow):
     def on_oh_shit(self):
         current_item = self.project_tree.tree.currentItem()
         if not current_item or self.project_tree.get_item_level(current_item) < 2:
-            QMessageBox.warning(self, _("Backup Versions"), _("Please select a scene to view backups."))
+            QMessageBox.warning(
+                self, _("Backup Versions"), _("Please select a scene to view backups.")
+            )
             return
-        backup_file_path = show_backup_dialog(self, self.model.project_name, current_item.text(0))
+        backup_file_path = show_backup_dialog(
+            self, self.model.project_name, current_item.text(0)
+        )
         if backup_file_path:
             with open(backup_file_path, "r", encoding="utf-8") as f:
                 content = f.read()
@@ -417,12 +465,21 @@ class ProjectWindow(QMainWindow):
                 editor.setHtml(content)
             else:
                 editor.setPlainText(content)
-            QMessageBox.information(self, _("Backup Loaded"), _("Backup loaded from:\n{}").format(backup_file_path))
+            QMessageBox.information(
+                self,
+                _("Backup Loaded"),
+                _("Backup loaded from:\n{}").format(backup_file_path),
+            )
 
     def handle_pov_change(self, index):
         value = self.bottom_stack.pov_combo.currentText()
         if value == _("Custom..."):
-            custom, ok = QInputDialog.getText(self, _("Custom POV"), _("Enter custom POV:"), text=self.model.settings["global_pov"])
+            custom, ok = QInputDialog.getText(
+                self,
+                _("Custom POV"),
+                _("Enter custom POV:"),
+                text=self.model.settings["global_pov"],
+            )
             if ok and custom.strip():
                 value = custom.strip()
                 combo = self.bottom_stack.pov_combo
@@ -448,7 +505,12 @@ class ProjectWindow(QMainWindow):
     def handle_pov_character_change(self, index=0):
         value = self.bottom_stack.pov_character_combo.currentText()
         if value == _("Custom..."):
-            custom, ok = QInputDialog.getText(self, _("Custom POV Character"), _("Enter custom POV Character:"), text=self.model.settings["global_pov_character"])
+            custom, ok = QInputDialog.getText(
+                self,
+                _("Custom POV Character"),
+                _("Enter custom POV Character:"),
+                text=self.model.settings["global_pov_character"],
+            )
             if ok and custom.strip():
                 value = custom.strip()
                 combo = self.bottom_stack.pov_character_combo
@@ -474,27 +536,46 @@ class ProjectWindow(QMainWindow):
     def handle_tense_change(self, index):
         value = self.bottom_stack.tense_combo.currentText()
         if value == _("Custom..."):
-            custom, ok = QInputDialog.getText(self, pgettext("verb_tense", "Custom Tense"), pgettext("verb_tense", "Enter custom Tense:"), text=self.model.settings["global_tense"])
+            custom, ok = QInputDialog.getText(
+                self,
+                pgettext("verb_tense", "Custom Tense"),
+                pgettext("verb_tense", "Enter custom Tense:"),
+                text=self.model.settings["global_tense"],
+            )
             if ok and custom.strip():
                 value = custom.strip()
                 if self.bottom_stack.tense_combo.findText(value) == -1:
                     self.bottom_stack.tense_combo.insertItem(0, value)
             else:
-                self.bottom_stack.tense_combo.setCurrentText(self.model.settings["global_tense"])
+                self.bottom_stack.tense_combo.setCurrentText(
+                    self.model.settings["global_tense"]
+                )
                 return
         self.model.settings["global_tense"] = value
         self.update_setting_tooltips()
         self.model.save_settings()
 
     def update_setting_tooltips(self):
-        self.bottom_stack.pov_combo.setToolTip(_("POV: {}").format(self.model.settings['global_pov']))
-        self.bottom_stack.pov_character_combo.setToolTip(_("POV Character: {}").format(self.model.settings['global_pov_character']))
-        self.bottom_stack.tense_combo.setToolTip(pgettext("verb_tense", "Tense: {}").format(self.model.settings['global_tense']))
+        self.bottom_stack.pov_combo.setToolTip(
+            _("POV: {}").format(self.model.settings["global_pov"])
+        )
+        self.bottom_stack.pov_character_combo.setToolTip(
+            _("POV Character: {}").format(self.model.settings["global_pov_character"])
+        )
+        self.bottom_stack.tense_combo.setToolTip(
+            pgettext("verb_tense", "Tense: {}").format(
+                self.model.settings["global_tense"]
+            )
+        )
 
     def send_prompt(self):
         action_beats = self.bottom_stack.prompt_input.toPlainText().strip()
         if not action_beats:
-            QMessageBox.warning(self, _("LLM Prompt"), _("Please enter some action beats before sending."))
+            QMessageBox.warning(
+                self,
+                _("LLM Prompt"),
+                _("Please enter some action beats before sending."),
+            )
             return
         prose_config = self.bottom_stack.prose_prompt_panel.get_prompt()
         if not prose_config:
@@ -502,9 +583,21 @@ class ProjectWindow(QMainWindow):
             return
         overrides = self.bottom_stack.prose_prompt_panel.get_overrides()
         additional_vars = self.bottom_stack.get_additional_vars()
-        current_scene_text = self.scene_editor.editor.toPlainText().strip() if self.project_tree.tree.currentItem() and self.project_tree.get_item_level(self.project_tree.tree.currentItem()) >= 2 else None
+        current_scene_text = (
+            self.scene_editor.editor.toPlainText().strip()
+            if self.project_tree.tree.currentItem()
+            and self.project_tree.get_item_level(self.project_tree.tree.currentItem())
+            >= 2
+            else None
+        )
         extra_context = self.bottom_stack.context_panel.get_selected_context_text()
-        final_prompt = prompt_handler.assemble_final_prompt(prose_config, action_beats, additional_vars, current_scene_text, extra_context)
+        final_prompt = prompt_handler.assemble_final_prompt(
+            prose_config,
+            action_beats,
+            additional_vars,
+            current_scene_text,
+            extra_context,
+        )
         self.bottom_stack.preview_text.clear()
         self.bottom_stack.send_button.setEnabled(False)
         self.bottom_stack.preview_text.setReadOnly(True)
@@ -521,7 +614,11 @@ class ProjectWindow(QMainWindow):
         self.bottom_stack.send_button.setEnabled(True)
         current_item = self.project_tree.tree.currentItem()
         level = self.project_tree.get_item_level(current_item) if current_item else -1
-        if current_item and level < 2 and current_item.data(0, Qt.UserRole).get("summary"):
+        if (
+            current_item
+            and level < 2
+            and current_item.data(0, Qt.UserRole).get("summary")
+        ):
             summary = current_item.data(0, Qt.UserRole)["summary"]
             self.retry_with_summary(summary)
             return
@@ -532,16 +629,14 @@ class ProjectWindow(QMainWindow):
     def retry_with_summary(self, summary):
         additional_vars = {
             "pov": self.model.settings["global_pov"] or _("Third Person"),
-            "pov_character": self.model.settings["global_pov_character"] or _("Character"),
+            "pov_character": self.model.settings["global_pov_character"]
+            or _("Character"),
             "tense": self.model.settings["global_tense"] or _("Present Tense"),
         }
         action_beats = self.bottom_stack.prompt_input.toPlainText().strip()
         prose_config = self.bottom_stack.prose_prompt_panel.get_prompt()
         final_prompt = prompt_handler.assemble_final_prompt(
-            prose_config.get("text"),
-            action_beats, additional_vars,
-            summary,
-            None
+            prose_config.get("text"), action_beats, additional_vars, summary, None
         )
         self.bottom_stack.preview_text.clear()
         self.bottom_stack.preview_text.setReadOnly(True)
@@ -555,12 +650,19 @@ class ProjectWindow(QMainWindow):
     def retry_with_auto_summary(self):
         summary = self.scene_editor.editor.toPlainText().strip()
         self.bottom_stack.preview_text.setPlainText(summary)
-        self.statusBar().showMessage(_("Summary generated. Edit if needed, then resend."))
+        self.statusBar().showMessage(
+            _("Summary generated. Edit if needed, then resend.")
+        )
 
     def show_token_limit_dialog(self, error_msg):
         prose_config = self.bottom_stack.prose_prompt_panel.get_prompt()
         max_tokens = prose_config.get("max_tokens", 2000)
-        dialog = TokenLimitDialog(error_msg, self.bottom_stack.preview_text.toPlainText(), max_tokens, parent=self)
+        dialog = TokenLimitDialog(
+            error_msg,
+            self.bottom_stack.preview_text.toPlainText(),
+            max_tokens,
+            parent=self,
+        )
         dialog.use_summary.connect(self.retry_with_summary)
         dialog.truncate_story.connect(self.retry_with_truncated_story)
         dialog.exec_()
@@ -570,7 +672,7 @@ class ProjectWindow(QMainWindow):
         prose_config = self.bottom_stack.prose_prompt_panel.get_prompt()
         tokens = tiktoken.get_encoding("cl100k_base").encode(full_text)
         max_tokens = prose_config.get("max_tokens", 2000) * 0.5
-        truncated = self.encoding.decode(tokens[-int(max_tokens):])
+        truncated = self.encoding.decode(tokens[-int(max_tokens) :])
         self.retry_with_summary(truncated)
 
     def update_text(self, text):
@@ -580,7 +682,9 @@ class ProjectWindow(QMainWindow):
         self.bottom_stack.preview_text.insertPlainText(text)
 
     def cleanup_worker(self):
-        logging.debug(f"Starting cleanup_worker, worker: {id(self.worker) if self.worker else None}")
+        logging.debug(
+            f"Starting cleanup_worker, worker: {id(self.worker) if self.worker else None}"
+        )
         try:
             if self.worker:
                 worker_id = id(self.worker)
@@ -589,27 +693,41 @@ class ProjectWindow(QMainWindow):
                     self.worker.stop()
                     self.worker.wait(5000)
                     if self.worker.isRunning():
-                        logging.warning(f"Worker {worker_id} did not stop in time; skipping termination")
+                        logging.warning(
+                            f"Worker {worker_id} did not stop in time; skipping termination"
+                        )
                 try:
                     logging.debug(f"Disconnecting signals for worker {worker_id}")
                     self.worker.data_received.disconnect()
                     self.worker.finished.disconnect()
                     self.worker.token_limit_exceeded.disconnect()
                 except TypeError as e:
-                    logging.debug(f"Signal disconnection error for worker {worker_id}: {e}")
+                    logging.debug(
+                        f"Signal disconnection error for worker {worker_id}: {e}"
+                    )
                 logging.debug(f"Scheduling worker {worker_id} for deletion")
                 self.worker.deleteLater()
                 self.worker = None
         except Exception as e:
             logging.error(f"Error cleaning up LLMWorker: {e}", exc_info=True)
-            QMessageBox.critical(self, _("Thread Error"), _("An error occurred while stopping the LLM thread: {}").format(str(e)))
+            QMessageBox.critical(
+                self,
+                _("Thread Error"),
+                _("An error occurred while stopping the LLM thread: {}").format(str(e)),
+            )
 
     def on_finished(self):
         self.bottom_stack.send_button.setEnabled(True)
         self.bottom_stack.preview_text.setReadOnly(False)
         raw_text = self.bottom_stack.preview_text.toPlainText()
         if not raw_text.strip():
-            QMessageBox.warning(self, _("LLM Response"), _("The LLM did not return any text. Possible token limit reached or an error occurred."))
+            QMessageBox.warning(
+                self,
+                _("LLM Response"),
+                _(
+                    "The LLM did not return any text. Possible token limit reached or an error occurred."
+                ),
+            )
             return
         formatted_text = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", raw_text)
         formatted_text = re.sub(r"\*(.*?)\*", r"<i>\1</i>", formatted_text)
@@ -618,9 +736,11 @@ class ProjectWindow(QMainWindow):
         logging.debug(f"Active threads: {threading.enumerate()}")
 
     def stop_llm(self):
-        logging.debug(f"Starting stop_llm, worker: {id(self.worker) if self.worker else None}")
+        logging.debug(
+            f"Starting stop_llm, worker: {id(self.worker) if self.worker else None}"
+        )
         try:
-            if hasattr(self, 'worker') and self.worker and self.worker.isRunning():
+            if hasattr(self, "worker") and self.worker and self.worker.isRunning():
                 logging.debug("Calling worker.stop()")
                 self.worker.stop()
                 logging.debug("Calling WWApiAggregator.interrupt()")
@@ -631,13 +751,19 @@ class ProjectWindow(QMainWindow):
             self.cleanup_worker()
         except Exception as e:
             logging.error(f"Error in stop_llm: {e}", exc_info=True)
-            QMessageBox.critical(self, _("Error"), _("An error occurred while stopping the LLM: {}").format(str(e)))
+            QMessageBox.critical(
+                self,
+                _("Error"),
+                _("An error occurred while stopping the LLM: {}").format(str(e)),
+            )
 
     def apply_preview(self):
         try:
             preview = self.bottom_stack.preview_text.toHtml().strip()
             if not preview:
-                QMessageBox.warning(self, _("Apply Preview"), _("No preview text to apply."))
+                QMessageBox.warning(
+                    self, _("Apply Preview"), _("No preview text to apply.")
+                )
                 return
             prompt_block = None
             if self.bottom_stack.include_prompt_checkbox.isChecked():
@@ -667,14 +793,20 @@ class ProjectWindow(QMainWindow):
         if filepath:
             self.update_save_status(_("Summary saved successfully"))
             self.model.unsaved_changes = False
-            QMessageBox.information(self, _("Summary"), _("Summary saved successfully."))
+            QMessageBox.information(
+                self, _("Summary"), _("Summary saved successfully.")
+            )
         else:
             QMessageBox.critical(self, _("Summary"), _("Failed to save summary."))
 
     def toggle_bold(self):
         cursor = self.scene_editor.editor.textCursor()
         fmt = QTextCharFormat()
-        fmt.setFontWeight(QFont.Normal if self.scene_editor.editor.fontWeight() == QFont.Bold else QFont.Bold)
+        fmt.setFontWeight(
+            QFont.Normal
+            if self.scene_editor.editor.fontWeight() == QFont.Bold
+            else QFont.Bold
+        )
         cursor.mergeCharFormat(fmt)
         self.scene_editor.editor.mergeCurrentCharFormat(fmt)
 
@@ -736,7 +868,9 @@ class ProjectWindow(QMainWindow):
             fmt = self.scene_editor.editor.currentCharFormat()
             fmt.setFontFamilies([font.family()])
             current_size = self.scene_editor.font_size_combo.currentText()
-            fmt.setFontPointSize(float(current_size) if current_size else font.pointSizeF())
+            fmt.setFontPointSize(
+                float(current_size) if current_size else font.pointSizeF()
+            )
             self.scene_editor.editor.setCurrentCharFormat(fmt)
         else:
             fmt = QTextCharFormat()
@@ -747,21 +881,35 @@ class ProjectWindow(QMainWindow):
         if self.tts_playing:
             WW_TTSManager.stop()
             self.tts_playing = False
-            self.scene_editor.tts_action.setIcon(ThemeManager.get_tinted_icon("assets/icons/play-circle.svg"))
+            self.scene_editor.tts_action.setIcon(
+                ThemeManager.get_tinted_icon("assets/icons/play-circle.svg")
+            )
         else:
             cursor = self.scene_editor.editor.textCursor()
-            text = cursor.selectedText() if cursor.hasSelection() else self.scene_editor.editor.toPlainText()
+            text = (
+                cursor.selectedText()
+                if cursor.hasSelection()
+                else self.scene_editor.editor.toPlainText()
+            )
             start_position = 0 if cursor.hasSelection() else cursor.position()
             if not text.strip():
-                QMessageBox.warning(self, _("TTS Warning"), _("There is no text to read."))
+                QMessageBox.warning(
+                    self, _("TTS Warning"), _("There is no text to read.")
+                )
                 return
             self.tts_playing = True
-            self.scene_editor.tts_action.setIcon(ThemeManager.get_tinted_icon("assets/icons/stop-circle.svg"))
-            WW_TTSManager.speak(text, start_position=start_position, on_complete=self.tts_completed)
+            self.scene_editor.tts_action.setIcon(
+                ThemeManager.get_tinted_icon("assets/icons/stop-circle.svg")
+            )
+            WW_TTSManager.speak(
+                text, start_position=start_position, on_complete=self.tts_completed
+            )
 
     def tts_completed(self):
         self.tts_playing = False
-        self.scene_editor.tts_action.setIcon(ThemeManager.get_tinted_icon("assets/icons/play-circle.svg"))
+        self.scene_editor.tts_action.setIcon(
+            ThemeManager.get_tinted_icon("assets/icons/play-circle.svg")
+        )
 
     def open_focus_mode(self):
         scene_text = self.scene_editor.editor.toPlainText()
@@ -775,7 +923,11 @@ class ProjectWindow(QMainWindow):
 
     def open_analysis_editor(self):
         current_text = self.scene_editor.editor.toPlainText()
-        self.analysis_editor_window = TextAnalysisApp(parent=self, initial_text=current_text, save_callback=self.analysis_save_callback)
+        self.analysis_editor_window = TextAnalysisApp(
+            parent=self,
+            initial_text=current_text,
+            save_callback=self.analysis_save_callback,
+        )
         self.analysis_editor_window.show()
 
     def open_web_llm(self):
@@ -795,7 +947,10 @@ class ProjectWindow(QMainWindow):
         self.manual_save_scene()
 
     def open_compendium(self):
-        self.toggle_compendium_view(not self.side_bar.isVisible() or self.side_bar.currentWidget() != self.compendium_panel)
+        self.toggle_compendium_view(
+            not self.side_bar.isVisible()
+            or self.side_bar.currentWidget() != self.compendium_panel
+        )
 
     def open_prompts_window(self):
         prompts_window = PromptsWindow(self.model.project_name, self)
@@ -821,7 +976,9 @@ class ProjectWindow(QMainWindow):
             self.scene_editor.editor.setTextCursor(cursor)
 
     def update_pov_character_dropdown(self):
-        compendium_path = WWSettingsManager.get_project_path(self.model.project_name, "compendium.json")
+        compendium_path = WWSettingsManager.get_project_path(
+            self.model.project_name, "compendium.json"
+        )
         characters = []
         if os.path.exists(compendium_path):
             try:
@@ -829,7 +986,11 @@ class ProjectWindow(QMainWindow):
                     data = json.load(f)
                 for cat in data.get("categories", []):
                     if cat.get("name", "").lower() == "characters":
-                        characters = [entry.get("name", "").strip() for entry in cat.get("entries", []) if entry.get("name", "").strip()]
+                        characters = [
+                            entry.get("name", "").strip()
+                            for entry in cat.get("entries", [])
+                            if entry.get("name", "").strip()
+                        ]
                         break
             except Exception as e:
                 print(f"Error loading characters from compendium: {e}")
@@ -882,7 +1043,9 @@ class ProjectWindow(QMainWindow):
         self.unsaved_preview = bool(preview_text)
 
     def load_prompt_input(self):
-        prompt_input_file = WWSettingsManager.get_project_path(self.model.project_name, "action-beat.txt")
+        prompt_input_file = WWSettingsManager.get_project_path(
+            self.model.project_name, "action-beat.txt"
+        )
         if os.path.exists(prompt_input_file):
             try:
                 with open(prompt_input_file, "r", encoding="utf-8") as f:
@@ -893,7 +1056,7 @@ class ProjectWindow(QMainWindow):
 
     def on_prompt_input_text_changed(self):
         if self.model.autosave_enabled:
-            if not hasattr(self, 'prompt_input_timer'):
+            if not hasattr(self, "prompt_input_timer"):
                 self.prompt_input_timer = QTimer(self)
                 self.prompt_input_timer.setSingleShot(True)
                 self.prompt_input_timer.timeout.connect(self.save_prompt_input)
@@ -911,12 +1074,14 @@ class ProjectWindow(QMainWindow):
 
     def clear_search_highlights(self):
         """Clear search highlights when switching tools."""
-        if hasattr(self, 'search_panel'):
+        if hasattr(self, "search_panel"):
             self.search_panel.clear_extra_selections()
+
 
 if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication
     import sys
+
     app = QApplication(sys.argv)
     window = ProjectWindow("My Awesome Project", None)
     window.show()
