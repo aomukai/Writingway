@@ -425,15 +425,43 @@ class SceneEditor(QWidget):
 
     def update_tint(self, tint_color):
         self.tint_color = tint_color
-        for name in [
-            "bold","italic","underline",
-            "tts","align_left","align_center","align_right",
-            "manual_save","oh_shit","analysis_editor",
-            "whisper_app","web_llm","ia_window"
-        ]:
-            action = getattr(self, f"{name}_action")
-            path = f"assets/icons/{name.replace('_','-')}.svg"
-            action.setIcon(ThemeManager.get_tinted_icon(path, tint_color))
+        # Update formatting actions
+        formatting_actions = [
+            ("bold", "assets/icons/bold.svg"),
+            ("italic", "assets/icons/italic.svg"),
+            ("underline", "assets/icons/underline.svg")
+        ]
+        for name, path in formatting_actions:
+            action = getattr(self, f"{name}_action", None)
+            if action:
+                action.setIcon(ThemeManager.get_tinted_icon(path, tint_color))
+        
+        # Update TTS action
+        tts_action = getattr(self, "tts_action", None)
+        if tts_action:
+            tts_action.setIcon(ThemeManager.get_tinted_icon("assets/icons/play-circle.svg", tint_color))
+        
+        # Update alignment actions
+        alignment_actions = [
+            ("align_left", "assets/icons/align-left.svg"),
+            ("align_center", "assets/icons/align-center.svg"),
+            ("align_right", "assets/icons/align-right.svg")
+        ]
+        for name, path in alignment_actions:
+            action = getattr(self, f"{name}_action", None)
+            if action:
+                action.setIcon(ThemeManager.get_tinted_icon(path, tint_color))
+        
+        # Update scene-specific actions
+        scene_actions = [
+            ("manual_save", "assets/icons/save.svg"),
+            ("oh_shit", "assets/icons/share.svg"),
+            ("analysis_editor", "assets/icons/feather.svg")
+        ]
+        for name, path in scene_actions:
+            action = getattr(self, f"{name}_action", None)
+            if action:
+                action.setIcon(ThemeManager.get_tinted_icon(path, tint_color))
             
     def open_find_dialog(self):
         if self.find_dialog is None:

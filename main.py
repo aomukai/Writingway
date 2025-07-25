@@ -52,6 +52,9 @@ def writingway_preload_settings(app):
     theme = WWSettingsManager.get_appearance_settings()["theme"]
     try:
         ThemeManager.apply_to_app(theme)
+        # Connect to theme change signal to update all windows
+        theme_manager = ThemeManager()  # Get the singleton instance
+        theme_manager.themeChanged.connect(on_theme_changed)
     except Exception as e:
         print("Error applying theme:", e)
     
@@ -60,6 +63,12 @@ def writingway_preload_settings(app):
         font = app.font()
         font.setPointSize(fontsize)
         app.setFont(font)
+
+def on_theme_changed(theme_name):
+    """Callback when theme changes to refresh all project windows."""
+    # This will be called when any project window changes the theme
+    # The theme manager will emit this signal and all windows should refresh
+    pass
 
 def main():
     app = QApplication(sys.argv)

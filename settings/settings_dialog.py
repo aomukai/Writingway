@@ -412,6 +412,7 @@ class SettingsDialog(QDialog):
         """Change the theme based on the selected theme in the combobox."""
         theme_name = self.theme_combobox.itemText(index)
         ThemeManager.apply_to_app(theme_name)
+        self.settings_saved.emit()
 
     def update_font_size(self, value):
         """Update the font size for all text UI objects except the TextEdit contents."""
