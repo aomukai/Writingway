@@ -1,0 +1,149 @@
+# Build a onedir OSX release using pyinstaller
+
+name: Create OSX arm64 release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    # Install macports to get portaudio
+    - name: Setup MacPorts (macOS)
+      id: setup-macports
+      uses: melusina-org/setup-macports@v1
+      with:
+        # Specify packages to install
+        parameters: '.github/parameters/setup-macports-arm64.yaml'
+      # Allow the workflow to continue even if this fails
+      continue-on-error: true  
+
+    - name: Display MacPorts build log on failure
+      if: steps.setup-macports.outcome == 'failure'
+      run: |
+        echo "=== MacPorts build log ==="
+        cat $(port logfile portaudio)
+        exit 1
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: '.python-version'
+
+    - name: Install Python dependencies using pip
+      run: |
+        # Install requirements using pip
+        # Add macports includes
+        export CPPFLAGS="-I/opt/local/include"
+        export LDFLAGS="-L/opt/local/lib"
+
+        # universal2 build of portaudio is broken
+        # See: https://trac.macports.org/ticket/71481
+        # See: https://github.com/PortAudio/portaudio/issues/994
+        # export ARCHFLAGS="-arch arm64 -arch x86_64" # Enable universal builds
+        export ARCHFLAGS="-arch arm64"
+
+        pip install -r requirements.txt
+      working-directory: ./
+
+    - name: Install spaCy English model
+      run: |
+        python -m spacy download en_core_web_sm
+      working-directory: ./
+
+    - name: install beautifulsoup4
+      run: |
+        python -m pip install beautifulsoup4
+      working-directory: ./  
+  
+    - name: Install PyInstaller
+      run: |
+        pip install pyinstaller
+      working-directory: ./    
+
+    - name: Build executable using pyinstaller
+      run: |
+        TARGET_ARCH=arm64 pyinstaller pyinstaller/Writingway_osx.spec
+      working-directory: ./
+
+      # Create Artifact associated with this run that can be downloaded later
+      #- name: Create Artifact
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: macos-arm64
+      #    path: dist/
+
+      # Determine release information
+    - name: Set release info
+      id: release_info
+      run: |
+        # Release instructions to add the body of the github release
+        RELEASE_INSTRUCTIONS=$(cat .github/assets/release-instructions.md)
+
+        if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+          # Tag-triggered release
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "release_name=${TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "prerelease=false" >> $GITHUB_OUTPUT
+          
+          # Use multiline format for body output
+          {
+            echo "body<<EOF"
+            echo "Release ${TAG_NAME}"
+            echo ""
+            cat .github/assets/release-instructions.md
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+        else
+          # Manual/snapshot release
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          DATE=$(date +'%Y%m%d-%H%M%S')
+          SHORT_SHA=${GITHUB_SHA:0:7}
+          SNAPSHOT_TAG="snapshot-${BRANCH_NAME}-${DATE}-${SHORT_SHA}"
+          
+          echo "release_name=Snapshot ${BRANCH_NAME} (${DATE})" >> $GITHUB_OUTPUT
+          echo "tag_name=${SNAPSHOT_TAG}" >> $GITHUB_OUTPUT
+          echo "prerelease=true" >> $GITHUB_OUTPUT
+          
+          # Use multiline format for body output
+          {
+            echo "body<<EOF"
+            echo "Snapshot build from branch \`${BRANCH_NAME}\` at commit ${GITHUB_SHA}"
+            echo ""
+            cat .github/assets/release-instructions.md
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+        fi
+
+    # Create ZIP archive of the build
+    - name: Create release archive
+      run: |
+        cd dist
+        zip -r ../macos-arm64.zip .
+        cd ..
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.release_info.outputs.tag_name }}
+        name: ${{ steps.release_info.outputs.release_name }}
+        body: ${{ steps.release_info.outputs.body }}
+        prerelease: ${{ steps.release_info.outputs.prerelease }}
+        files: |
+          macos-arm64.zip
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: List files in dist folder
+      run: ls -R ./dist/
