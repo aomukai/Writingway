@@ -28,3 +28,7 @@ Projects/
 .DS_Store
 Thumbs.db
 *.bak"
+
+# Ignore pyinstaller directories
+build
+dist
