@@ -8,7 +8,8 @@ import threading
 
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QSplitter, QLabel, QShortcut, 
                              QMessageBox, QInputDialog, QApplication, QDialog,
-                             QTreeWidgetItem, QTextEdit, QStackedWidget, QHBoxLayout)
+                             QTreeWidgetItem, QTextEdit, QStackedWidget, QHBoxLayout,
+                             QVBoxLayout, QFormLayout, QPushButton, QLineEdit)
 from PyQt5.QtCore import Qt, QTimer, QSettings, pyqtSlot
 from PyQt5.QtGui import QColor, QTextCharFormat, QFont, QTextCursor, QKeySequence
 from .project_model import ProjectModel
@@ -51,6 +52,46 @@ for path in possible_paths:
         break
 if plugin_path:
     os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = plugin_path
+
+class CustomPOVDialog(QDialog):
+    """Dialog for entering a custom POV character name and description."""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(_("Custom POV Character"))
+        self.setModal(True)
+        layout = QVBoxLayout(self)
+        
+        form_layout = QFormLayout()
+        form_layout.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
+        self.name_input = QLineEdit()
+        self.name_input.setPlaceholderText(_("Enter character name"))
+        form_layout.addRow(_("Name:"), self.name_input)
+        
+        self.description_input = QTextEdit()
+        self.description_input.setPlaceholderText(_("(Optional) Enter details for new compendium entry..."))
+        self.description_input.setMinimumHeight(100)
+        form_layout.addRow(_("Description:"), self.description_input)
+        
+        layout.addLayout(form_layout)
+        
+        buttons = QHBoxLayout()
+        self.ok_button = QPushButton(_("OK"))
+        self.cancel_button = QPushButton(_("Cancel"))
+        buttons.addWidget(self.ok_button)
+        buttons.addWidget(self.cancel_button)
+        layout.addLayout(buttons)
+        
+        self.ok_button.clicked.connect(self.ok_button_pressed)
+        self.cancel_button.clicked.connect(self.reject)
+        
+    def ok_button_pressed(self):
+        if not self.name_input.text().strip():
+            QMessageBox.warning(self, _("Custom POV Character"), _("Character name cannot be empty."))
+            return
+        self.accept()
+
+    def get_data(self):
+        return self.name_input.text().strip(), self.description_input.toPlainText().strip()
 
 class ProjectWindow(QMainWindow):
     def __init__(self, project_name, compendium_window):
@@ -225,6 +266,84 @@ class ProjectWindow(QMainWindow):
         self.focus_mode_shortcut.activated.connect(self.open_focus_mode)
         self.bottom_stack.summary_controller.progress_updated.connect(self.bottom_stack._update_progress)
 
+    def handle_pov_character_change(self, index=0):
+        value = self.bottom_stack.pov_character_combo.currentText()
+        if value == _("Custom..."):
+            dialog = CustomPOVDialog(self)
+            if dialog.exec_() == QDialog.Accepted:
+                name, description = dialog.get_data()
+
+                # Add to compendium triggers a signal that updates the contents of this combo box
+                # unless the user tried to enter a name that already exists.
+                self.model.settings["global_pov_character"] = name
+                self.add_character_to_compendium(name, description)
+                # No need to update dropdown - compendium update took care of it
+            else:
+                # Revert to previous selection if canceled
+                combo = self.bottom_stack.pov_character_combo
+                pov_index = combo.findText(self.model.settings["global_pov_character"])
+                combo.blockSignals(True)
+                combo.setCurrentIndex(pov_index)
+                combo.blockSignals(False)
+                return
+        else:
+            self.model.settings["global_pov_character"] = value
+            self.model.save_settings()
+        self.update_setting_tooltips()
+
+    def add_character_to_compendium(self, name, description):
+        """Add a new character to the compendium.json file."""
+        compendium_path = WWSettingsManager.get_project_path(self.model.project_name, "compendium.json")
+        compendium_data = {"categories": []}
+        if os.path.exists(compendium_path):
+            try:
+                with open(compendium_path, "r", encoding="utf-8") as f:
+                    compendium_data = json.load(f)
+            except Exception as e:
+                print(f"Error loading compendium: {e}")
+        
+        # Find or create Characters category
+        characters_cat = None
+        for cat in compendium_data.get("categories", []):
+            if cat.get("name", "").lower() == "characters":
+                characters_cat = cat
+                break
+        if not characters_cat:
+            characters_cat = {"name": "Characters", "entries": []}
+            compendium_data["categories"].append(characters_cat)
+        
+        # Check if character already exists
+        for entry in characters_cat.get("entries", []):
+            if entry.get("name") == name:
+                entry["content"] = description
+                break
+        else:
+            # Add new character entry
+            characters_cat["entries"].append({"name": name, "content": description})
+        
+        # Ensure extensions section exists
+        if "extensions" not in compendium_data:
+            compendium_data["extensions"] = {"entries": {}}
+        elif "entries" not in compendium_data["extensions"]:
+            compendium_data["extensions"]["entries"] = {}
+        
+        # Add minimal extended data
+        if name not in compendium_data["extensions"]["entries"]:
+            compendium_data["extensions"]["entries"][name] = {"details": "", "tags": [], "relationships": [], "images": []}
+        
+        # Save compendium
+        try:
+            with open(compendium_path, "w", encoding="utf-8") as f:
+                json.dump(compendium_data, f, indent=2)
+            # Update the compendium panel
+            self.compendium_panel.populate_compendium()
+            # Notify EnhancedCompendiumWindow
+            self.enhanced_window.populate_compendium()
+            self.enhanced_window.compendium_updated.emit(self.model.project_name)
+        except Exception as e:
+            print(f"Error saving compendium: {e}")
+            QMessageBox.warning(self, _("Error"), _("Failed to save compendium: {}").format(str(e)))
+
     def load_scene_from_hierarchy(self, hierarchy):
         if len(hierarchy) < 3:
             return
@@ -235,18 +354,21 @@ class ProjectWindow(QMainWindow):
 
     def on_compendium_updated(self, project_name):
         if project_name == self.model.project_name:
-            current_pov = self.bottom_stack.pov_character_combo.currentText() if self.bottom_stack.pov_character_combo else ""
+            if not self.bottom_stack.pov_character_combo:
+                return
+            current_pov = self.model.settings["global_pov_character"]
+            current_index = self.bottom_stack.pov_character_combo.currentIndex()
             self.update_pov_character_dropdown()
-            if self.bottom_stack.pov_character_combo:
-                self.restore_pov_character(current_pov)
-                if self.bottom_stack.pov_character_combo.currentText() != current_pov:
-                    self.handle_pov_character_change()
+            self.restore_pov_character(current_pov, current_index)
+            if self.bottom_stack.pov_character_combo.currentText() != current_pov:
+                self.handle_pov_character_change()
 
     def load_initial_state(self):
-        self.bottom_stack.pov_combo.setCurrentText(self.model.settings["global_pov"])
-        self.bottom_stack.pov_character_combo.setCurrentText(self.model.settings["global_pov_character"])
-        self.bottom_stack.tense_combo.setCurrentText(self.model.settings["global_tense"])
+        current_pov = self.model.settings["global_pov_character"]
         self.update_pov_character_dropdown()
+        self.bottom_stack.pov_character_combo.setCurrentText(current_pov)
+        self.bottom_stack.pov_combo.setCurrentText(self.model.settings["global_pov"])
+        self.bottom_stack.tense_combo.setCurrentText(self.model.settings["global_tense"])
         self.bottom_stack.prompt_input.setPlainText(self.load_prompt_input())
         if self.model.autosave_enabled:
             self.start_autosave_timer()
@@ -329,6 +451,8 @@ class ProjectWindow(QMainWindow):
                 editor.setHtml(content)
             elif content:
                 editor.setPlainText(content)
+            else:
+                editor.clear()
             editor.setPlaceholderText(_("Enter scene content..."))
             self.bottom_stack.stack.setCurrentIndex(1)
         else:
@@ -461,32 +585,6 @@ class ProjectWindow(QMainWindow):
                 combo.blockSignals(False)
                 return
         self.model.settings["global_pov"] = value
-        self.update_setting_tooltips()
-        self.model.save_settings()
-
-    def handle_pov_character_change(self, index=0):
-        value = self.bottom_stack.pov_character_combo.currentText()
-        if value == _("Custom..."):
-            custom, ok = QInputDialog.getText(self, _("Custom POV Character"), _("Enter custom POV Character:"), text=self.model.settings["global_pov_character"])
-            if ok and custom.strip():
-                value = custom.strip()
-                combo = self.bottom_stack.pov_character_combo
-                if combo.findText(value) == -1:
-                    combo.blockSignals(True)
-                    combo.insertItem(0, value)
-                    combo.setCurrentText(value)
-                    combo.blockSignals(False)
-                else:
-                    combo.blockSignals(True)
-                    combo.setCurrentText(value)
-                    combo.blockSignals(False)
-            else:
-                combo = self.bottom_stack.pov_character_combo
-                combo.blockSignals(True)
-                combo.setCurrentText(self.model.settings["global_pov_character"])
-                combo.blockSignals(False)
-                return
-        self.model.settings["global_pov_character"] = value
         self.update_setting_tooltips()
         self.model.save_settings()
 
@@ -833,10 +931,10 @@ class ProjectWindow(QMainWindow):
         characters.append(_("Custom..."))
         self.bottom_stack.pov_character_combo.blockSignals(True)
         self.bottom_stack.pov_character_combo.clear()
-        self.bottom_stack.pov_character_combo.blockSignals(False)
         self.bottom_stack.pov_character_combo.addItems(characters)
+        self.bottom_stack.pov_character_combo.blockSignals(False)
 
-    def restore_pov_character(self, previous_pov):
+    def restore_pov_character(self, previous_pov, previous_index):
         combo = self.bottom_stack.pov_character_combo
         index = combo.findText(previous_pov)
         if index >= 0:
@@ -844,11 +942,10 @@ class ProjectWindow(QMainWindow):
         else:
             if combo.count() == 2 and combo.itemText(0) != _("Custom..."):
                 combo.setCurrentIndex(0)
-            elif combo.count() > 2:
-                placeholder = _("-- Select Character --")
-                if combo.findText(placeholder) == -1:
-                    combo.insertItem(0, placeholder)
-                combo.setCurrentIndex(0)
+            elif combo.count() > previous_index: # possibly renamed character
+                combo.blockSignals(True)
+                combo.setCurrentIndex(previous_index)
+                combo.blockSignals(False)
             else:
                 combo.setCurrentIndex(combo.findText(_("Custom...")))
 
@@ -868,7 +965,6 @@ class ProjectWindow(QMainWindow):
 
     def change_theme(self, new_theme):
         self.current_theme = new_theme
-        # Apply theme to this window only, don't emit global signal to avoid recursion
         stylesheet = ThemeManager.get_stylesheet(new_theme)
         self.setStyleSheet(stylesheet)
         ThemeManager.clear_icon_cache()

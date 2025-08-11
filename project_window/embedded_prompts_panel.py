@@ -385,13 +385,16 @@ class EmbeddedPromptsPanel(QWidget):
                 if action == replicate_action:
                     self.replicate_prompt()
                 return
+            replicate_action = menu.addAction(_("Replicate"))
             rename_action = menu.addAction(_("Rename"))
             move_up_action = menu.addAction(_("Move Up"))
             move_down_action = menu.addAction(_("Move Down"))
             delete_action = menu.addAction(_("Delete"))
             save_action = menu.addAction(_("Save"))
             action = menu.exec_(self.tree.viewport().mapToGlobal(pos))
-            if action == rename_action:
+            if action == replicate_action:
+                self.replicate_prompt()
+            elif action == rename_action:
                 self.rename_prompt(item)
             elif action == move_up_action:
                 self.move_prompt(item, up=True)
@@ -543,7 +546,7 @@ class EmbeddedPromptsPanel(QWidget):
         if not current_item:
             return
         data = current_item.data(0, Qt.UserRole)
-        if not data or not data.get("default", False):
+        if not data:
             return
         new_name, ok = QInputDialog.getText(
             self, _("Replicate Prompt"),
@@ -565,7 +568,7 @@ class EmbeddedPromptsPanel(QWidget):
             parent_item.setExpanded(True)
             self.tree.setCurrentItem(new_child)
             self.on_item_clicked(new_child, 0)
-            QMessageBox.information(self, _("Replicated"), _("Prompt replicated. You can now edit the new prompt."))
+            QMessageBox.information(self, _("Replicated"), _("Prompt replicated. Save the new prompt after you edit it."))
 
     def show_provider_info(self):
         dialog = ProviderInfoDialog(self)
