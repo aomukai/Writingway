@@ -168,13 +168,22 @@ class OpenAIProvider(LLMProviderBase):
         return True
     
     def get_llm_instance(self, overrides) -> BaseChatModel:
-        if not self.llm_instance:
+        # Check if we need to create a new instance based on overrides
+        model = overrides.get("model", self.get_current_model())
+        temperature = overrides.get("temperature", self.config.get("temperature", DEFAULT_TEMPERATURE))
+        max_tokens = overrides.get("max_tokens", self.config.get("max_tokens", DEFAULT_MAX_TOKENS))
+        
+        # Create a new instance if model, temperature, or max_tokens have changed
+        if (not self.llm_instance or
+            getattr(self.llm_instance, 'model_name', None) != model or
+            getattr(self.llm_instance, 'temperature', None) != temperature or
+            getattr(self.llm_instance, 'max_tokens', None) != max_tokens):
             self.llm_instance = ChatOpenAI(
                 openai_api_key=overrides.get("api_key", self.get_api_key()),
                 openai_api_base=overrides.get("endpoint", self.get_base_url()),
-                model=overrides.get("model", self.get_current_model()),
-                temperature=self.config.get("temperature", DEFAULT_TEMPERATURE),
-                max_tokens=self.config.get("max_tokens", DEFAULT_MAX_TOKENS),
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
                 request_timeout=self.get_timeout(overrides)
             )
         return self.llm_instance
@@ -228,13 +237,22 @@ class AnthropicProvider(LLMProviderBase):
         return True
 
     def get_llm_instance(self, overrides) -> BaseChatModel:
-        if not self.llm_instance:
+        # Check if we need to create a new instance based on overrides
+        model = overrides.get("model", self.get_current_model() or "claude-3-haiku-20240307")
+        temperature = overrides.get("temperature", self.config.get("temperature", DEFAULT_TEMPERATURE))
+        max_tokens = overrides.get("max_tokens", self.config.get("max_tokens", DEFAULT_MAX_TOKENS))
+        
+        # Create a new instance if model, temperature, or max_tokens have changed
+        if (not self.llm_instance or
+            getattr(self.llm_instance, 'model', None) != model or
+            getattr(self.llm_instance, 'temperature', None) != temperature or
+            getattr(self.llm_instance, 'max_tokens', None) != max_tokens):
             self.llm_instance = ChatAnthropic(
                 anthropic_api_key=overrides.get("api_key", self.get_api_key()),
                 base_url=overrides.get("endpoint", None),
-                model=overrides.get("model", self.get_current_model() or "claude-3-haiku-20240307"),
-                temperature=self.config.get("temperature", DEFAULT_TEMPERATURE),
-                max_tokens=self.config.get("max_tokens", DEFAULT_MAX_TOKENS),
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
                 timeout=self.get_timeout(overrides)
             )
         return self.llm_instance
@@ -277,12 +295,21 @@ class GeminiProvider(LLMProviderBase):
         return True
     
     def get_llm_instance(self, overrides) -> BaseChatModel:
-        if not self.llm_instance:
+        # Check if we need to create a new instance based on overrides
+        model = overrides.get("model", self.get_current_model() or "gemini-2.0-flash")
+        temperature = overrides.get("temperature", self.config.get("temperature", DEFAULT_TEMPERATURE))
+        max_output_tokens = overrides.get("max_tokens", self.config.get("max_tokens", DEFAULT_MAX_TOKENS))
+        
+        # Create a new instance if model, temperature, or max_output_tokens have changed
+        if (not self.llm_instance or
+            getattr(self.llm_instance, 'model', None) != model or
+            getattr(self.llm_instance, 'temperature', None) != temperature or
+            getattr(self.llm_instance, 'max_output_tokens', None) != max_output_tokens):
             self.llm_instance = ChatGoogleGenerativeAI(
                 google_api_key=overrides.get("api_key", self.get_api_key()),
-                model=overrides.get("model", self.get_current_model() or "gemini-2.0-flash"),
-                temperature=overrides.get("temperature", self.config.get("temperature", DEFAULT_TEMPERATURE)),
-                max_output_tokens=overrides.get("max_tokens", self.config.get("max_tokens", DEFAULT_MAX_TOKENS)),
+                model=model,
+                temperature=temperature,
+                max_output_tokens=max_output_tokens,
                 timeout=self.get_timeout(overrides)
             )
         return self.llm_instance
@@ -343,13 +370,19 @@ class OllamaProvider(LLMProviderBase):
         return "http://localhost:11434/v1/"
     
     def get_llm_instance(self, overrides) -> LLM:
-        if not self.llm_instance:
-            mymodel = overrides.get("model", self.get_current_model())
-            if mymodel[0:5] in ["", "Local"]:
-                mymodel = self.get_current_model()
+        # Check if we need to create a new instance based on overrides
+        mymodel = overrides.get("model", self.get_current_model())
+        if mymodel[0:5] in ["", "Local"]:
+            mymodel = self.get_current_model()
+        temperature = overrides.get("temperature", self.config.get("temperature", DEFAULT_TEMPERATURE))
+        
+        # Create a new instance if model or temperature have changed
+        if (not self.llm_instance or
+            getattr(self.llm_instance, 'model', None) != mymodel or
+            getattr(self.llm_instance, 'temperature', None) != temperature):
             self.llm_instance = ChatOllama(
                 model=mymodel,
-                temperature=self.config.get("temperature", DEFAULT_TEMPERATURE),
+                temperature=temperature,
                 timeout=self.get_timeout(overrides)
             )
         return self.llm_instance
@@ -395,13 +428,22 @@ class OpenRouterProvider(LLMProviderBase):
         return True
     
     def get_llm_instance(self, overrides) -> BaseChatModel:
-        if not self.llm_instance:
+        # Check if we need to create a new instance based on overrides
+        model = overrides.get("model", self.get_current_model())
+        temperature = overrides.get("temperature", self.config.get("temperature", DEFAULT_TEMPERATURE))
+        max_tokens = overrides.get("max_tokens", self.config.get("max_tokens", DEFAULT_MAX_TOKENS))
+        
+        # Create a new instance if model, temperature, or max_tokens have changed
+        if (not self.llm_instance or
+            getattr(self.llm_instance, 'model_name', None) != model or
+            getattr(self.llm_instance, 'temperature', None) != temperature or
+            getattr(self.llm_instance, 'max_tokens', None) != max_tokens):
             self.llm_instance = ChatOpenAI(
                 openai_api_key=overrides.get("api_key", self.get_api_key()),
                 base_url=overrides.get("endpoint", self.get_base_url()),
-                model=overrides.get("model", self.get_current_model()),
-                temperature=overrides.get("temperature", self.config.get("temperature", DEFAULT_TEMPERATURE)),
-                max_tokens=overrides.get("max_tokens", self.config.get("max_tokens", DEFAULT_MAX_TOKENS)),
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
                 request_timeout=self.get_timeout(overrides)
             )
         return self.llm_instance
@@ -452,13 +494,22 @@ class TogetherAIProvider(LLMProviderBase):
         return True
     
     def get_llm_instance(self, overrides) -> BaseChatModel:
-        if not self.llm_instance:
+        # Check if we need to create a new instance based on overrides
+        model = overrides.get("model", self.get_current_model())
+        temperature = overrides.get("temperature", self.config.get("temperature", DEFAULT_TEMPERATURE))
+        max_tokens = overrides.get("max_tokens", self.config.get("max_tokens", DEFAULT_MAX_TOKENS))
+        
+        # Create a new instance if model, temperature, or max_tokens have changed
+        if (not self.llm_instance or
+            getattr(self.llm_instance, 'model', None) != model or
+            getattr(self.llm_instance, 'temperature', None) != temperature or
+            getattr(self.llm_instance, 'max_tokens', None) != max_tokens):
             self.llm_instance = ChatTogether(
                 together_api_key=overrides.get("api_key", self.get_api_key()),
                 base_url=overrides.get("endpoint", self.get_base_url()),
-                model=overrides.get("model", self.get_current_model()),
-                temperature=self.config.get("temperature", DEFAULT_TEMPERATURE),
-                max_tokens=self.config.get("max_tokens", DEFAULT_MAX_TOKENS),
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
             )
         return self.llm_instance
 
@@ -521,13 +572,22 @@ class LMStudioProvider(LLMProviderBase):
         return "http://localhost:1234/v1"
 
     def get_llm_instance(self, overrides) -> BaseChatModel:
-        if not self.llm_instance:
+        # Check if we need to create a new instance based on overrides
+        model_name = overrides.get("model", self.get_current_model() or "local-model")
+        temperature = overrides.get("temperature", self.config.get("temperature", DEFAULT_TEMPERATURE))
+        max_tokens = overrides.get("max_tokens", self.config.get("max_tokens", DEFAULT_MAX_TOKENS))
+        
+        # Create a new instance if model_name, temperature, or max_tokens have changed
+        if (not self.llm_instance or
+            getattr(self.llm_instance, 'model_name', None) != model_name or
+            getattr(self.llm_instance, 'temperature', None) != temperature or
+            getattr(self.llm_instance, 'max_tokens', None) != max_tokens):
             self.llm_instance = ChatOpenAI(
                 api_key="not-needed",
                 base_url=overrides.get("endpoint", self.get_base_url()),
-                model_name=overrides.get("model", self.get_current_model() or "local-model"),
-                temperature=self.config.get("temperature", DEFAULT_TEMPERATURE),
-                max_tokens=self.config.get("max_tokens", DEFAULT_MAX_TOKENS),
+                model_name=model_name,
+                temperature=temperature,
+                max_tokens=max_tokens,
                 request_timeout=self.get_timeout(overrides)
             )
         return self.llm_instance
@@ -547,16 +607,25 @@ class CustomProvider(LLMProviderBase):
         return super().get_api_key() or "not-needed"
     
     def get_llm_instance(self, overrides) -> BaseChatModel:
-        if not self.llm_instance:
-            self.config["endpoint"] = overrides.get("endpoint", self.get_base_url())
-            self.config["api_key"] = overrides.get("api_key", self.get_api_key())
-            self.config["model"] = overrides.get("model", self.get_current_model())
+        # Check if we need to create a new instance based on overrides
+        self.config["endpoint"] = overrides.get("endpoint", self.get_base_url())
+        self.config["api_key"] = overrides.get("api_key", self.get_api_key())
+        self.config["model"] = overrides.get("model", self.get_current_model())
+        model_name = self.get_current_model() or "custom-model"
+        temperature = overrides.get("temperature", self.config.get("temperature", DEFAULT_TEMPERATURE))
+        max_tokens = overrides.get("max_tokens", self.config.get("max_tokens", DEFAULT_MAX_TOKENS))
+        
+        # Create a new instance if model_name, temperature, or max_tokens have changed
+        if (not self.llm_instance or
+            getattr(self.llm_instance, 'model_name', None) != model_name or
+            getattr(self.llm_instance, 'temperature', None) != temperature or
+            getattr(self.llm_instance, 'max_tokens', None) != max_tokens):
             self.llm_instance = ChatOpenAI(
                 base_url=self.get_base_url(),
                 api_key=self.get_api_key(),
-                model_name=self.get_current_model() or "custom-model",
-                temperature=self.config.get("temperature", DEFAULT_TEMPERATURE),
-                max_tokens=self.config.get("max_tokens", DEFAULT_MAX_TOKENS),
+                model_name=model_name,
+                temperature=temperature,
+                max_tokens=max_tokens,
                 request_timeout=self.get_timeout(overrides)
             )
         return self.llm_instance
@@ -640,7 +709,8 @@ class LLMAPIAggregator:
         provider_name = overrides.get("provider") or WWSettingsManager.get_active_llm_name()
         if provider_name in ["Local", "Default"]:
             provider_name = WWSettingsManager.get_active_llm_name()
-            overrides = {}
+            # Only remove the provider from overrides, keep other settings like model
+            overrides = {k: v for k, v in overrides.items() if k != "provider"}
         if not provider_name:
             raise ValueError("No active LLM provider specified")
         
@@ -685,7 +755,8 @@ class LLMAPIAggregator:
         provider_name = overrides.get("provider") or WWSettingsManager.get_active_llm_name()
         if provider_name in ["Local", "Default"]:
             provider_name = WWSettingsManager.get_active_llm_name()
-            overrides = {}
+            # Only remove the provider from overrides, keep other settings like model
+            overrides = {k: v for k, v in overrides.items() if k != "provider"}
         if not provider_name:
             raise ValueError("No active LLM provider specified")
         

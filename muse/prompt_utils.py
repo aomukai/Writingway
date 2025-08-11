@@ -4,7 +4,7 @@ import os
 from settings.settings_manager import WWSettingsManager
 
 def get_prompt_categories():
-    return ["Workshop", "Summary", "Prose", "Rewrite"]
+    return ["Workshop", "Summary", "Prose", "Rewrite", "Judge"]
 
 def get_workshop_prompts(): # backward compatibility for workshop
     """
@@ -40,6 +40,7 @@ def get_default_prompt(style:str):
         "Summary": _("Summarize the following chapter for use in a story prompt, covering Goal, Key Events, Character Dev, Info Revealed, Emotional Arc, and Plot Setup. Be conscientious of token usage."),
         "Rewrite": _("Rewrite the passage for clarity."),
         "Workshop": _("I need your help with my project. Please provide creative brainstorming and ideas."),
+        "Judge": _("Rank and evaluate the following responses. Provide a brief explanation for your ranking and highlight the strengths and weaknesses of each response."),
     }
     default_config = {
         "name": _("Default {} Prompt").format(style),

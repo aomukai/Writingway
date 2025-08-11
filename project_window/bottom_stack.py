@@ -160,6 +160,12 @@ class BottomStack(QWidget):
         self.context_toggle_button.setCheckable(True)
         self.context_toggle_button.clicked.connect(self.toggle_context_panel)
         buttons_layout.addWidget(self.context_toggle_button)
+        
+        # Add Wizard button for Brainstorm Mode
+        self.wizard_button = QPushButton(_("Wizard"))
+        self.wizard_button.setToolTip(_("Open Brainstorm Mode"))
+        self.wizard_button.clicked.connect(self.open_brainstorm_mode)
+        buttons_layout.addWidget(self.wizard_button)
 
         buttons_layout.addStretch()
         pulldown_widget = QWidget()
@@ -243,9 +249,23 @@ class BottomStack(QWidget):
         
         dialog = PromptPreviewDialog(
             self.controller,
-            prompt_config=prompt_config, 
-            user_input=action_beats, 
-            additional_vars=additional_vars, 
-            current_scene_text=current_scene_text, 
+            prompt_config=prompt_config,
+            user_input=action_beats,
+            additional_vars=additional_vars,
+            current_scene_text=current_scene_text,
             extra_context=extra_context)
+        dialog.exec_()
+        
+    def open_brainstorm_mode(self):
+        """Open the Brainstorm Mode dialog."""
+        action_beats = self.prompt_input.toPlainText().strip()
+        if not action_beats:
+            # Show a warning message
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.warning(self.controller, _("Brainstorm Mode"), _("Please enter some action beats before opening Brainstorm Mode."))
+            return
+        
+        # Import here to avoid circular imports
+        from muse.brainstorm_dialog import BrainstormModeDialog
+        dialog = BrainstormModeDialog(action_beats, self.controller)
         dialog.exec_()
