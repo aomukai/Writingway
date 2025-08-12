@@ -162,7 +162,8 @@ class BottomStack(QWidget):
         buttons_layout.addWidget(self.context_toggle_button)
         
         # Add Wizard button for Brainstorm Mode
-        self.wizard_button = QPushButton(_("Wizard"))
+        self.wizard_button = QPushButton()
+        self.wizard_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/brainstorm-wizard.svg", self.tint_color))
         self.wizard_button.setToolTip(_("Open Brainstorm Mode"))
         self.wizard_button.clicked.connect(self.open_brainstorm_mode)
         buttons_layout.addWidget(self.wizard_button)
@@ -212,6 +213,7 @@ class BottomStack(QWidget):
         self.summary_preview_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/eye.svg", tint_color))
         self.summary_start_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/play-circle.svg", tint_color))
         self.delete_summary_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/trash.svg", tint_color))
+        self.wizard_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/brainstorm-wizard.svg", tint_color))
         if self.pov_combo:
             self.pov_combo.setToolTip(_("POV: {}").format(self.model.settings.get('global_pov', 'Third Person')))
         if self.pov_character_combo:
