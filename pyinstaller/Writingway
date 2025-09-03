@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Get the directory of this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Set additional required environment variables
+export KMP_DUPLICATE_LIB_OK=TRUE
+
+echo "Starting Writingway from $SCRIPT_DIR. This can take a while..."
+echo ""
+echo "Notes:"
+echo "- If you close this window Writingway will exit immediately"
+echo "- Your projects are saved in $SCRIPT_DIR/Projects"
+echo ""
+
+# Set the working directory so assets and configuration can be found.
+cd "$SCRIPT_DIR" || exit 1
+
+# Start the Writingway application
+./main
+
