@@ -1,3 +1,4 @@
+from typing import Dict, List
 from PyQt5.QtWidgets import QFormLayout, QGroupBox, QComboBox
 from PyQt5.QtCore import QFileSystemWatcher
 
@@ -6,10 +7,11 @@ from settings.llm_api_aggregator import WWApiAggregator
 from settings.settings_manager import WWSettingsManager
 
 class PromptPanel(QGroupBox):
-    def __init__(self, prompt_style:str, parent=None):
+    def __init__(self, prompt_style: str, parent=None):
         super().__init__(parent)
         self.prompt_style = prompt_style
         self.prompt = None
+        self.prompts: List[Dict] = []
         self._load_prompts()
         self.init_ui()
 
@@ -21,7 +23,7 @@ class PromptPanel(QGroupBox):
 
 
     def init_ui(self):
-         # LLM Settings Group
+        # LLM Settings Group
         llm_settings_layout = QFormLayout()
         llm_settings_layout.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
         llm_settings_layout.setContentsMargins(0, 0, 0, 0)
@@ -48,7 +50,21 @@ class PromptPanel(QGroupBox):
         
         self._on_provider_combo_changed()
     
-    def repopulate_prompts(self):
+    def set_category(self, category: str) -> None:
+        """Switch the prompt category, reload prompts, and update the prompt combo box."""
+        self.prompt_style = category
+        current_prompt = self.prompt_combo.currentText()
+        self.prompt = None  # Reset selected prompt
+        self._load_prompts()
+        self.prompt_combo.setToolTip(_("Select a {} Prompt").format(self.prompt_style))
+        self._populate_prompt_combo()
+        # Try to reselect the same prompt if it exists in the new category
+        if current_prompt in [prompt["name"] for prompt in self.prompts]:
+            self.prompt_combo.setCurrentText(current_prompt)
+        else:
+            self._on_prompt_combo_changed()  # Trigger to update provider/model
+
+    def repopulate_prompts(self) -> None:
         """Reload prompts after add/delete/rename, and ensure selection is maintained"""
         current_id = self.prompt_combo.itemData(self.prompt_combo.currentIndex())
         self._load_prompts()
@@ -71,16 +87,15 @@ class PromptPanel(QGroupBox):
                 self.prompt_combo.setCurrentIndex(0)
         self._on_prompt_combo_changed()
 
-    def get_prompt(self):
+    def get_prompt(self) -> Dict:
         return self.prompt or {}
-    
-    def get_overrides(self):
+
+    def get_overrides(self) -> Dict:
         return {
             "provider": self.provider_combo.currentText(),
             "model": self.model_combo.currentText(),
-            "max_tokens": self.prompt.get("max_tokens"),
-            "temperature": self.prompt.get("temperature")
-
+            "max_tokens": self.prompt.get("max_tokens") if self.prompt else 2000,
+            "temperature": self.prompt.get("temperature") if self.prompt else 0.7
         }
     
     def _populate_prompt_combo(self):
@@ -95,11 +110,15 @@ class PromptPanel(QGroupBox):
         self.provider_combo.addItems(provider_names)
 
     def _load_prompts(self):
-        self.prompts = load_prompts(self.prompt_style)
+        loaded_prompts = load_prompts(self.prompt_style)
+        self.prompts = loaded_prompts if isinstance(loaded_prompts, list) else []
 
     def _on_prompt_combo_changed(self):
         prompt_name = self.prompt_combo.currentText()
         if not prompt_name:
+            self.prompt = {}
+            self.provider_combo.setCurrentText("Default")
+            self.model_combo.setCurrentText("Default")
             return
         
         self.prompt = next((prompt for prompt in self.prompts if prompt["name"] == prompt_name), {})
@@ -125,8 +144,8 @@ class PromptPanel(QGroupBox):
             try:
                 models = provider.get_available_models()
                 self.model_combo.addItems(models)
-                if provider_name == self.prompt["name"]:
-                    self.model_combo.setCurrentText(self.prompt.get("model", provider.get_current_model()))
+                if self.prompt and provider_name == self.prompt.get("name"):
+                        self.model_combo.setCurrentText(self.prompt.get("model", provider.get_current_model()))
                 else:
                     self.model_combo.setCurrentText(provider.get_current_model())
             except Exception as e:

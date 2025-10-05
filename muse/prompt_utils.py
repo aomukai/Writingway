@@ -1,44 +1,21 @@
 import json
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union, Any
 
 from settings.settings_manager import WWSettingsManager
 
 def get_prompt_categories() -> List[str]:
     """Return the list of supported prompt categories."""
-    return ["Workshop", "Summary", "Prose", "Rewrite"]
-
-def get_workshop_prompts() -> List[Dict]:
-    """Load workshop prompts from the global prompts file for backward compatibility."""
-    return load_prompts("Workshop")
-
-def load_project_options(project_name: str) -> Dict:
-    """Load project options to inject dynamic values into default prompts."""
-    options = {}
-    project_settings_file = "project_settings.json"
-    filepath = WWSettingsManager.get_project_path(file=project_settings_file)
-    
-    if not os.path.exists(filepath):
-        oldpath = os.path.join(os.getcwd(), project_settings_file)
-        if os.path.exists(oldpath):
-            os.rename(oldpath, filepath)
-
-    if os.path.exists(filepath):
-        try:
-            with open(filepath, "r", encoding="utf-8") as f:
-                all_settings = json.load(f)
-            options = all_settings.get(project_name, {})
-        except Exception as e:
-            print(f"Error loading project options: {e}")
-    return options
+    return ["Workshop", "Summary", "Prose", "Rewrite", "Roleplay"]
 
 def get_default_prompt(style: str) -> Dict:
-    """Generate a default prompt configuration for the given style."""
+    """Return the default prompt configuration for the given style."""
     default_prompts = {
         "Prose": _("You are collaborating with the author to write a scene. Write the scene in {pov} point of view, from the perspective of {pov_character}, and in {tense}."),
         "Summary": _("Summarize the following chapter for use in a story prompt, covering Goal, Key Events, Character Dev, Info Revealed, Emotional Arc, and Plot Setup. Be conscientious of token usage."),
         "Rewrite": _("Rewrite the passage for clarity."),
         "Workshop": _("I need your help with my project. Please provide creative brainstorming and ideas."),
+        "Roleplay": _("You are role-playing as the character(s) described below. Stay in character, using their voice, personality, and perspective in all responses. Creatively add details about the character where appropriate, but do not deviate from the provided description unless explicitly asked.")
     }
     return {
         "name": _("Default {} Prompt").format(style),
@@ -49,7 +26,7 @@ def get_default_prompt(style: str) -> Dict:
         "id": f"default_{style.lower()}"
     }
 
-def load_prompts(style: Optional[str] = None) -> Dict[str, List[Dict]]:
+def load_prompts(style: Optional[str] = None) -> Union[Dict[str, List[Dict]], List[Dict]]:
     """Load prompts from the prompts.json file."""
     try:
         return _load_prompt_style(style)
@@ -69,7 +46,7 @@ def save_prompts(prompts_data: Dict[str, List[Dict]], prompts_file: str, backup_
         print(f"Error saving prompts: {e}")
         return False
 
-def _load_prompt_style(style: Optional[str]) -> Dict[str, List[Dict]]:
+def _load_prompt_style(style: Optional[str]) -> Union[Dict[str, List[Dict]], List[Dict]]:
     """Load prompts for a specific style or all styles from prompts.json."""
     filepath = WWSettingsManager.get_project_path(file="prompts.json")
     data = {}

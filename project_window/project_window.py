@@ -29,12 +29,11 @@ from settings.llm_api_aggregator import WWApiAggregator
 from settings.llm_worker import LLMWorker
 from settings.settings_manager import WWSettingsManager
 from settings.theme_manager import ThemeManager
-from workshop.workshop import WorkshopWindow
+from workshop.workshop_controller import WorkshopController
 from util.text_analysis_gui import TextAnalysisApp
 from util.web_llm import MainWindow
 from util.whisper_app import WhisperApp
 from util.ia_window import IAWindow
-from muse.prompts_window import PromptsWindow
 from .token_limit_dialog import TokenLimitDialog
 from gettext import pgettext
 import muse.prompt_handler as prompt_handler
@@ -890,17 +889,12 @@ class ProjectWindow(QMainWindow):
     def open_compendium(self):
         self.toggle_compendium_view(not self.side_bar.isVisible() or self.side_bar.currentWidget() != self.compendium_panel)
 
-    def open_prompts_window(self):
-        prompts_window = PromptsWindow(self.model.project_name, self)
-        prompts_window.finished.connect(self.repopulate_prompts)
-        prompts_window.exec_()
-
     def repopulate_prompts(self):
         self.bottom_stack.prose_prompt_panel.repopulate_prompts()
 
     def open_workshop(self):
-        self.workshop_window = WorkshopWindow(self)
-        self.workshop_window.show()
+        self.workshop_window = WorkshopController(self)
+        self.workshop_window.view.show()
 
     def rewrite_selected_text(self):
         cursor = self.scene_editor.editor.textCursor()

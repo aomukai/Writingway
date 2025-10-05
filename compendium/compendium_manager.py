@@ -52,6 +52,14 @@ class CompendiumManager:
             except Exception as e:
                 print(f"Error loading compendium data from {filename}: {e}")
         return {"categories": []}
+    
+    def get_category(self, category: str) -> List[Dict[str, str]]:
+        data = self.load_data()
+        categories = data.get("categories", [])
+        for cat in categories:
+            if cat.get("name") == category:
+                return cat.get("entries", [])
+        return []
 
     def get_text(self, category: str, entry: str) -> str:
         """
