@@ -1,5 +1,5 @@
 faiss-cpu
-langchain
+langchain==0.3.27
 langchain-core
 langchain-openai
 langchain-anthropic
@@ -18,7 +18,6 @@ textstat
 tiktoken
 noisereduce
 pyaudio
-whisper
 openai-whisper
 pydub
 moviepy
