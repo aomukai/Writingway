@@ -1,5 +1,6 @@
 import sys
 import logging
+import whisper
 from settings.translation_manager import TranslationManager
 from settings.settings_manager import WWSettingsManager
 
