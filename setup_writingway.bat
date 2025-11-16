@@ -12,15 +12,15 @@ title Writingway Setup
 :: -------------------------------------------------
 cd /d "%~dp0"
 
-REM Determine if this cmd.exe was launched with /c (usually Explorer/double-click)
+:: Determine if this cmd.exe was launched with /c (usually Explorer/double-click)
 echo %cmdcmdline% | find /i "/c" >nul
-set IS_CMDLINE=%errorlevel%
+set "IS_CMDLINE=%errorlevel%"
 
 :: -------------------------------------------------
 ::  Optional: require administrator privileges
 ::  (needed if winget installs system-wide)
 :: -------------------------------------------------
-if %IS_CMDLINE%==0 (
+if "%IS_CMDLINE%"=="0" (
    >nul 2>&1 net session || (
     echo In order to download Python 3.11 this setup may need
     echo to run as Administrator. If the first download fails,
@@ -56,7 +56,7 @@ pause
 goto :terminate
 
 :terminate
-if %IS_CMDLINE%==0 {
+if "%IS_CMDLINE%"=="0" (
     exit 1
 ) else (
     exit /b 1
@@ -77,7 +77,7 @@ REM -------------------------------------------------
 set "STEP=Detecting Python 3.11"
 
 py -3.11 -c "import sys; print('PY311_OK')" >nul 2>&1
-if %errorlevel%==1 (
+if errorlevel 1 (
      call :abort "py launcher missing or broken"
 )
 
@@ -85,14 +85,20 @@ for /f %%V in ('py -3.11 -c "import sys; print('PY311_OK')" 2^>nul') do if "%%V"
     echo [OK] Found Python 3.11 on the system.
     goto :create_venv
 )
-pause
+echo [..] Python 3.11 not found.
 
 REM -------------------------------------------------
 REM  2. Install Python 3.11 via winget if missing
 REM -------------------------------------------------
 set "STEP=Installing Python 3.11 via winget"
-echo [..] Python 3.11 not found – installing with winget...
-set PYLAUNCHER_ALLOW_INSTALL=TRUE
+echo [..] Python 3.11 not found – attempting to install with winget...
+set "PYLAUNCHER_ALLOW_INSTALL=TRUE"
+
+where winget >nul 2>&1 || (
+    echo winget not available; please install Python 3.11 manually or via the Microsoft Store.
+    pause
+    call :abort "winget not found"
+)
 
 winget install --id Python.Python.3.11 --exact --source winget --accept-package-agreements --accept-source-agreements -h
 if errorlevel 1 call :abort "winget install of Python 3.11 failed"
@@ -137,7 +143,13 @@ call venv\Scripts\activate || call :abort "Failed to activate venv"
 
 call :RUN "python -m pip install --upgrade pip" "Upgrading pip" "pip upgrade failed"
 call :RUN "python -m pip install --upgrade setuptools" "Upgrading setuptools" "setuptools upgrade failed"
-call :RUN "pip install -r requirements.txt" "Installing requirements" "requirements.txt install failed"
+
+if exist requirements.txt (
+    call :RUN "pip install -r requirements.txt" "Installing requirements" "requirements.txt install failed"
+) else (
+    echo No requirements.txt found — skipping dependencies install.
+)
+
 call :RUN "python -m spacy download en_core_web_sm" "spaCy model" "spaCy model download failed"
 call :RUN "python -m pip install beautifulsoup4" "BeautifulSoup4" "BeautifulSoup4 install failed"
 
@@ -147,4 +159,3 @@ echo   SETUP COMPLETE! Writingway is ready.
 echo =================================================
 pause
 exit /b 0
-
