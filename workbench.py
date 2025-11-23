@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 import random
+from typing import List
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QStackedWidget, QHBoxLayout, QVBoxLayout, QSizePolicy,
     QToolButton, QPushButton, QLabel, QMessageBox, QMenu, QFileDialog, QInputDialog
@@ -320,7 +321,7 @@ class WorkbenchWindow(QMainWindow):
         self.resize(640, 720)
         self.init_ui()
         self.apply_fixed_stylesheet()
-        self.enhanced_compendium = EnhancedCompendiumWindow()
+        self.enhanced_compendium = EnhancedCompendiumWindow(self)
         self.enhanced_compendium.hide()
         self.last_opened_project = None
         self.open_project_windows = {}
@@ -670,6 +671,11 @@ class WorkbenchWindow(QMainWindow):
         for project_name, project_window in self.open_project_windows.items():
             if project_window and project_window.isVisible():
                 project_window.change_theme(theme_name)
+                
+    def get_project_list(self) -> List[str]:
+        """ Extract a list of "name" values from the PROJECTS list of dicts """
+        project_list = [project.get("name", "Unnamed Project") for project in PROJECTS]
+        return project_list
 
 if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication

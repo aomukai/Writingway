@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt, QVariant
 from settings.theme_manager import ThemeManager
 from .focus_mode import PlainTextEdit
 from compendium.context_panel import ContextPanel
+from compendium.pov_combobox import POVComboBox
 from .summary_controller import SummaryController, SummaryMode
 from .summary_model import SummaryModel
 from muse.prompt_panel import PromptPanel
@@ -167,8 +168,10 @@ class BottomStack(QWidget):
         pulldown_layout.setContentsMargins(0, 0, 20, 0)
         pulldown_layout.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
 
+        self.pov_character_combo = POVComboBox(self.model.project_name, initial_pov=self.model.settings.get("global_pov_character", "Character"))
+        self.pov_character_combo.currentTextChanged.connect(self.handle_pov_character_change)
         self.pov_combo = self.add_combo(pulldown_layout, _("POV"), [_("First Person"), _("Third Person Limited"), _("Omniscient"), _("Custom...")], self.controller.handle_pov_change)
-        self.pov_character_combo = self.add_combo(pulldown_layout, _("POV Character"), ["Alice", "Bob", "Charlie", _("Custom...")], self.controller.handle_pov_character_change)
+        pulldown_layout.addRow(_("POV Character"), self.pov_character_combo)
         self.tense_combo = self.add_combo(pulldown_layout, _("Tense"), [_("Past Tense"), _("Present Tense"), _("Custom...")], self.controller.handle_tense_change)
         buttons_layout.addWidget(pulldown_widget)
 
@@ -196,6 +199,13 @@ class BottomStack(QWidget):
         layout.addRow(f"{label_text}:", combo)
         return combo
     
+    def handle_pov_character_change(self, text):
+        if text == _("Custom..."):
+            return
+        self.model.settings["global_pov_character"] = text
+        self.model.save_settings()
+        self.update_tooltips()
+    
     def update_tint(self, tint_color):
         self.tint_color = tint_color
         self.apply_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/save.svg", tint_color))
@@ -204,10 +214,13 @@ class BottomStack(QWidget):
         self.context_toggle_button.setIcon(ThemeManager.get_tinted_icon(
             "assets/icons/book-open.svg" if self.context_panel.isVisible() else "assets/icons/book.svg", tint_color))
         self.summary_preview_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/eye.svg", tint_color))
-        self.summary_start_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/play-circle.svg", tint_color))
+        self.summary_start_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/send.svg", tint_color))
         self.delete_summary_button.setIcon(ThemeManager.get_tinted_icon("assets/icons/trash.svg", tint_color))
+        self.update_tooltips()
+
+    def update_tooltips(self):
         if self.pov_combo:
-            self.pov_combo.setToolTip(_("POV: {}").format(self.model.settings.get('global_pov', 'Third Person')))
+            self.pov_combo.setToolTip(_("POV: {}").format(self.model.settings.get('global_pov', 'Third Person Limited')))
         if self.pov_character_combo:
             self.pov_character_combo.setToolTip(_("POV Character: {}").format(self.model.settings.get('global_pov_character', 'Character')))
         if self.tense_combo:

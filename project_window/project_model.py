@@ -5,6 +5,7 @@ import uuid
 from typing import Optional
 from PyQt5.QtCore import pyqtSignal, QObject
 from . import project_settings_manager as psm
+from compendium.compendium_manager import CompendiumManager
 from settings.settings_manager import WWSettingsManager
 from settings.autosave_manager import load_latest_autosave, save_scene, get_latest_autosave_path
 from .tree_manager import load_structure, save_structure, update_structure_from_tree, get_structure_file_path
@@ -23,6 +24,7 @@ class ProjectModel(QObject):
         self.autosave_enabled = WWSettingsManager.get_setting("general", "enable_autosave", False)
         self.unsaved_changes = False
         self.last_saved_hierarchy = None
+        self.compendium = CompendiumManager(project_name)
 
     def load_settings(self):
         settings = psm.load_project_settings(self.project_name)

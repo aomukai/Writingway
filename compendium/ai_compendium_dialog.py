@@ -583,6 +583,7 @@ class AICompendiumDialog(QDialog):
                 if cat_data["entries"]:
                     new_data["categories"].append(cat_data)
 
+            # Test to ensure we can serialize new_data. Handle exceptions if its bad.
             json.dumps(new_data)
             self.ai_compendium_data = new_data
             self.write_settings()
